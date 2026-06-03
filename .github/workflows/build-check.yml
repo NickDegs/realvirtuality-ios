@@ -1,0 +1,29 @@
+name: iOS Build Check (Syntax)
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [develop]
+
+jobs:
+  lint:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Select Xcode version
+        run: sudo xcode-select -s /Applications/Xcode_16.2.app
+
+      - name: Build for Simulator (no signing)
+        run: |
+          xcodebuild build \
+            -project RealVirtuality/RealVirtuality.xcodeproj \
+            -scheme RealVirtuality \
+            -destination 'platform=iOS Simulator,name=iPhone 16,OS=latest' \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO \
+            | xcpretty || true

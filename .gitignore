@@ -1,0 +1,35 @@
+# Xcode
+*.xcuserstate
+*.xcworkspace/xcuserdata/
+DerivedData/
+*.hmap
+*.ipa
+*.xcarchive
+build/
+.build/
+
+# Swift Package Manager
+.swiftpm/
+Packages/
+*.resolved
+
+# CocoaPods (not used but just in case)
+Pods/
+Podfile.lock
+
+# Carthage
+Carthage/Build/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+
+# Secrets
+*.p12
+*.mobileprovision
+AuthKey_*.p8
+ExportOptions.plist

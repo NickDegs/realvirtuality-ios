@@ -1,0 +1,64 @@
+/* General */
+"app_name" = "Real Virtuality";
+"ok" = "OK";
+"cancel" = "Cancel";
+"close" = "Close";
+"error" = "Error";
+"loading" = "Loading...";
+
+/* Auth */
+"login" = "Sign In";
+"register" = "Sign Up";
+"email" = "Email";
+"username" = "Username";
+"password" = "Password";
+"login_subtitle" = "Sign in to your account";
+"register_subtitle" = "Create a new account";
+"no_account" = "Don't have an account?";
+"have_account" = "Already have an account?";
+"logout" = "Sign Out";
+
+/* Home */
+"download" = "Download";
+"downloading" = "Downloading...";
+"media_url" = "Media URL";
+"url_placeholder" = "Instagram, TikTok, YouTube...";
+"supported_platforms" = "Supported Platforms";
+
+/* Download */
+"preparing" = "Preparing...";
+"download_complete" = "Download complete!";
+"download_failed" = "Download failed";
+"share_save" = "Share / Save";
+
+/* Account */
+"my_account" = "My Account";
+"subscription" = "Subscription";
+"upgrade" = "Upgrade";
+"free_plan" = "Free Plan";
+"adfree_plan" = "Ad-Free Plan";
+"full_plan" = "Full Plan";
+
+/* Subscription */
+"premium" = "Premium";
+"go_premium" = "Go Premium";
+"unlimited_download" = "Unlimited downloads from all platforms";
+"buy" = "Buy";
+"one_time" = "one-time";
+
+/* Settings */
+"settings" = "Settings";
+"quality" = "Quality";
+"best" = "Best";
+"audio_only" = "Audio Only (MP3)";
+"instagram_session" = "Private Account Login";
+"manage_plan" = "Manage Plan";
+"version" = "Version";
+"privacy_policy" = "Privacy Policy";
+"support" = "Support";
+"terms" = "Terms of Use";
+
+/* Instagram */
+"instagram_login" = "Instagram Login";
+"instagram_saved" = "Instagram session saved. You can now download private content.";
+"saving" = "Saving...";
