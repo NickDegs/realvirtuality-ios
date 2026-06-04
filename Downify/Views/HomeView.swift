@@ -79,7 +79,6 @@ struct HomeView: View {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button { showSettings = true } label: {
                         Image(systemName: "gearshape.fill")
-                            .symbolEffect(.pulse, isActive: false)
                             .foregroundStyle(.purple)
                             .padding(8)
                             .glassInput(radius: 10)

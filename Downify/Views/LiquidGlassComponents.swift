@@ -61,23 +61,22 @@ struct PrimaryButtonStyle: ButtonStyle {
             .padding(.vertical, 16)
             .fontWeight(.semibold)
             .foregroundStyle(.white)
-            .background(
-                Group {
-                    if enabled {
-                        LinearGradient(
-                            colors: [
-                                Color(red: 0.55, green: 0.18, blue: 0.90),
-                                Color(red: 0.38, green: 0.08, blue: 0.72)
-                            ],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    } else {
-                        Color(.systemGray4)
-                    }
+            .background {
+                if enabled {
+                    LinearGradient(
+                        colors: [
+                            Color(red: 0.55, green: 0.18, blue: 0.90),
+                            Color(red: 0.38, green: 0.08, blue: 0.72)
+                        ],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                    .clipShape(RoundedRectangle(cornerRadius: 16))
+                } else {
+                    Color(.systemGray4)
+                        .clipShape(RoundedRectangle(cornerRadius: 16))
                 }
-            )
-            .clipShape(RoundedRectangle(cornerRadius: 16))
+            }
             .overlay(
                 RoundedRectangle(cornerRadius: 16)
                     .stroke(Color.white.opacity(enabled ? 0.22 : 0), lineWidth: 0.7)
@@ -116,24 +115,20 @@ struct GlassPill: View {
             .padding(.horizontal, 14)
             .padding(.vertical, 8)
             .foregroundStyle(isSelected ? .white : .secondary)
-            .background(
-                Group {
-                    if isSelected {
-                        LinearGradient(
-                            colors: [
-                                Color(red: 0.55, green: 0.18, blue: 0.90),
-                                Color(red: 0.38, green: 0.08, blue: 0.72)
-                            ],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    } else {
-                        Color.clear
-                    }
-                },
-                in: Capsule()
-            )
             .background(.thinMaterial, in: Capsule())
+            .background {
+                if isSelected {
+                    LinearGradient(
+                        colors: [
+                            Color(red: 0.55, green: 0.18, blue: 0.90),
+                            Color(red: 0.38, green: 0.08, blue: 0.72)
+                        ],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                    .clipShape(Capsule())
+                }
+            }
             .overlay(
                 Capsule()
                     .stroke(Color.white.opacity(isSelected ? 0.3 : 0.12), lineWidth: 0.6)
