@@ -55,13 +55,13 @@ struct SettingsView: View {
                 "Versiyon",
                 value: Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0"
             )
-            Link(destination: URL(string: "https://realvirtuality.app/privacy")!) {
+            Link(destination: URL(string: "https://mediafy.app/privacy")!) {
                 Label("Gizlilik Politikası", systemImage: "hand.raised.fill")
             }
-            Link(destination: URL(string: "https://realvirtuality.app/support")!) {
+            Link(destination: URL(string: "https://mediafy.app/support")!) {
                 Label("Destek", systemImage: "questionmark.circle.fill")
             }
-            Link(destination: URL(string: "https://realvirtuality.app/terms")!) {
+            Link(destination: URL(string: "https://mediafy.app/terms")!) {
                 Label("Kullanım Koşulları", systemImage: "doc.text.fill")
             }
         }

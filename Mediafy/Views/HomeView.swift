@@ -69,7 +69,7 @@ struct HomeView: View {
                 }
                 .padding()
             }
-            .navigationTitle("Real Virtuality")
+            .navigationTitle("Mediafy")
             .navigationBarTitleDisplayMode(.large)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {

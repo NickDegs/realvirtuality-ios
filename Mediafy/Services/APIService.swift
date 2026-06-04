@@ -18,7 +18,7 @@ enum APIError: LocalizedError {
 
 final class APIService {
     static let shared = APIService()
-    private let baseURL = "https://api.realvirtuality.app"
+    private let baseURL = "https://api.mediafy.app"
     private let session = URLSession.shared
 
     private init() {}

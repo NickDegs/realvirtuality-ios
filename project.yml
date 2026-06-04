@@ -1,0 +1,68 @@
+name: Mediafy
+options:
+  bundleIdPrefix: app
+  deploymentTarget:
+    iOS: "16.0"
+  xcodeVersion: "16.2"
+  createIntermediateGroups: true
+
+settings:
+  base:
+    SWIFT_VERSION: "5.9"
+    TARGETED_DEVICE_FAMILY: "1"
+    IPHONEOS_DEPLOYMENT_TARGET: "16.0"
+    MARKETING_VERSION: "1.0"
+    CURRENT_PROJECT_VERSION: "1"
+
+targets:
+  Mediafy:
+    type: application
+    platform: iOS
+    bundleId: app.mediafy
+    deploymentTarget: "16.0"
+    sources:
+      - path: Mediafy
+        excludes:
+          - "**/*.entitlements"
+    resources:
+      - path: Mediafy/Resources
+    entitlements:
+      path: Mediafy/Mediafy.entitlements
+    info:
+      path: Mediafy/Info.plist
+    settings:
+      base:
+        PRODUCT_NAME: Mediafy
+        PRODUCT_BUNDLE_IDENTIFIER: app.mediafy
+        CODE_SIGN_STYLE: Automatic
+        DEVELOPMENT_TEAM: SZF4T3P583
+        INFOPLIST_FILE: Mediafy/Info.plist
+        SWIFT_OBJC_BRIDGING_HEADER: ""
+    dependencies: []
+
+  MediafyShareExtension:
+    type: app-extension
+    platform: iOS
+    bundleId: app.mediafy.share
+    deploymentTarget: "16.0"
+    sources:
+      - path: ShareExtension
+    info:
+      path: ShareExtension/Info.plist
+    settings:
+      base:
+        PRODUCT_NAME: MediafyShareExtension
+        PRODUCT_BUNDLE_IDENTIFIER: app.mediafy.share
+        CODE_SIGN_STYLE: Automatic
+        DEVELOPMENT_TEAM: SZF4T3P583
+        INFOPLIST_FILE: ShareExtension/Info.plist
+    dependencies: []
+
+schemes:
+  Mediafy:
+    build:
+      targets:
+        Mediafy: all
+        MediafyShareExtension: all
+    archive:
+      config: Release

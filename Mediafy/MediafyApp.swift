@@ -1,7 +1,7 @@
 import SwiftUI
 
 @main
-struct RealVirtualityApp: App {
+struct MediafyApp: App {
     @StateObject private var authState = AuthState()
 
     var body: some Scene {
@@ -15,7 +15,7 @@ struct RealVirtualityApp: App {
     }
 
     private func handleDeepLink(_ url: URL) {
-        guard url.scheme == "realvirtuality" else { return }
+        guard url.scheme == "mediafy" else { return }
         switch url.host {
         case "payment":
             let success = url.pathComponents.contains("success")

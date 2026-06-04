@@ -29,7 +29,7 @@ struct AuthView: View {
                 .foregroundStyle(
                     LinearGradient(colors: [.purple, .pink], startPoint: .topLeading, endPoint: .bottomTrailing)
                 )
-            Text("Real Virtuality")
+            Text("Mediafy")
                 .font(.largeTitle.bold())
             Text(isLogin ? "Hesabınıza giriş yapın" : "Yeni hesap oluşturun")
                 .foregroundColor(.secondary)
