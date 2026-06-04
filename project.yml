@@ -1,4 +1,4 @@
-name: Mediafy
+name: Downify
 options:
   bundleIdPrefix: app
   deploymentTarget:
@@ -15,35 +15,35 @@ settings:
     CURRENT_PROJECT_VERSION: "1"
 
 targets:
-  Mediafy:
+  Downify:
     type: application
     platform: iOS
-    bundleId: app.mediafy
+    bundleId: app.downify
     deploymentTarget: "16.0"
     sources:
-      - path: Mediafy
+      - path: Downify
         excludes:
           - "**/*.entitlements"
     resources:
-      - path: Mediafy/Resources
+      - path: Downify/Resources
     entitlements:
-      path: Mediafy/Mediafy.entitlements
+      path: Downify/Downify.entitlements
     info:
-      path: Mediafy/Info.plist
+      path: Downify/Info.plist
     settings:
       base:
-        PRODUCT_NAME: Mediafy
-        PRODUCT_BUNDLE_IDENTIFIER: app.mediafy
+        PRODUCT_NAME: Downify
+        PRODUCT_BUNDLE_IDENTIFIER: app.downify
         CODE_SIGN_STYLE: Automatic
         DEVELOPMENT_TEAM: SZF4T3P583
-        INFOPLIST_FILE: Mediafy/Info.plist
+        INFOPLIST_FILE: Downify/Info.plist
         SWIFT_OBJC_BRIDGING_HEADER: ""
     dependencies: []
 
-  MediafyShareExtension:
+  DownifyShareExtension:
     type: app-extension
     platform: iOS
-    bundleId: app.mediafy.share
+    bundleId: app.downify.share
     deploymentTarget: "16.0"
     sources:
       - path: ShareExtension
@@ -51,18 +51,18 @@ targets:
       path: ShareExtension/Info.plist
     settings:
       base:
-        PRODUCT_NAME: MediafyShareExtension
-        PRODUCT_BUNDLE_IDENTIFIER: app.mediafy.share
+        PRODUCT_NAME: DownifyShareExtension
+        PRODUCT_BUNDLE_IDENTIFIER: app.downify.share
         CODE_SIGN_STYLE: Automatic
         DEVELOPMENT_TEAM: SZF4T3P583
         INFOPLIST_FILE: ShareExtension/Info.plist
     dependencies: []
 
 schemes:
-  Mediafy:
+  Downify:
     build:
       targets:
-        Mediafy: all
-        MediafyShareExtension: all
+        Downify: all
+        DownifyShareExtension: all
     archive:
       config: Release

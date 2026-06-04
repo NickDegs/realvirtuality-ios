@@ -48,7 +48,7 @@ class ShareViewController: UIViewController {
 
     private func openMainApp(with urlString: String) {
         guard let encoded = urlString.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
-              let appURL = URL(string: "mediafy://share?url=\(encoded)") else {
+              let appURL = URL(string: "downify://share?url=\(encoded)") else {
             close()
             return
         }

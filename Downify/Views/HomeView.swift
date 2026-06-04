@@ -69,7 +69,7 @@ struct HomeView: View {
                 }
                 .padding()
             }
-            .navigationTitle("Mediafy")
+            .navigationTitle("Downify")
             .navigationBarTitleDisplayMode(.large)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {

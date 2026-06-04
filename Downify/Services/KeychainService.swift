@@ -3,7 +3,7 @@ import Security
 
 final class KeychainService {
     static let shared = KeychainService()
-    private let accessGroup = "app.mediafy"
+    private let accessGroup = "app.downify"
     private let tokenKey = "jwt_token"
 
     private init() {}

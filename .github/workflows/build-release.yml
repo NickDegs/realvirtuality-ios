@@ -47,10 +47,10 @@ jobs:
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
         run: |
           xcodebuild archive \
-            -project Mediafy.xcodeproj \
-            -scheme Mediafy \
+            -project Downify.xcodeproj \
+            -scheme Downify \
             -configuration Release \
-            -archivePath $RUNNER_TEMP/Mediafy.xcarchive \
+            -archivePath $RUNNER_TEMP/Downify.xcarchive \
             -destination "generic/platform=iOS" \
             -allowProvisioningUpdates \
             -authenticationKeyPath ~/.appstoreconnect/private_keys/AuthKey_${ASC_KEY_ID}.p8 \
@@ -86,7 +86,7 @@ jobs:
           ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
         run: |
           xcodebuild -exportArchive \
-            -archivePath $RUNNER_TEMP/Mediafy.xcarchive \
+            -archivePath $RUNNER_TEMP/Downify.xcarchive \
             -exportPath $RUNNER_TEMP/export \
             -exportOptionsPlist $RUNNER_TEMP/ExportOptions.plist \
             -allowProvisioningUpdates \
@@ -97,7 +97,7 @@ jobs:
       - name: Upload IPA artifact
         uses: actions/upload-artifact@v4
         with:
-          name: Mediafy-release
+          name: Downify-release
           path: ${{ runner.temp }}/export/*.ipa
           retention-days: 30
 

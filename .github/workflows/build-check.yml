@@ -20,8 +20,8 @@ jobs:
       - name: Build for Simulator (no signing)
         run: |
           xcodebuild build \
-            -project Mediafy/Mediafy.xcodeproj \
-            -scheme Mediafy \
+            -project Downify/Downify.xcodeproj \
+            -scheme Downify \
             -destination 'platform=iOS Simulator,name=iPhone 16,OS=latest' \
             CODE_SIGN_IDENTITY="" \
             CODE_SIGNING_REQUIRED=NO \

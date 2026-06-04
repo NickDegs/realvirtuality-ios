@@ -1,4 +1,4 @@
-# Mediafy — Xcode Kurulum Kılavuzu
+# Downify — Xcode Kurulum Kılavuzu
 
 ## Gereksinimler
 - macOS 13.0+
@@ -13,8 +13,8 @@
 1. Xcode → **File → New → Project**
 2. **iOS → App** seç
 3. Ayarlar:
-   - **Product Name**: `Mediafy`
-   - **Bundle Identifier**: `app.mediafy`
+   - **Product Name**: `Downify`
+   - **Bundle Identifier**: `app.downify`
    - **Interface**: SwiftUI
    - **Language**: Swift
    - **Minimum Deployments**: iOS 16.0
@@ -24,10 +24,10 @@
 
 ## 2. Dosyaları Ekle
 
-Xcode'da proje navigatöründe `Mediafy` grubuna sağ tıkla → **Add Files to "Mediafy"**:
+Xcode'da proje navigatöründe `Downify` grubuna sağ tıkla → **Add Files to "Downify"**:
 
 ```
-Mediafy/
+Downify/
 ├── Models/
 │   └── Models.swift
 ├── Services/
@@ -53,7 +53,7 @@ Mediafy/
 │   ├── en-GB.lproj/Localizable.strings
 │   ├── az.lproj/Localizable.strings
 │   └── kk.lproj/Localizable.strings
-└── MediafyApp.swift
+└── DownifyApp.swift
 ```
 
 > Xcode tarafından oluşturulan `ContentView.swift`'i sil, kendi dosyanla değiştir.
@@ -80,7 +80,7 @@ Ana uygulama `Info.plist`'ini sil, bu repodan kopyala. Veya mevcut dosyaya şunu
     <dict>
         <key>CFBundleURLSchemes</key>
         <array>
-            <string>mediafy</string>
+            <string>downify</string>
         </array>
     </dict>
 </array>
@@ -95,24 +95,24 @@ Ana uygulama `Info.plist`'ini sil, bu repodan kopyala. Veya mevcut dosyaya şunu
 1. **Signing & Capabilities** sekmesini aç
 2. Ana uygulama için:
    - **+ Capability → Keychain Sharing** ekle
-     - Grup: `app.mediafy`
+     - Grup: `app.downify`
    - **+ Capability → App Groups** ekle
-     - Grup: `group.app.mediafy`
+     - Grup: `group.app.downify`
 3. ShareExtension için:
-   - Aynı App Groups'u ekle: `group.app.mediafy`
+   - Aynı App Groups'u ekle: `group.app.downify`
 
-> `Mediafy.entitlements` dosyası otomatik oluşur; doğru değerler için repo dosyasıyla karşılaştır.
+> `Downify.entitlements` dosyası otomatik oluşur; doğru değerler için repo dosyasıyla karşılaştır.
 
 ---
 
 ## 6. Bundle ID & İmzalama
 
-**Project Navigator → Mediafy (proje) → Targets:**
+**Project Navigator → Downify (proje) → Targets:**
 
 | Target | Bundle Identifier |
 |--------|-------------------|
-| Mediafy | `app.mediafy` |
-| ShareExtension | `app.mediafy.share` |
+| Downify | `app.downify` |
+| ShareExtension | `app.downify.share` |
 
 - **Signing Team**: Apple Developer hesabını seç
 - **Automatically manage signing**: ✓
@@ -135,14 +135,14 @@ Cihazı bağla → Scheme menüsünden cihazı seç → Run
 
 1. [appstoreconnect.apple.com](https://appstoreconnect.apple.com) → **Apps → +**
 2. Bilgiler:
-   - **Name**: Mediafy
-   - **Bundle ID**: `app.mediafy`
-   - **SKU**: `mediafy001`
+   - **Name**: Downify
+   - **Bundle ID**: `app.downify`
+   - **SKU**: `downify001`
    - **Primary Language**: Turkish
 3. Gerekli URL'ler:
-   - **Privacy Policy**: `https://mediafy.app/privacy`
-   - **Support URL**: `https://mediafy.app/support`
-   - **Marketing URL**: `https://mediafy.app`
+   - **Privacy Policy**: `https://downify.app/privacy`
+   - **Support URL**: `https://downify.app/support`
+   - **Marketing URL**: `https://downify.app`
 
 ---
 
@@ -172,13 +172,13 @@ STRIPE_WEBHOOK_SECRET=whsec_...
 ## 10. Stripe Yapılandırması
 
 [Stripe Dashboard](https://dashboard.stripe.com) → Webhooks:
-- Endpoint URL: `https://api.mediafy.app/subscription/webhook`
+- Endpoint URL: `https://api.downify.app/subscription/webhook`
 - Events:
   - `checkout.session.completed`
   - `customer.subscription.deleted`
 
-Success URL: `mediafy://payment/success`
-Cancel URL: `mediafy://payment/cancel`
+Success URL: `downify://payment/success`
+Cancel URL: `downify://payment/cancel`
 
 ---
 
@@ -197,5 +197,5 @@ Cancel URL: `mediafy://payment/cancel`
 
 - Sıfır üçüncü parti bağımlılık — SPM/CocoaPods kullanılmamıştır
 - Stripe ödemesi SFSafariViewController ile hosted checkout kullanır
-- Share Extension → Uygulama iletişimi: `mediafy://share?url=<encoded>`
-- Keychain paylaşımı: `app.mediafy` grubu (hem uygulama hem extension erişir)
+- Share Extension → Uygulama iletişimi: `downify://share?url=<encoded>`
+- Keychain paylaşımı: `app.downify` grubu (hem uygulama hem extension erişir)

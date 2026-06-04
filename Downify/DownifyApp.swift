@@ -1,7 +1,7 @@
 import SwiftUI
 
 @main
-struct MediafyApp: App {
+struct DownifyApp: App {
     @StateObject private var authState = AuthState()
 
     var body: some Scene {
@@ -15,7 +15,7 @@ struct MediafyApp: App {
     }
 
     private func handleDeepLink(_ url: URL) {
-        guard url.scheme == "mediafy" else { return }
+        guard url.scheme == "downify" else { return }
         switch url.host {
         case "payment":
             let success = url.pathComponents.contains("success")
