@@ -62,5 +62,7 @@
 	</array>
 	<key>UIAppFonts</key>
 	<array/>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 </dict>
 </plist>
