@@ -62,19 +62,27 @@ struct HomeView: View {
 
     private var downloadTab: some View {
         NavigationStack {
-            ScrollView {
-                VStack(spacing: 20) {
-                    modeSelector
-                    modeContent
+            ZStack {
+                AppBackground()
+                ScrollView {
+                    VStack(spacing: 20) {
+                        modeSelector
+                        modeContent
+                    }
+                    .padding(.horizontal)
+                    .padding(.bottom, 24)
                 }
-                .padding()
             }
             .navigationTitle("Downify")
             .navigationBarTitleDisplayMode(.large)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button { showSettings = true } label: {
-                        Image(systemName: "gearshape")
+                        Image(systemName: "gearshape.fill")
+                            .symbolEffect(.pulse, isActive: false)
+                            .foregroundStyle(.purple)
+                            .padding(8)
+                            .glassInput(radius: 10)
                     }
                 }
             }
@@ -85,27 +93,20 @@ struct HomeView: View {
 
     private var modeSelector: some View {
         ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 10) {
+            HStack(spacing: 8) {
                 ForEach(DownloadMode.allCases) { mode in
-                    Button {
-                        withAnimation(.spring(response: 0.3)) {
+                    GlassPill(
+                        mode.rawValue,
+                        icon: mode.icon,
+                        isSelected: downloadMode == mode
+                    ) {
+                        withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
                             downloadMode = mode
                         }
-                    } label: {
-                        HStack(spacing: 6) {
-                            Image(systemName: mode.icon)
-                                .font(.caption.bold())
-                            Text(mode.rawValue)
-                                .font(.caption.bold())
-                        }
-                        .padding(.horizontal, 14)
-                        .padding(.vertical, 8)
-                        .background(downloadMode == mode ? Color.purple : Color(.systemGray6))
-                        .foregroundColor(downloadMode == mode ? .white : .secondary)
-                        .cornerRadius(20)
                     }
                 }
             }
+            .padding(.vertical, 4)
         }
     }
 
@@ -114,24 +115,19 @@ struct HomeView: View {
     @ViewBuilder
     private var modeContent: some View {
         switch downloadMode {
-        case .single:
-            singleDownloadSection
-        case .clip:
-            ClipView()
-        case .gif:
-            ClipView()
-        case .subtitles:
-            SubtitleView()
-        case .keyMoments:
-            KeyMomentsView()
+        case .single:    singleDownloadSection
+        case .clip:      ClipView()
+        case .gif:       ClipView()
+        case .subtitles: SubtitleView()
+        case .keyMoments: KeyMomentsView()
         }
     }
 
     // MARK: - Single Download
 
     private var singleDownloadSection: some View {
-        VStack(spacing: 20) {
-            urlInputSection
+        VStack(spacing: 16) {
+            urlInputCard
             optionsBar
             if let task = downloadTask {
                 DownloadProgressView(taskId: task.taskId) {
@@ -151,81 +147,69 @@ struct HomeView: View {
         }
     }
 
-    private var urlInputSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text("Medya URL'si")
-                .font(.headline)
+    private var urlInputCard: some View {
+        VStack(spacing: 14) {
+            HStack(spacing: 10) {
+                Image(systemName: "link")
+                    .foregroundStyle(.purple)
+                    .frame(width: 20)
 
-            HStack(spacing: 8) {
                 TextField("Instagram, TikTok, YouTube...", text: $urlText)
-                    .textFieldStyle(.plain)
                     .keyboardType(.URL)
                     .autocorrectionDisabled()
                     .textInputAutocapitalization(.never)
-                    .padding(12)
-                    .background(Color(.systemGray6))
-                    .cornerRadius(10)
 
-                Button {
-                    urlText = UIPasteboard.general.string ?? ""
-                } label: {
-                    Image(systemName: "doc.on.clipboard")
-                        .padding(12)
-                        .background(Color(.systemGray6))
-                        .cornerRadius(10)
+                if !urlText.isEmpty {
+                    Button {
+                        withAnimation { urlText = "" }
+                    } label: {
+                        Image(systemName: "xmark.circle.fill")
+                            .foregroundStyle(.secondary)
+                    }
+                } else {
+                    Button {
+                        urlText = UIPasteboard.general.string ?? ""
+                    } label: {
+                        Image(systemName: "doc.on.clipboard")
+                            .foregroundStyle(.purple)
+                    }
                 }
             }
+            .padding(14)
+            .glassInput()
 
             Button {
                 Task { await startDownload() }
             } label: {
-                HStack {
+                HStack(spacing: 8) {
                     if isDownloading {
-                        ProgressView().tint(.white)
+                        ProgressView().tint(.white).scaleEffect(0.85)
                     } else {
                         Image(systemName: "arrow.down.circle.fill")
+                            .font(.body.bold())
                     }
                     Text(isDownloading ? "İndiriliyor..." : "İndir")
-                        .fontWeight(.semibold)
                 }
-                .frame(maxWidth: .infinity)
-                .padding()
-                .background(urlText.isEmpty ? Color.gray : Color.purple)
-                .foregroundColor(.white)
-                .cornerRadius(12)
             }
+            .buttonStyle(PrimaryButtonStyle(enabled: !urlText.isEmpty && !isDownloading))
             .disabled(urlText.isEmpty || isDownloading)
         }
+        .padding(16)
+        .glassCard()
     }
 
     private var optionsBar: some View {
-        HStack(spacing: 12) {
-            Button { removeWatermark.toggle() } label: {
-                HStack(spacing: 4) {
-                    Image(systemName: removeWatermark ? "checkmark.seal.fill" : "seal")
-                        .foregroundColor(removeWatermark ? .purple : .secondary)
-                    Text("Watermark'sız")
-                        .font(.caption.bold())
-                        .foregroundColor(removeWatermark ? .purple : .secondary)
-                }
-                .padding(.horizontal, 10)
-                .padding(.vertical, 6)
-                .background(removeWatermark ? Color.purple.opacity(0.1) : Color(.systemGray6))
-                .cornerRadius(8)
+        HStack(spacing: 8) {
+            GlassPill("Watermark'sız",
+                      icon: removeWatermark ? "checkmark.seal.fill" : "seal",
+                      isSelected: removeWatermark) {
+                removeWatermark.toggle()
             }
 
-            Button { audioOnly.toggle() } label: {
-                HStack(spacing: 4) {
-                    Image(systemName: audioOnly ? "music.note" : "video")
-                        .foregroundColor(audioOnly ? .purple : .secondary)
-                    Text(audioOnly ? "MP3" : "Video")
-                        .font(.caption.bold())
-                        .foregroundColor(audioOnly ? .purple : .secondary)
-                }
-                .padding(.horizontal, 10)
-                .padding(.vertical, 6)
-                .background(audioOnly ? Color.purple.opacity(0.1) : Color(.systemGray6))
-                .cornerRadius(8)
+            GlassPill(audioOnly ? "MP3" : "Video",
+                      icon: audioOnly ? "music.note" : "video",
+                      isSelected: audioOnly) {
+                audioOnly.toggle()
             }
 
             Spacer()
@@ -235,35 +219,42 @@ struct HomeView: View {
                     Button(q == "best" ? "En İyi" : "\(q)p") { defaultQuality = q }
                 }
             } label: {
-                HStack(spacing: 4) {
+                HStack(spacing: 5) {
                     Image(systemName: "slider.horizontal.3")
                     Text(defaultQuality == "best" ? "En İyi" : "\(defaultQuality)p")
                 }
                 .font(.caption.bold())
-                .foregroundColor(.secondary)
-                .padding(.horizontal, 10)
-                .padding(.vertical, 6)
-                .background(Color(.systemGray6))
-                .cornerRadius(8)
+                .foregroundStyle(.secondary)
+                .padding(.horizontal, 12)
+                .padding(.vertical, 8)
+                .background(.thinMaterial, in: Capsule())
+                .overlay(Capsule().stroke(Color.white.opacity(0.12), lineWidth: 0.6))
             }
         }
     }
 
     private var platformChips: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 10) {
             Text("Desteklenen Platformlar")
                 .font(.caption)
-                .foregroundColor(.secondary)
+                .foregroundStyle(.secondary)
+                .padding(.horizontal, 4)
+
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 8) {
-                    ForEach(["Instagram", "TikTok", "YouTube", "Twitter/X", "Facebook",
-                             "Reddit", "Twitch", "Vimeo", "Pinterest", "1000+"], id: \.self) { platform in
+                    ForEach(["Instagram", "TikTok", "YouTube", "Twitter/X",
+                             "Facebook", "Reddit", "Twitch", "Vimeo",
+                             "Pinterest", "1000+"], id: \.self) { platform in
                         Text(platform)
-                            .font(.caption)
-                            .padding(.horizontal, 10)
-                            .padding(.vertical, 6)
-                            .background(Color(.systemGray6))
-                            .cornerRadius(8)
+                            .font(.caption.bold())
+                            .foregroundStyle(.purple)
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 7)
+                            .background(.thinMaterial, in: Capsule())
+                            .overlay(
+                                Capsule()
+                                    .stroke(Color.purple.opacity(0.25), lineWidth: 0.7)
+                            )
                     }
                 }
             }
@@ -274,22 +265,29 @@ struct HomeView: View {
 
     private var moreTab: some View {
         NavigationStack {
-            List {
-                NavigationLink {
-                    AutoDownloadView()
-                } label: {
-                    Label("Otomatik İndirme", systemImage: "clock.arrow.2.circlepath")
+            ZStack {
+                AppBackground()
+                List {
+                    NavigationLink {
+                        AutoDownloadView()
+                    } label: {
+                        Label("Otomatik İndirme", systemImage: "clock.arrow.2.circlepath")
+                            .foregroundStyle(.primary)
+                    }
+                    NavigationLink {
+                        ScheduledDownloadView()
+                    } label: {
+                        Label("Planlı İndirmeler", systemImage: "calendar.badge.clock")
+                            .foregroundStyle(.primary)
+                    }
+                    NavigationLink {
+                        CollectionView()
+                    } label: {
+                        Label("Koleksiyonlar", systemImage: "rectangle.stack.fill")
+                            .foregroundStyle(.primary)
+                    }
                 }
-                NavigationLink {
-                    ScheduledDownloadView()
-                } label: {
-                    Label("Planlı İndirmeler", systemImage: "calendar.badge.clock")
-                }
-                NavigationLink {
-                    CollectionView()
-                } label: {
-                    Label("Koleksiyonlar", systemImage: "rectangle.stack.fill")
-                }
+                .scrollContentBackground(.hidden)
             }
             .navigationTitle("Daha Fazla")
         }

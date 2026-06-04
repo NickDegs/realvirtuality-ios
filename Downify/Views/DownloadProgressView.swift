@@ -10,80 +10,92 @@ struct DownloadProgressView: View {
         VStack(spacing: 16) {
             if let status = status {
                 switch status.status {
-                case "completed":
-                    completedView(status)
-                case "failed":
-                    failedView(status)
-                default:
-                    progressView(status)
+                case "completed": completedView(status)
+                case "failed":    failedView(status)
+                default:          progressView(status)
                 }
             } else {
                 HStack(spacing: 12) {
-                    ProgressView()
+                    ProgressView().tint(.purple)
                     Text("Hazırlanıyor...")
-                        .foregroundColor(.secondary)
+                        .foregroundStyle(.secondary)
                 }
-                .padding()
+                .padding(.vertical, 8)
             }
         }
-        .padding()
-        .background(Color(.systemGray6))
-        .cornerRadius(16)
+        .padding(20)
+        .glassCard()
         .task { await pollStatus() }
     }
 
     private func progressView(_ status: DownloadStatus) -> some View {
-        VStack(spacing: 8) {
+        VStack(spacing: 10) {
             HStack {
-                Text("İndiriliyor")
-                    .fontWeight(.medium)
+                HStack(spacing: 6) {
+                    Image(systemName: "arrow.down.circle")
+                        .foregroundStyle(.purple)
+                    Text("İndiriliyor")
+                        .fontWeight(.medium)
+                }
                 Spacer()
                 Text("\(Int((status.progress ?? 0) * 100))%")
-                    .foregroundColor(.secondary)
+                    .font(.subheadline.bold())
+                    .foregroundStyle(.purple)
             }
             ProgressView(value: status.progress ?? 0)
                 .tint(.purple)
+                .scaleEffect(y: 1.4)
         }
     }
 
     @ViewBuilder
     private func completedView(_ status: DownloadStatus) -> some View {
-        VStack(spacing: 12) {
-            Image(systemName: "checkmark.circle.fill")
-                .font(.largeTitle)
-                .foregroundColor(.green)
+        VStack(spacing: 14) {
+            ZStack {
+                Circle()
+                    .fill(Color.green.opacity(0.15))
+                    .frame(width: 56, height: 56)
+                Image(systemName: "checkmark.circle.fill")
+                    .font(.system(size: 32))
+                    .foregroundStyle(.green)
+            }
             Text("İndirme tamamlandı!")
                 .fontWeight(.semibold)
+
             if let urlStr = status.downloadUrl, let url = URL(string: urlStr) {
                 ShareLink(item: url) {
                     Label("Paylaş / Kaydet", systemImage: "square.and.arrow.up")
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(Color.purple)
-                        .foregroundColor(.white)
-                        .cornerRadius(12)
                 }
+                .buttonStyle(PrimaryButtonStyle())
             }
+
             Button("Kapat", action: onDismiss)
-                .foregroundColor(.secondary)
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
         }
     }
 
     private func failedView(_ status: DownloadStatus) -> some View {
-        VStack(spacing: 12) {
-            Image(systemName: "xmark.circle.fill")
-                .font(.largeTitle)
-                .foregroundColor(.red)
+        VStack(spacing: 14) {
+            ZStack {
+                Circle()
+                    .fill(Color.red.opacity(0.12))
+                    .frame(width: 56, height: 56)
+                Image(systemName: "xmark.circle.fill")
+                    .font(.system(size: 32))
+                    .foregroundStyle(.red)
+            }
             Text("İndirme başarısız")
                 .fontWeight(.semibold)
             if let error = status.error {
                 Text(error)
                     .font(.caption)
-                    .foregroundColor(.secondary)
+                    .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
             }
             Button("Kapat", action: onDismiss)
-                .foregroundColor(.secondary)
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
         }
     }
 

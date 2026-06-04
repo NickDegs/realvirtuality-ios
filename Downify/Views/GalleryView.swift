@@ -12,27 +12,37 @@ struct GalleryView: View {
 
     var body: some View {
         NavigationStack {
-            Group {
-                if isLoading && items.isEmpty {
-                    ProgressView()
-                } else if items.isEmpty {
-                    emptyState
-                } else {
-                    ScrollView {
-                        LazyVGrid(columns: columns, spacing: 12) {
-                            ForEach(items) { item in
-                                GalleryItemCard(item: item)
-                                    .onTapGesture { selectedItem = item }
-                                    .onAppear {
-                                        if item.id == items.last?.id && hasMore {
-                                            Task { await loadMore() }
-                                        }
-                                    }
-                            }
+            ZStack {
+                AppBackground()
+                Group {
+                    if isLoading && items.isEmpty {
+                        VStack(spacing: 14) {
+                            ProgressView().tint(.purple)
+                            Text("Yükleniyor...")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
                         }
-                        .padding()
-                        if isLoading {
-                            ProgressView().padding()
+                    } else if items.isEmpty {
+                        emptyState
+                    } else {
+                        ScrollView {
+                            LazyVGrid(columns: columns, spacing: 12) {
+                                ForEach(items) { item in
+                                    GalleryItemCard(item: item)
+                                        .onTapGesture { selectedItem = item }
+                                        .onAppear {
+                                            if item.id == items.last?.id && hasMore {
+                                                Task { await loadMore() }
+                                            }
+                                        }
+                                }
+                            }
+                            .padding(.horizontal)
+                            .padding(.top, 8)
+
+                            if isLoading {
+                                ProgressView().tint(.purple).padding()
+                            }
                         }
                     }
                 }
@@ -47,15 +57,20 @@ struct GalleryView: View {
     }
 
     private var emptyState: some View {
-        VStack(spacing: 16) {
-            Image(systemName: "photo.stack")
-                .font(.system(size: 60))
-                .foregroundColor(.secondary)
+        VStack(spacing: 20) {
+            ZStack {
+                Circle()
+                    .fill(Color.purple.opacity(0.12))
+                    .frame(width: 90, height: 90)
+                Image(systemName: "photo.stack")
+                    .font(.system(size: 38))
+                    .foregroundStyle(.purple.opacity(0.7))
+            }
             Text("Henüz indirme yok")
                 .font(.headline)
             Text("İndirdiğiniz içerikler burada görünecek")
                 .font(.subheadline)
-                .foregroundColor(.secondary)
+                .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
         }
         .padding()
@@ -96,9 +111,9 @@ struct GalleryItemCard: View {
     let item: DownloadHistoryItem
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 6) {
-            ZStack {
-                RoundedRectangle(cornerRadius: 10)
+        VStack(alignment: .leading, spacing: 8) {
+            ZStack(alignment: .topLeading) {
+                RoundedRectangle(cornerRadius: 12)
                     .fill(Color(.systemGray5))
                     .aspectRatio(16/9, contentMode: .fit)
 
@@ -108,37 +123,49 @@ struct GalleryItemCard: View {
                     } placeholder: {
                         Image(systemName: "play.rectangle.fill")
                             .font(.largeTitle)
-                            .foregroundColor(.secondary)
+                            .foregroundStyle(.tertiary)
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
                     }
-                    .clipShape(RoundedRectangle(cornerRadius: 10))
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
                 } else {
                     Image(systemName: "play.rectangle.fill")
                         .font(.largeTitle)
-                        .foregroundColor(.secondary)
+                        .foregroundStyle(.tertiary)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
                 }
 
                 if let platform = item.platform {
                     Text(platform)
                         .font(.caption2.bold())
-                        .padding(.horizontal, 6)
+                        .foregroundStyle(.white)
+                        .padding(.horizontal, 7)
                         .padding(.vertical, 3)
-                        .background(Color.purple)
-                        .foregroundColor(.white)
-                        .cornerRadius(4)
-                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-                        .padding(6)
+                        .background(
+                            LinearGradient(
+                                colors: [Color(red: 0.55, green: 0.18, blue: 0.90),
+                                         Color(red: 0.38, green: 0.08, blue: 0.72)],
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            ),
+                            in: Capsule()
+                        )
+                        .padding(8)
                 }
             }
 
-            Text(item.filename)
-                .font(.caption)
-                .lineLimit(2)
-                .foregroundColor(.primary)
+            VStack(alignment: .leading, spacing: 3) {
+                Text(item.filename)
+                    .font(.caption.bold())
+                    .lineLimit(2)
 
-            Text(formatDate(item.completedAt))
-                .font(.caption2)
-                .foregroundColor(.secondary)
+                Text(formatDate(item.completedAt))
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+            }
+            .padding(.horizontal, 4)
+            .padding(.bottom, 4)
         }
+        .glassCard(radius: 14)
     }
 
     private func formatDate(_ str: String) -> String {
@@ -157,49 +184,53 @@ struct GalleryDetailView: View {
 
     var body: some View {
         NavigationStack {
-            VStack(spacing: 24) {
-                if let thumb = item.thumbnailUrl, let url = URL(string: thumb) {
-                    AsyncImage(url: url) { image in
-                        image.resizable().scaledToFit()
-                    } placeholder: {
-                        Rectangle().fill(Color(.systemGray5))
-                    }
-                    .frame(maxHeight: 250)
-                    .cornerRadius(12)
-                }
-
-                VStack(alignment: .leading, spacing: 8) {
-                    Text(item.filename)
-                        .font(.headline)
-                    if let size = item.fileSize {
-                        Text(formatSize(size))
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                    }
-                }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.horizontal)
-
-                VStack(spacing: 12) {
-                    if let url = URL(string: item.downloadUrl) {
-                        ShareLink(item: url) {
-                            Label("Paylaş / Kaydet", systemImage: "square.and.arrow.up")
-                                .frame(maxWidth: .infinity)
-                                .padding()
-                                .background(Color.purple)
-                                .foregroundColor(.white)
-                                .cornerRadius(12)
+            ZStack {
+                AppBackground()
+                ScrollView {
+                    VStack(spacing: 20) {
+                        if let thumb = item.thumbnailUrl, let url = URL(string: thumb) {
+                            AsyncImage(url: url) { image in
+                                image.resizable().scaledToFit()
+                            } placeholder: {
+                                Rectangle()
+                                    .fill(Color(.systemGray5))
+                                    .overlay(ProgressView().tint(.purple))
+                            }
+                            .frame(maxHeight: 260)
+                            .clipShape(RoundedRectangle(cornerRadius: 16))
+                            .shadow(color: .black.opacity(0.2), radius: 12, y: 6)
                         }
-                        .padding(.horizontal)
 
-                        CloudSaveButton(downloadURL: url, filename: item.filename)
-                            .padding(.horizontal)
+                        VStack(alignment: .leading, spacing: 6) {
+                            Text(item.filename)
+                                .font(.headline)
+                            if let size = item.fileSize {
+                                Text(formatSize(size))
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(16)
+                        .glassCard()
+
+                        if let url = URL(string: item.downloadUrl) {
+                            VStack(spacing: 12) {
+                                ShareLink(item: url) {
+                                    Label("Paylaş / Kaydet", systemImage: "square.and.arrow.up")
+                                }
+                                .buttonStyle(PrimaryButtonStyle())
+
+                                CloudSaveButton(downloadURL: url, filename: item.filename)
+                            }
+                        }
+
+                        Spacer(minLength: 20)
                     }
+                    .padding(.horizontal)
+                    .padding(.top, 16)
                 }
-
-                Spacer()
             }
-            .padding(.top)
             .navigationTitle("Detay")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
