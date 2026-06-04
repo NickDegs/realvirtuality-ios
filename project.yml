@@ -38,6 +38,11 @@ targets:
         DEVELOPMENT_TEAM: SZF4T3P583
         INFOPLIST_FILE: Downify/Info.plist
         SWIFT_OBJC_BRIDGING_HEADER: ""
+      configs:
+        Release:
+          CODE_SIGN_STYLE: Manual
+          CODE_SIGN_IDENTITY: "Apple Distribution"
+          PROVISIONING_PROFILE_SPECIFIER: "Downify AppStore Distribution"
     dependencies: []
 
   DownifyShareExtension:
@@ -56,6 +61,11 @@ targets:
         CODE_SIGN_STYLE: Automatic
         DEVELOPMENT_TEAM: SZF4T3P583
         INFOPLIST_FILE: ShareExtension/Info.plist
+      configs:
+        Release:
+          CODE_SIGN_STYLE: Manual
+          CODE_SIGN_IDENTITY: "Apple Distribution"
+          PROVISIONING_PROFILE_SPECIFIER: "DownifyShare AppStore Distribution"
     dependencies: []
 
 schemes:
