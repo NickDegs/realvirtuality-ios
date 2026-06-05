@@ -266,7 +266,8 @@ struct AuthView: View {
                 await authState.loginWithApple(identityToken: token, fullName: fullName.isEmpty ? nil : fullName)
             }
         case .failure(let error):
-            if (error as NSError).code != ASAuthorizationError.canceled.rawValue {
+            let nsErr = error as NSError
+            if nsErr.domain != ASAuthorizationErrorDomain || nsErr.code != ASAuthorizationError.Code.canceled.rawValue {
                 authState.error = error.localizedDescription
             }
         }
@@ -277,13 +278,15 @@ struct AuthView: View {
               let rootVC = scene.windows.first?.rootViewController else { return }
         GIDSignIn.sharedInstance.signIn(withPresenting: rootVC) { result, error in
             if let error {
-                if (error as NSError).code != GIDSignInError.canceled.rawValue {
-                    authState.error = error.localizedDescription
+                let nsErr = error as NSError
+                let isCanceled = nsErr.domain == "com.google.GIDSignIn" && nsErr.code == -5
+                if !isCanceled {
+                    DispatchQueue.main.async { self.authState.error = error.localizedDescription }
                 }
                 return
             }
             guard let idToken = result?.user.idToken?.tokenString else { return }
-            Task { await authState.loginWithGoogle(idToken: idToken) }
+            Task { await self.authState.loginWithGoogle(idToken: idToken) }
         }
     }
 }
