@@ -60,6 +60,10 @@ targets:
     dependencies:
       - package: GoogleMobileAds
         product: GoogleMobileAds
+      - package: GoogleSignIn
+        product: GoogleSignIn
+      - package: GoogleSignIn
+        product: GoogleSignInSwift
 
   DownifyShareExtension:
     type: app-extension
@@ -89,6 +93,9 @@ packages:
   GoogleMobileAds:
     url: https://github.com/googleads/swift-package-manager-google-mobile-ads
     from: "11.0.0"
+  GoogleSignIn:
+    url: https://github.com/google/GoogleSignIn-iOS
+    from: "8.0.0"
 
 schemes:
   Downify:

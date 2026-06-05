@@ -6,9 +6,9 @@
 	<array>
 		<string>$(AppIdentifierPrefix)app.downify</string>
 	</array>
-	<key>com.apple.security.application-groups</key>
+	<key>com.apple.developer.applesignin</key>
 	<array>
-		<string>group.app.downify</string>
+		<string>Default</string>
 	</array>
 </dict>
 </plist>

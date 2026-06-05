@@ -51,6 +51,16 @@ final class APIService {
 
     // MARK: - Auth
 
+    func loginWithApple(identityToken: String, fullName: String?) async throws -> AuthResponse {
+        struct Body: Encodable { let identityToken: String; let fullName: String? }
+        return try await request("/auth/apple", method: "POST", body: Body(identityToken: identityToken, fullName: fullName))
+    }
+
+    func loginWithGoogle(idToken: String) async throws -> AuthResponse {
+        struct Body: Encodable { let idToken: String }
+        return try await request("/auth/google", method: "POST", body: Body(idToken: idToken))
+    }
+
     func login(email: String, password: String) async throws -> AuthResponse {
         struct Body: Encodable { let email, password: String }
         return try await request("/auth/login", method: "POST", body: Body(email: email, password: password))

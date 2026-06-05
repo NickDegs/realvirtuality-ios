@@ -1,4 +1,7 @@
 import SwiftUI
+import AuthenticationServices
+import GoogleSignIn
+import GoogleSignInSwift
 
 struct AuthView: View {
     @EnvironmentObject var authState: AuthState
@@ -10,7 +13,6 @@ struct AuthView: View {
     var body: some View {
         ZStack {
             AppBackground()
-            // Extra purple glow at top
             RadialGradient(
                 colors: [Color.purple.opacity(0.35), Color.clear],
                 center: .top,
@@ -20,8 +22,10 @@ struct AuthView: View {
             .ignoresSafeArea()
 
             ScrollView {
-                VStack(spacing: 28) {
+                VStack(spacing: 24) {
                     header
+                    socialButtons
+                    divider
                     formCard
                     actionButton
                     toggleSection
@@ -73,6 +77,63 @@ struct AuthView: View {
             Text(isLogin ? "Hesabınıza giriş yapın" : "Yeni hesap oluşturun")
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
+        }
+    }
+
+    // MARK: - Social Buttons
+
+    private var socialButtons: some View {
+        VStack(spacing: 12) {
+            SignInWithAppleButton(
+                isLogin ? .signIn : .signUp,
+                onRequest: { request in
+                    request.requestedScopes = [.fullName, .email]
+                },
+                onCompletion: { result in
+                    handleAppleSignIn(result)
+                }
+            )
+            .signInWithAppleButtonStyle(.whiteOutline)
+            .frame(height: 50)
+            .clipShape(RoundedRectangle(cornerRadius: 13))
+
+            Button {
+                handleGoogleSignIn()
+            } label: {
+                HStack(spacing: 10) {
+                    Image("google_logo")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 20, height: 20)
+                    Text(isLogin ? "Google ile Giriş Yap" : "Google ile Kayıt Ol")
+                        .font(.system(size: 16, weight: .medium))
+                        .foregroundStyle(.primary)
+                }
+                .frame(maxWidth: .infinity)
+                .frame(height: 50)
+                .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 13))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 13)
+                        .stroke(Color.white.opacity(0.2), lineWidth: 0.8)
+                )
+            }
+            .disabled(authState.isLoading)
+        }
+    }
+
+    // MARK: - Divider
+
+    private var divider: some View {
+        HStack(spacing: 12) {
+            Rectangle()
+                .fill(Color.white.opacity(0.15))
+                .frame(height: 0.5)
+            Text("veya")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+            Rectangle()
+                .fill(Color.white.opacity(0.15))
+                .frame(height: 0.5)
         }
     }
 
@@ -187,6 +248,42 @@ struct AuthView: View {
             }
             .font(.subheadline)
             .foregroundStyle(.secondary)
+        }
+    }
+
+    // MARK: - Social Auth Handlers
+
+    private func handleAppleSignIn(_ result: Result<ASAuthorization, Error>) {
+        switch result {
+        case .success(let auth):
+            guard let credential = auth.credential as? ASAuthorizationAppleIDCredential,
+                  let tokenData = credential.identityToken,
+                  let token = String(data: tokenData, encoding: .utf8) else { return }
+            let fullName = [credential.fullName?.givenName, credential.fullName?.familyName]
+                .compactMap { $0 }
+                .joined(separator: " ")
+            Task {
+                await authState.loginWithApple(identityToken: token, fullName: fullName.isEmpty ? nil : fullName)
+            }
+        case .failure(let error):
+            if (error as NSError).code != ASAuthorizationError.canceled.rawValue {
+                authState.error = error.localizedDescription
+            }
+        }
+    }
+
+    private func handleGoogleSignIn() {
+        guard let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+              let rootVC = scene.windows.first?.rootViewController else { return }
+        GIDSignIn.sharedInstance.signIn(withPresenting: rootVC) { result, error in
+            if let error {
+                if (error as NSError).code != GIDSignInError.canceled.rawValue {
+                    authState.error = error.localizedDescription
+                }
+                return
+            }
+            guard let idToken = result?.user.idToken?.tokenString else { return }
+            Task { await authState.loginWithGoogle(idToken: idToken) }
         }
     }
 }
