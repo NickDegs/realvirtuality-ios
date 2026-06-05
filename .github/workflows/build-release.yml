@@ -17,9 +17,9 @@ permissions:
 
 # ─── Simulator matrix — her model için en uygun Xcode ───────────────────────
 # Güncelleme tarihi: 2026-06-05
-# iPhone 16 serisi (iOS 19 / Xcode 26.x)
-# iPhone 15 serisi (iOS 18 / Xcode 16.x) — geriye dönük uyumluluk
-# iPad Pro M4 (iPadOS 19 / Xcode 26.x)
+# iPhone 17 serisi (iOS 19 / Xcode 26.x) — en güncel, Eylül 2025 çıkış
+# iPhone 16 serisi (iOS 18 / Xcode 16.x) — geriye dönük uyumluluk
+# iPad Pro M4 / iPad Air M2 (iPadOS 19 / Xcode 26.x)
 # ─────────────────────────────────────────────────────────────────────────────
 
 jobs:
@@ -32,29 +32,29 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          # iPhone 16 serisi — Xcode 26
+          # iPhone 17 serisi — Xcode 26 (en güncel)
+          - device: "iPhone 17 Pro Max"
+            os: "19.0"
+            xcode: "26.3"
+            xcode_path: "/Applications/Xcode_26.3.app"
+          - device: "iPhone 17 Pro"
+            os: "19.0"
+            xcode: "26.3"
+            xcode_path: "/Applications/Xcode_26.3.app"
+          - device: "iPhone 17 Air"
+            os: "19.0"
+            xcode: "26.3"
+            xcode_path: "/Applications/Xcode_26.3.app"
+          - device: "iPhone 17"
+            os: "19.0"
+            xcode: "26.3"
+            xcode_path: "/Applications/Xcode_26.3.app"
+          # iPhone 16 serisi — Xcode 16 (geriye uyumluluk)
           - device: "iPhone 16 Pro Max"
-            os: "19.0"
-            xcode: "26.3"
-            xcode_path: "/Applications/Xcode_26.3.app"
-          - device: "iPhone 16 Pro"
-            os: "19.0"
-            xcode: "26.3"
-            xcode_path: "/Applications/Xcode_26.3.app"
-          - device: "iPhone 16 Plus"
-            os: "19.0"
-            xcode: "26.3"
-            xcode_path: "/Applications/Xcode_26.3.app"
-          - device: "iPhone 16"
-            os: "19.0"
-            xcode: "26.3"
-            xcode_path: "/Applications/Xcode_26.3.app"
-          # iPhone 15 serisi — Xcode 16 (geriye uyumluluk)
-          - device: "iPhone 15 Pro Max"
             os: "18.5"
             xcode: "16.3"
             xcode_path: "/Applications/Xcode_16.3.app"
-          - device: "iPhone 15"
+          - device: "iPhone 16"
             os: "18.5"
             xcode: "16.3"
             xcode_path: "/Applications/Xcode_16.3.app"

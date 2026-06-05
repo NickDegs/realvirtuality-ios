@@ -15,9 +15,11 @@ class AdManager: ObservableObject {
     private init() {}
 
     func initialize() {
-        MobileAds.shared.start { [weak self] _ in
-            self?.consentObtained = true
-            self?.requestATT()
+        GADMobileAds.sharedInstance().start { [weak self] _ in
+            DispatchQueue.main.async {
+                self?.consentObtained = true
+                self?.requestATT()
+            }
         }
     }
 
