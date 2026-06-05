@@ -60,8 +60,6 @@ targets:
     dependencies:
       - package: GoogleMobileAds
         product: GoogleMobileAds
-      - package: GoogleMobileAds
-        product: UserMessagingPlatform
 
   DownifyShareExtension:
     type: app-extension
