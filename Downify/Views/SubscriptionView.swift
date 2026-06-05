@@ -12,10 +12,10 @@ struct SubscriptionView: View {
     let plans: [SubscriptionPlan] = [
         SubscriptionPlan(
             id: "ad_free",
-            name: "Reklamsız",
+            name: "Pro",
             price: "$3",
             period: "tek seferlik",
-            features: ["Reklamsız deneyim", "Temel indirme", "Tüm platformlar"],
+            features: ["Öncelikli indirme", "Temel indirme", "Tüm platformlar"],
             tier: .adFree
         ),
         SubscriptionPlan(

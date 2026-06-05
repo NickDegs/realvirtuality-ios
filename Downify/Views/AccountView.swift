@@ -144,7 +144,7 @@ struct AccountView: View {
     private var tierName: String {
         switch authState.user?.tier {
         case .free:   return "Ücretsiz Plan"
-        case .adFree: return "Reklamsız Plan"
+        case .adFree: return "Pro Plan"
         case .full:   return "Full Plan"
         case .none:   return ""
         }
@@ -162,7 +162,7 @@ struct AccountView: View {
     private var tierDescription: String {
         switch authState.user?.tier {
         case .free:   return "Temel özellikler"
-        case .adFree: return "Reklamsız deneyim"
+        case .adFree: return "Gelişmiş özellikler"
         case .full:   return "Tüm özellikler açık"
         case .none:   return ""
         }
