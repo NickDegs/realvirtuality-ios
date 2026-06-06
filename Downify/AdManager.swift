@@ -12,9 +12,12 @@ class AdManager: ObservableObject {
     @Published var attStatus: ATTrackingManager.AuthorizationStatus = .notDetermined
     @Published var consentObtained = false
 
+    private var isInitialized = false
     private init() {}
 
     func initialize() {
+        guard !isInitialized else { return }
+        isInitialized = true
         GADMobileAds.sharedInstance().start { [weak self] _ in
             DispatchQueue.main.async {
                 self?.consentObtained = true
