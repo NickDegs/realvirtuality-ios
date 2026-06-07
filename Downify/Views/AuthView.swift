@@ -274,8 +274,16 @@ struct AuthView: View {
     }
 
     private func handleGoogleSignIn() {
+        // GIDClientID is configured programmatically — must be set before calling signIn
+        let clientID = GoogleClientID.value
+        guard !clientID.isEmpty else {
+            authState.error = "Google Sign-In henüz yapılandırılmadı"
+            return
+        }
+        GIDSignIn.sharedInstance.configuration = GIDConfiguration(clientID: clientID)
+
         guard let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-              let rootVC = scene.windows.first?.rootViewController else { return }
+              let rootVC = scene.keyWindow?.rootViewController else { return }
         GIDSignIn.sharedInstance.signIn(withPresenting: rootVC) { result, error in
             if let error {
                 let nsErr = error as NSError
