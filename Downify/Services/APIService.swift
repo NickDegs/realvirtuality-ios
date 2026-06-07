@@ -81,11 +81,6 @@ final class APIService {
 
     // MARK: - Download
 
-    func startDownload(url: String, quality: String? = nil, audioOnly: Bool = false) async throws -> DownloadResponse {
-        let body = DownloadRequest(url: url, quality: quality, audioOnly: audioOnly)
-        return try await request("/download/start", method: "POST", body: body)
-    }
-
     func getDownloadStatus(taskId: String) async throws -> DownloadStatus {
         return try await request("/download/status/\(taskId)")
     }

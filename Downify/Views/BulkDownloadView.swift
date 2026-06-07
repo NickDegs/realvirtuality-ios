@@ -2,7 +2,6 @@ import SwiftUI
 
 struct BulkDownloadView: View {
     @EnvironmentObject var authState: AuthState
-    @Environment(\.dismiss) private var dismiss
     @State private var urlText = ""
     @State private var isFetching = false
     @State private var bulkResponse: BulkDownloadListResponse?
@@ -25,11 +24,6 @@ struct BulkDownloadView: View {
             }
             .navigationTitle("Toplu İndirme")
             .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                    Button("Kapat") { dismiss() }
-                }
-            }
             .alert("Hata", isPresented: .init(
                 get: { errorMessage != nil },
                 set: { if !$0 { errorMessage = nil } }
@@ -165,7 +159,13 @@ struct BulkDownloadView: View {
             Text("\(taskIds.count) içerik arka planda indiriliyor.\nTamamlananlar galeride görünecek.")
                 .multilineTextAlignment(.center)
                 .foregroundColor(.secondary)
-            Button("Kapat") { dismiss() }
+            Button("Yeni İndirme") {
+                    done = false
+                    bulkResponse = nil
+                    urlText = ""
+                    selectedIds = []
+                    taskIds = []
+                }
                 .font(.headline)
                 .foregroundColor(.purple)
         }

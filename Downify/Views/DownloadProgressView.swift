@@ -100,14 +100,20 @@ struct DownloadProgressView: View {
     }
 
     private func pollStatus() async {
-        while true {
+        let maxAttempts = 150 // 5 dakika (150 × 2sn)
+        for _ in 0..<maxAttempts {
             do {
                 status = try await APIService.shared.getDownloadStatus(taskId: taskId)
-                if status?.status == "completed" || status?.status == "failed" { break }
+                if status?.status == "completed" || status?.status == "failed" { return }
                 try await Task.sleep(nanoseconds: 2_000_000_000)
             } catch {
-                break
+                return
             }
+        }
+        // Timeout: failed olarak işaretle
+        if status == nil || (status?.status != "completed" && status?.status != "failed") {
+            status = DownloadStatus(taskId: taskId, status: "failed", progress: nil,
+                                    downloadUrl: nil, filename: nil, error: "Zaman aşımı")
         }
     }
 }

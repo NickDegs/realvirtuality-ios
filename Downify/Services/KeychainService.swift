@@ -3,8 +3,8 @@ import Security
 
 final class KeychainService {
     static let shared = KeychainService()
-    private let accessGroup = "app.downify"
     private let tokenKey = "jwt_token"
+    private let service = "app.downify"
 
     private init() {}
 
@@ -12,8 +12,8 @@ final class KeychainService {
         let data = token.data(using: .utf8)!
         let query: [CFString: Any] = [
             kSecClass: kSecClassGenericPassword,
+            kSecAttrService: service,
             kSecAttrAccount: tokenKey,
-            kSecAttrAccessGroup: accessGroup,
             kSecValueData: data,
             kSecAttrAccessible: kSecAttrAccessibleAfterFirstUnlock
         ]
@@ -24,8 +24,8 @@ final class KeychainService {
     func loadToken() -> String? {
         let query: [CFString: Any] = [
             kSecClass: kSecClassGenericPassword,
+            kSecAttrService: service,
             kSecAttrAccount: tokenKey,
-            kSecAttrAccessGroup: accessGroup,
             kSecReturnData: true,
             kSecMatchLimit: kSecMatchLimitOne
         ]
@@ -38,8 +38,8 @@ final class KeychainService {
     func deleteToken() {
         let query: [CFString: Any] = [
             kSecClass: kSecClassGenericPassword,
-            kSecAttrAccount: tokenKey,
-            kSecAttrAccessGroup: accessGroup
+            kSecAttrService: service,
+            kSecAttrAccount: tokenKey
         ]
         SecItemDelete(query as CFDictionary)
     }

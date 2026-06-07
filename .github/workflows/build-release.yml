@@ -15,11 +15,15 @@ on:
 permissions:
   contents: write
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 # ─── Simulator matrix — her model için en uygun Xcode ───────────────────────
-# Güncelleme tarihi: 2026-06-05
+# Güncelleme tarihi: 2026-06-07
 # iPhone 17 serisi (iOS 19 / Xcode 26.x) — en güncel, Eylül 2025 çıkış
 # iPhone 16 serisi (iOS 18 / Xcode 16.x) — geriye dönük uyumluluk
-# iPad Pro M4 / iPad Air M2 (iPadOS 19 / Xcode 26.x)
+# iPhone 15 / 14 / SE — iOS 17-18 / Xcode 16.x
+# iPad Pro M4 / iPad Air M2 / iPad mini (iPadOS 19 / Xcode 26.x)
 # ─────────────────────────────────────────────────────────────────────────────
 
 jobs:
@@ -32,39 +36,57 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          # iPhone 17 serisi — Xcode 26 (en güncel)
+          # ── iPhone 17 serisi — iOS 19 / Xcode 26
           - device: "iPhone 17 Pro Max"
-            os: "19.0"
             xcode: "26.3"
             xcode_path: "/Applications/Xcode_26.3.app"
           - device: "iPhone 17 Pro"
-            os: "19.0"
             xcode: "26.3"
             xcode_path: "/Applications/Xcode_26.3.app"
           - device: "iPhone 17 Air"
-            os: "19.0"
             xcode: "26.3"
             xcode_path: "/Applications/Xcode_26.3.app"
           - device: "iPhone 17"
-            os: "19.0"
             xcode: "26.3"
             xcode_path: "/Applications/Xcode_26.3.app"
-          # iPhone 16 serisi — Xcode 16 (geriye uyumluluk)
+          # ── iPhone 16 serisi — iOS 18 / Xcode 16
           - device: "iPhone 16 Pro Max"
-            os: "18.5"
+            xcode: "16.3"
+            xcode_path: "/Applications/Xcode_16.3.app"
+          - device: "iPhone 16 Pro"
+            xcode: "16.3"
+            xcode_path: "/Applications/Xcode_16.3.app"
+          - device: "iPhone 16 Plus"
             xcode: "16.3"
             xcode_path: "/Applications/Xcode_16.3.app"
           - device: "iPhone 16"
-            os: "18.5"
             xcode: "16.3"
             xcode_path: "/Applications/Xcode_16.3.app"
-          # iPad — Xcode 26
+          # ── iPhone 15 serisi — iOS 18 / Xcode 16
+          - device: "iPhone 15 Pro Max"
+            xcode: "16.3"
+            xcode_path: "/Applications/Xcode_16.3.app"
+          - device: "iPhone 15"
+            xcode: "16.3"
+            xcode_path: "/Applications/Xcode_16.3.app"
+          # ── iPhone 14 / SE — iOS 17 / Xcode 16
+          - device: "iPhone 14 Pro Max"
+            xcode: "16.3"
+            xcode_path: "/Applications/Xcode_16.3.app"
+          - device: "iPhone 14"
+            xcode: "16.3"
+            xcode_path: "/Applications/Xcode_16.3.app"
+          - device: "iPhone SE (3rd generation)"
+            xcode: "16.3"
+            xcode_path: "/Applications/Xcode_16.3.app"
+          # ── iPad — Xcode 26
           - device: "iPad Pro 13-inch (M4)"
-            os: "19.0"
             xcode: "26.3"
             xcode_path: "/Applications/Xcode_26.3.app"
           - device: "iPad Air 13-inch (M2)"
-            os: "19.0"
+            xcode: "26.3"
+            xcode_path: "/Applications/Xcode_26.3.app"
+          - device: "iPad mini (A17 Pro)"
             xcode: "26.3"
             xcode_path: "/Applications/Xcode_26.3.app"
 
@@ -236,7 +258,7 @@ jobs:
       - name: Create GitHub Release
         if: startsWith(github.ref, 'refs/tags/')
         continue-on-error: true
-        uses: softprops/action-gh-release@v3
+        uses: softprops/action-gh-release@v2
         with:
           files: ${{ runner.temp }}/export/*.ipa
           generate_release_notes: true

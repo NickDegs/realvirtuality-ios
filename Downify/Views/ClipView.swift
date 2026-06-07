@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct ClipView: View {
+    var startAsGif: Bool = false
     @EnvironmentObject var authState: AuthState
     @State private var urlText = ""
     @State private var startMinutes = 0
@@ -22,6 +23,7 @@ struct ClipView: View {
         ScrollView {
             VStack(spacing: 20) {
                 modeHeader
+                    .onAppear { if startAsGif { asGif = true } }
                 urlSection
                 timeSection
                 gifToggle

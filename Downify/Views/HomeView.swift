@@ -115,8 +115,8 @@ struct HomeView: View {
     private var modeContent: some View {
         switch downloadMode {
         case .single:    singleDownloadSection
-        case .clip:      ClipView()
-        case .gif:       ClipView()
+        case .clip:      ClipView(startAsGif: false)
+        case .gif:       ClipView(startAsGif: true)
         case .subtitles: SubtitleView()
         case .keyMoments: KeyMomentsView()
         }
