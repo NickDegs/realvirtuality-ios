@@ -62,16 +62,6 @@ workflows:
             -exportOptionsPlist /tmp/ExportOptions.plist \
             -allowProvisioningUpdates
 
-      - name: Upload to TestFlight
-        script: |
-          xcrun altool --upload-app \
-            --type ios \
-            --file "$(ls $CM_BUILD_DIR/export/*.ipa)" \
-            --apiKey "$ASC_KEY_ID" \
-            --apiIssuer "$ASC_ISSUER_ID" \
-            --apiPrivateKey <(echo "$ASC_KEY_BASE64" | base64 --decode) \
-            --verbose
-
     artifacts:
       - $CM_BUILD_DIR/export/*.ipa
       - $CM_BUILD_DIR/Downify.xcarchive
