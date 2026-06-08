@@ -12,6 +12,7 @@ struct AccountView: View {
                     VStack(spacing: 16) {
                         profileCard
                         subscriptionCard
+                        featuresCard
                         actionsCard
                     }
                     .padding(.horizontal)
@@ -120,6 +121,50 @@ struct AccountView: View {
         .glassCard()
     }
 
+    // MARK: - Features Card
+
+    private var featuresCard: some View {
+        VStack(spacing: 0) {
+            NavigationLink(destination: PrivateAccountsView()) {
+                AccountRow(
+                    icon: "lock.open.fill",
+                    iconColor: .purple,
+                    title: "Özel Hesaplar",
+                    subtitle: "Instagram özel içerik erişimi",
+                    showBadge: authState.user?.tier != .full
+                )
+            }
+            .buttonStyle(.plain)
+
+            Divider().padding(.leading, 56)
+
+            NavigationLink(destination: ShortcutView()) {
+                AccountRow(
+                    icon: "bolt.fill",
+                    iconColor: .orange,
+                    title: "Kestirmeler",
+                    subtitle: "Siri & paylaşım menüsü",
+                    showBadge: authState.user?.tier != .full
+                )
+            }
+            .buttonStyle(.plain)
+
+            Divider().padding(.leading, 56)
+
+            NavigationLink(destination: AutoDownloadView()) {
+                AccountRow(
+                    icon: "clock.arrow.2.circlepath",
+                    iconColor: .green,
+                    title: "Otomatik İndirme",
+                    subtitle: "Profil takibi & zamanlama",
+                    showBadge: false
+                )
+            }
+            .buttonStyle(.plain)
+        }
+        .glassCard()
+    }
+
     // MARK: - Actions Card
 
     private var actionsCard: some View {
@@ -174,6 +219,45 @@ struct AccountView: View {
         case .adFree: return "star.fill"
         case .full:   return "crown.fill"
         case .none:   return "star"
+        }
+    }
+
+    // MARK: - Account Row Helper
+
+    private struct AccountRow: View {
+        let icon: String
+        let iconColor: Color
+        let title: String
+        let subtitle: String
+        let showBadge: Bool
+
+        var body: some View {
+            HStack(spacing: 14) {
+                Image(systemName: icon)
+                    .font(.subheadline.bold())
+                    .foregroundStyle(iconColor)
+                    .frame(width: 36, height: 36)
+                    .background(iconColor.opacity(0.12), in: RoundedRectangle(cornerRadius: 10))
+
+                VStack(alignment: .leading, spacing: 2) {
+                    HStack(spacing: 6) {
+                        Text(title).font(.subheadline.bold())
+                        if showBadge {
+                            Image(systemName: "crown.fill")
+                                .font(.system(size: 9))
+                                .foregroundStyle(.yellow)
+                        }
+                    }
+                    Text(subtitle).font(.caption).foregroundStyle(.secondary)
+                }
+
+                Spacer()
+
+                Image(systemName: "chevron.right")
+                    .font(.caption.bold())
+                    .foregroundStyle(.tertiary)
+            }
+            .padding(16)
         }
     }
 

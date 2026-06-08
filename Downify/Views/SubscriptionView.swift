@@ -23,7 +23,7 @@ struct SubscriptionView: View {
             name: "Full — Aylık",
             price: "$5",
             period: "/ ay",
-            features: ["Tüm özellikler", "Özel Instagram hesapları", "Öncelikli indirme", "HD kalite"],
+            features: ["Tüm özellikler", "⚡ Kestirme & Siri desteği", "🔒 Özel hesap indirme", "Öncelikli indirme", "HD kalite"],
             tier: .full
         ),
         SubscriptionPlan(
@@ -31,7 +31,7 @@ struct SubscriptionView: View {
             name: "Full — Yıllık",
             price: "$30",
             period: "/ yıl",
-            features: ["Tüm özellikler", "Özel Instagram hesapları", "Öncelikli indirme", "HD kalite", "%50 tasarruf"],
+            features: ["Tüm özellikler", "⚡ Kestirme & Siri desteği", "🔒 Özel hesap indirme", "Öncelikli indirme", "HD kalite", "%50 tasarruf"],
             tier: .full
         ),
         SubscriptionPlan(
@@ -39,7 +39,7 @@ struct SubscriptionView: View {
             name: "Ömür Boyu",
             price: "$50",
             period: "tek seferlik",
-            features: ["Tüm özellikler", "Özel Instagram hesapları", "Sınırsız indirme", "Kalıcı lisans"],
+            features: ["Tüm özellikler", "⚡ Kestirme & Siri desteği", "🔒 Özel hesap indirme", "Sınırsız indirme", "Kalıcı lisans"],
             tier: .full
         )
     ]

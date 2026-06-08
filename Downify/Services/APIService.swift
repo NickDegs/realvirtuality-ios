@@ -94,10 +94,10 @@ final class APIService {
         return response.checkoutUrl
     }
 
-    func startDownload(url: String, quality: String? = nil, audioOnly: Bool = false, noWatermark: Bool = false) async throws -> DownloadResponse {
-        struct Body: Encodable { let url: String; let quality: String?; let audioOnly: Bool?; let noWatermark: Bool? }
+    func startDownload(url: String, quality: String? = nil, audioOnly: Bool = false, noWatermark: Bool = false, usePrivateSession: Bool = false) async throws -> DownloadResponse {
+        struct Body: Encodable { let url: String; let quality: String?; let audioOnly: Bool?; let noWatermark: Bool?; let usePrivateSession: Bool? }
         return try await request("/download/start", method: "POST",
-            body: Body(url: url, quality: quality, audioOnly: audioOnly, noWatermark: noWatermark))
+            body: Body(url: url, quality: quality, audioOnly: audioOnly, noWatermark: noWatermark, usePrivateSession: usePrivateSession ? true : nil))
     }
 
     // MARK: - Bulk Download
@@ -184,11 +184,26 @@ final class APIService {
         let _: Empty = try await request("/download/scheduled/\(id)", method: "DELETE")
     }
 
-    // MARK: - Instagram
+    // MARK: - Instagram / Private Sessions
 
     func saveInstagramSession(cookies: String) async throws {
         struct Body: Encodable { let cookies: String }
         struct Response: Decodable { let success: Bool }
         let _: Response = try await request("/instagram/session", method: "POST", body: Body(cookies: cookies))
+    }
+
+    func getPrivateSessions() async throws -> [PlatformSession] {
+        return try await request("/sessions/list")
+    }
+
+    func deletePrivateSession(platform: String) async throws {
+        struct Empty: Decodable {}
+        let _: Empty = try await request("/sessions/\(platform.lowercased())", method: "DELETE")
+    }
+
+    // MARK: - User
+
+    func refreshUser() async throws -> User {
+        return try await request("/auth/me")
     }
 }
