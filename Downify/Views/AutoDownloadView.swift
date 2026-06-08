@@ -9,13 +9,19 @@ struct AutoDownloadView: View {
 
     var body: some View {
         NavigationStack {
-            Group {
-                if isLoading && subscriptions.isEmpty {
-                    ProgressView()
-                } else if subscriptions.isEmpty {
-                    emptyState
-                } else {
-                    list
+            ZStack {
+                AppBackground()
+                Group {
+                    if isLoading && subscriptions.isEmpty {
+                        VStack(spacing: 14) {
+                            ProgressView().tint(.purple)
+                            Text("Yükleniyor...").font(.caption).foregroundStyle(.secondary)
+                        }
+                    } else if subscriptions.isEmpty {
+                        emptyState
+                    } else {
+                        subscriptionList
+                    }
                 }
             }
             .navigationTitle("Otomatik İndirme")
@@ -40,51 +46,37 @@ struct AutoDownloadView: View {
         }
     }
 
+    // MARK: - Empty
+
     private var emptyState: some View {
-        VStack(spacing: 16) {
-            Image(systemName: "clock.arrow.2.circlepath")
-                .font(.system(size: 60))
-                .foregroundColor(.secondary)
-            Text("Otomatik indirme yok")
-                .font(.headline)
-            Text("Bir hesabı takip edin, yeni içerikler otomatik indirilsin")
-                .font(.subheadline)
-                .foregroundColor(.secondary)
-                .multilineTextAlignment(.center)
-            Button {
-                showAddSheet = true
-            } label: {
-                Label("Hesap Ekle", systemImage: "plus.circle.fill")
-                    .padding()
-                    .background(Color.purple)
-                    .foregroundColor(.white)
-                    .cornerRadius(12)
-            }
-        }
-        .padding()
+        EmptyStateView(
+            icon: "clock.arrow.2.circlepath",
+            title: "Otomatik indirme yok",
+            subtitle: "Bir hesabı takip edin, yeni içerikler otomatik indirilsin",
+            action: { showAddSheet = true },
+            actionLabel: "Hesap Ekle"
+        )
     }
 
-    private var list: some View {
-        List {
-            ForEach(subscriptions) { sub in
-                AutoSubscriptionRow(subscription: sub) {
-                    await deleteSubscription(id: sub.id)
-                }
-            }
-            .onDelete { indexSet in
-                Task {
-                    for i in indexSet {
-                        await deleteSubscription(id: subscriptions[i].id)
+    // MARK: - List
+
+    private var subscriptionList: some View {
+        ScrollView {
+            VStack(spacing: 12) {
+                ForEach(subscriptions) { sub in
+                    AutoSubscriptionRow(subscription: sub) {
+                        await deleteSubscription(id: sub.id)
                     }
                 }
             }
+            .padding(.horizontal)
+            .padding(.top, 8)
+            .padding(.bottom, 24)
         }
-        .toolbar {
-            ToolbarItem(placement: .topBarLeading) {
-                EditButton()
-            }
-        }
+        .refreshable { await load() }
     }
+
+    // MARK: - Actions
 
     private func load() async {
         isLoading = true
@@ -115,51 +107,77 @@ struct AutoDownloadView: View {
     }
 }
 
+// MARK: - Subscription Row
+
 struct AutoSubscriptionRow: View {
     let subscription: AutoSubscription
     let onDelete: () async -> Void
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 6) {
-            HStack {
+        HStack(spacing: 14) {
+            ZStack {
+                Circle()
+                    .fill(subscription.active ? Color.green.opacity(0.15) : Color.orange.opacity(0.15))
+                    .frame(width: 42, height: 42)
                 Image(systemName: subscription.active ? "checkmark.circle.fill" : "pause.circle.fill")
-                    .foregroundColor(subscription.active ? .green : .orange)
+                    .foregroundStyle(subscription.active ? .green : .orange)
+                    .font(.title3)
+            }
+
+            VStack(alignment: .leading, spacing: 4) {
                 Text(subscription.title ?? subscription.url)
                     .font(.subheadline.bold())
                     .lineLimit(1)
-            }
-            Text(subscription.url)
-                .font(.caption)
-                .foregroundColor(.secondary)
-                .lineLimit(1)
-            HStack {
-                Label(frequencyLabel(subscription.frequency), systemImage: "clock")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-                Spacer()
-                if let last = subscription.lastChecked {
-                    Text("Son: \(formatDate(last))")
-                        .font(.caption2)
-                        .foregroundColor(.secondary)
-                }
-                Text("\(subscription.downloadCount) indirme")
+                Text(subscription.url)
                     .font(.caption2)
-                    .foregroundColor(.purple)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
+                HStack(spacing: 8) {
+                    Label(frequencyLabel(subscription.frequency), systemImage: "clock")
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                    if subscription.downloadCount > 0 {
+                        Text("• \(subscription.downloadCount) indirme")
+                            .font(.caption2)
+                            .foregroundStyle(Color.brand.opacity(0.8))
+                    }
+                }
+            }
+
+            Spacer()
+
+            if let last = subscription.lastChecked {
+                VStack(alignment: .trailing, spacing: 2) {
+                    Text("Son")
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                    Text(relativeDate(last))
+                        .font(.caption2.bold())
+                        .foregroundStyle(.secondary)
+                }
             }
         }
-        .padding(.vertical, 4)
+        .padding(14)
+        .glassCard()
+        .contextMenu {
+            Button(role: .destructive) {
+                Task { await onDelete() }
+            } label: {
+                Label("Sil", systemImage: "trash")
+            }
+        }
     }
 
     private func frequencyLabel(_ f: String) -> String {
         switch f {
         case "hourly": return "Saatte bir"
-        case "daily": return "Günlük"
+        case "daily":  return "Günlük"
         case "weekly": return "Haftalık"
-        default: return f
+        default:       return f
         }
     }
 
-    private func formatDate(_ str: String) -> String {
+    private func relativeDate(_ str: String) -> String {
         let f = ISO8601DateFormatter()
         guard let d = f.date(from: str) else { return str }
         let r = RelativeDateTimeFormatter()
@@ -167,6 +185,8 @@ struct AutoSubscriptionRow: View {
         return r.localizedString(for: d, relativeTo: Date())
     }
 }
+
+// MARK: - Add Sheet
 
 struct AddAutoSubscriptionSheet: View {
     let onAdd: (String, String) async -> Void
@@ -179,27 +199,88 @@ struct AddAutoSubscriptionSheet: View {
 
     var body: some View {
         NavigationStack {
-            Form {
-                Section("Hesap / Sayfa URL'si") {
-                    TextField("instagram.com/hesap veya youtube.com/kanal", text: $urlText)
-                        .keyboardType(.URL)
-                        .autocorrectionDisabled()
-                        .textInputAutocapitalization(.never)
-                }
-
-                Section("Kontrol Sıklığı") {
-                    Picker("Sıklık", selection: $frequency) {
-                        ForEach(frequencies, id: \.0) { f in
-                            Text(f.1).tag(f.0)
+            ZStack {
+                AppBackground()
+                ScrollView {
+                    VStack(spacing: 16) {
+                        VStack(alignment: .leading, spacing: 10) {
+                            Text("Hesap / Sayfa URL'si")
+                                .font(.caption.bold())
+                                .foregroundStyle(.secondary)
+                                .padding(.horizontal, 4)
+                            HStack {
+                                TextField("instagram.com/hesap veya youtube.com/kanal", text: $urlText)
+                                    .textFieldStyle(.plain)
+                                    .keyboardType(.URL)
+                                    .autocorrectionDisabled()
+                                    .textInputAutocapitalization(.never)
+                                Button {
+                                    urlText = UIPasteboard.general.string ?? ""
+                                } label: {
+                                    Image(systemName: "doc.on.clipboard").foregroundStyle(.purple)
+                                }
+                            }
+                            .padding(14)
+                            .glassInput()
                         }
-                    }
-                    .pickerStyle(.inline)
-                }
 
-                Section {
-                    Text("Seçilen hesapta yeni içerik yayımlandığında otomatik olarak indirilecek.")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
+                        VStack(alignment: .leading, spacing: 10) {
+                            Text("Kontrol Sıklığı")
+                                .font(.caption.bold())
+                                .foregroundStyle(.secondary)
+                                .padding(.horizontal, 4)
+                            VStack(spacing: 8) {
+                                ForEach(frequencies, id: \.0) { f in
+                                    Button {
+                                        frequency = f.0
+                                    } label: {
+                                        HStack {
+                                            ZStack {
+                                                Circle()
+                                                    .stroke(frequency == f.0 ? Color.brand : Color.white.opacity(0.3), lineWidth: 1.5)
+                                                    .frame(width: 20, height: 20)
+                                                if frequency == f.0 {
+                                                    Circle().fill(Color.brand).frame(width: 10, height: 10)
+                                                }
+                                            }
+                                            Text(f.1).font(.subheadline)
+                                            Spacer()
+                                        }
+                                        .padding(14)
+                                        .glassCard()
+                                    }
+                                    .buttonStyle(.plain)
+                                    .animation(.spring(response: 0.2), value: frequency)
+                                }
+                            }
+                        }
+
+                        Text("Seçilen hesapta yeni içerik yayımlandığında otomatik indirilecek.")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                            .multilineTextAlignment(.center)
+
+                        Button {
+                            Task {
+                                isAdding = true
+                                await onAdd(urlText, frequency)
+                                isAdding = false
+                                dismiss()
+                            }
+                        } label: {
+                            LoadingLabel(
+                                isLoading: isAdding,
+                                icon: "plus.circle.fill",
+                                loadingText: "Ekleniyor...",
+                                idleText: "Hesap Ekle"
+                            )
+                        }
+                        .buttonStyle(PrimaryButtonStyle(enabled: !urlText.isEmpty && !isAdding))
+                        .disabled(urlText.isEmpty || isAdding)
+                    }
+                    .padding(.horizontal)
+                    .padding(.top, 8)
+                    .padding(.bottom, 32)
                 }
             }
             .navigationTitle("Hesap Ekle")
@@ -207,19 +288,6 @@ struct AddAutoSubscriptionSheet: View {
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     Button("İptal") { dismiss() }
-                }
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button {
-                        Task {
-                            isAdding = true
-                            await onAdd(urlText, frequency)
-                            isAdding = false
-                            dismiss()
-                        }
-                    } label: {
-                        if isAdding { ProgressView() } else { Text("Ekle").bold() }
-                    }
-                    .disabled(urlText.isEmpty || isAdding)
                 }
             }
         }

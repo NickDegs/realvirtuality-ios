@@ -18,32 +18,16 @@ struct GalleryView: View {
                     if isLoading && items.isEmpty {
                         VStack(spacing: 14) {
                             ProgressView().tint(.purple)
-                            Text("Yükleniyor...")
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
+                            Text("Yükleniyor...").font(.caption).foregroundStyle(.secondary)
                         }
                     } else if items.isEmpty {
-                        emptyState
+                        EmptyStateView(
+                            icon: "photo.stack",
+                            title: "Henüz indirme yok",
+                            subtitle: "İndirdiğiniz içerikler burada görünecek"
+                        )
                     } else {
-                        ScrollView {
-                            LazyVGrid(columns: columns, spacing: 12) {
-                                ForEach(items) { item in
-                                    GalleryItemCard(item: item)
-                                        .onTapGesture { selectedItem = item }
-                                        .onAppear {
-                                            if item.id == items.last?.id && hasMore {
-                                                Task { await loadMore() }
-                                            }
-                                        }
-                                }
-                            }
-                            .padding(.horizontal)
-                            .padding(.top, 8)
-
-                            if isLoading {
-                                ProgressView().tint(.purple).padding()
-                            }
-                        }
+                        contentGrid
                     }
                 }
             }
@@ -56,24 +40,26 @@ struct GalleryView: View {
         }
     }
 
-    private var emptyState: some View {
-        VStack(spacing: 20) {
-            ZStack {
-                Circle()
-                    .fill(Color.purple.opacity(0.12))
-                    .frame(width: 90, height: 90)
-                Image(systemName: "photo.stack")
-                    .font(.system(size: 38))
-                    .foregroundStyle(.purple.opacity(0.7))
+    private var contentGrid: some View {
+        ScrollView {
+            LazyVGrid(columns: columns, spacing: 12) {
+                ForEach(items) { item in
+                    GalleryItemCard(item: item)
+                        .onTapGesture { selectedItem = item }
+                        .onAppear {
+                            if item.id == items.last?.id && hasMore {
+                                Task { await loadMore() }
+                            }
+                        }
+                }
             }
-            Text("Henüz indirme yok")
-                .font(.headline)
-            Text("İndirdiğiniz içerikler burada görünecek")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-                .multilineTextAlignment(.center)
+            .padding(.horizontal)
+            .padding(.top, 8)
+
+            if isLoading {
+                ProgressView().tint(.purple).padding()
+            }
         }
-        .padding()
     }
 
     private func load() async {
@@ -106,6 +92,8 @@ struct GalleryView: View {
         isLoading = false
     }
 }
+
+// MARK: - Gallery Item Card
 
 struct GalleryItemCard: View {
     let item: DownloadHistoryItem
@@ -140,15 +128,7 @@ struct GalleryItemCard: View {
                         .foregroundStyle(.white)
                         .padding(.horizontal, 7)
                         .padding(.vertical, 3)
-                        .background(
-                            LinearGradient(
-                                colors: [Color(red: 0.55, green: 0.18, blue: 0.90),
-                                         Color(red: 0.38, green: 0.08, blue: 0.72)],
-                                startPoint: .leading,
-                                endPoint: .trailing
-                            ),
-                            in: Capsule()
-                        )
+                        .background(LinearGradient.brand, in: Capsule())
                         .padding(8)
                 }
             }
@@ -157,10 +137,19 @@ struct GalleryItemCard: View {
                 Text(item.filename)
                     .font(.caption.bold())
                     .lineLimit(2)
-
-                Text(formatDate(item.completedAt))
-                    .font(.caption2)
-                    .foregroundStyle(.secondary)
+                HStack(spacing: 4) {
+                    Text(formatDate(item.completedAt))
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                    if !item.formattedSize.isEmpty {
+                        Text("•")
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                        Text(item.formattedSize)
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                    }
+                }
             }
             .padding(.horizontal, 4)
             .padding(.bottom, 4)
@@ -178,6 +167,8 @@ struct GalleryItemCard: View {
     }
 }
 
+// MARK: - Gallery Detail
+
 struct GalleryDetailView: View {
     let item: DownloadHistoryItem
     @Environment(\.dismiss) private var dismiss
@@ -187,7 +178,7 @@ struct GalleryDetailView: View {
             ZStack {
                 AppBackground()
                 ScrollView {
-                    VStack(spacing: 20) {
+                    VStack(spacing: 16) {
                         if let thumb = item.thumbnailUrl, let url = URL(string: thumb) {
                             AsyncImage(url: url) { image in
                                 image.resizable().scaledToFit()
@@ -201,16 +192,17 @@ struct GalleryDetailView: View {
                             .shadow(color: .black.opacity(0.2), radius: 12, y: 6)
                         }
 
-                        VStack(alignment: .leading, spacing: 6) {
-                            Text(item.filename)
-                                .font(.headline)
-                            if let size = item.fileSize {
-                                Text(formatSize(size))
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
+                        VStack(alignment: .leading, spacing: 10) {
+                            InfoRow(label: "Dosya", value: item.filename)
+                            if !item.formattedSize.isEmpty {
+                                Divider()
+                                InfoRow(label: "Boyut", value: item.formattedSize)
+                            }
+                            if let platform = item.platform {
+                                Divider()
+                                InfoRow(label: "Platform", value: platform)
                             }
                         }
-                        .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(16)
                         .glassCard()
 
@@ -229,6 +221,7 @@ struct GalleryDetailView: View {
                     }
                     .padding(.horizontal)
                     .padding(.top, 16)
+                    .padding(.bottom, 32)
                 }
             }
             .navigationTitle("Detay")
@@ -239,10 +232,5 @@ struct GalleryDetailView: View {
                 }
             }
         }
-    }
-
-    private func formatSize(_ bytes: Int) -> String {
-        let mb = Double(bytes) / 1_000_000
-        return String(format: "%.1f MB", mb)
     }
 }

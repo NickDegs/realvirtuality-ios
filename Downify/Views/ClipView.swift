@@ -21,7 +21,7 @@ struct ClipView: View {
 
     var body: some View {
         ScrollView {
-            VStack(spacing: 20) {
+            VStack(spacing: 16) {
                 modeHeader
                     .onAppear { if startAsGif { asGif = true } }
                 urlSection
@@ -30,12 +30,12 @@ struct ClipView: View {
                 if asGif { gifOptions }
                 downloadButton
                 if let task = downloadTask {
-                    DownloadProgressView(taskId: task.taskId) {
-                        downloadTask = nil
-                    }
+                    DownloadProgressView(taskId: task.taskId) { downloadTask = nil }
                 }
             }
-            .padding()
+            .padding(.horizontal)
+            .padding(.top, 8)
+            .padding(.bottom, 32)
         }
         .alert("Hata", isPresented: .init(
             get: { errorMessage != nil },
@@ -44,29 +44,40 @@ struct ClipView: View {
         message: { Text(errorMessage ?? "") }
     }
 
+    // MARK: - Header
+
     private var modeHeader: some View {
-        HStack(spacing: 16) {
-            Image(systemName: asGif ? "photo.fill" : "scissors")
-                .font(.system(size: 32))
-                .foregroundColor(.purple)
-            VStack(alignment: .leading, spacing: 2) {
+        HStack(spacing: 14) {
+            ZStack {
+                RoundedRectangle(cornerRadius: 12)
+                    .fill((asGif ? Color.orange : Color.brand).opacity(0.14))
+                    .frame(width: 52, height: 52)
+                Image(systemName: asGif ? "photo.fill" : "scissors")
+                    .font(.system(size: 22))
+                    .foregroundStyle(asGif ? Color.orange : Color.brand)
+            }
+            VStack(alignment: .leading, spacing: 3) {
                 Text(asGif ? "GIF Oluşturucu" : "Klip Kesici")
-                    .font(.title3.bold())
+                    .font(.headline)
                 Text(asGif ? "Seçilen kısımdan animasyonlu GIF üret" : "Videonun istediğin bölümünü indir")
                     .font(.caption)
-                    .foregroundColor(.secondary)
+                    .foregroundStyle(.secondary)
             }
             Spacer()
         }
-        .padding()
-        .background(Color(.systemGray6))
-        .cornerRadius(12)
+        .padding(16)
+        .glassCard()
     }
 
+    // MARK: - URL
+
     private var urlSection: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("Video URL'si").font(.headline)
-            HStack {
+        VStack(alignment: .leading, spacing: 10) {
+            Text("Video URL'si")
+                .font(.caption.bold())
+                .foregroundStyle(.secondary)
+                .padding(.horizontal, 4)
+            HStack(spacing: 10) {
                 TextField("Instagram, TikTok, YouTube...", text: $urlText)
                     .textFieldStyle(.plain)
                     .keyboardType(.URL)
@@ -75,51 +86,65 @@ struct ClipView: View {
                 Button {
                     urlText = UIPasteboard.general.string ?? ""
                 } label: {
-                    Image(systemName: "doc.on.clipboard")
+                    Image(systemName: "doc.on.clipboard").foregroundStyle(.purple)
                 }
             }
-            .padding()
-            .background(Color(.systemGray6))
-            .cornerRadius(10)
+            .padding(14)
+            .glassInput()
         }
     }
 
-    private var timeSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text("Zaman Aralığı").font(.headline)
+    // MARK: - Time
 
-            HStack(spacing: 16) {
+    private var timeSection: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            Text("Zaman Aralığı")
+                .font(.caption.bold())
+                .foregroundStyle(.secondary)
+                .padding(.horizontal, 4)
+
+            HStack(spacing: 12) {
                 timeInput(label: "Başlangıç", minutes: $startMinutes, seconds: $startSeconds)
-                Image(systemName: "arrow.right").foregroundColor(.secondary)
+                VStack {
+                    Spacer()
+                    Image(systemName: "arrow.right")
+                        .foregroundStyle(.secondary)
+                        .padding(.bottom, 16)
+                }
                 timeInput(label: "Bitiş", minutes: $endMinutes, seconds: $endSeconds)
             }
 
-            if endTime <= startTime {
-                Label("Bitiş zamanı başlangıçtan büyük olmalı", systemImage: "exclamationmark.triangle.fill")
-                    .font(.caption)
-                    .foregroundColor(.orange)
-            } else {
-                let duration = endTime - startTime
-                Label("Süre: \(Int(duration))s (\(String(format: "%.1f", duration/60)) dk)", systemImage: "clock")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
+            HStack(spacing: 6) {
+                if endTime <= startTime {
+                    Image(systemName: "exclamationmark.triangle.fill")
+                        .foregroundStyle(.orange)
+                        .font(.caption)
+                    Text("Bitiş zamanı başlangıçtan büyük olmalı")
+                        .font(.caption)
+                        .foregroundStyle(.orange)
+                } else {
+                    let duration = endTime - startTime
+                    Image(systemName: "clock").font(.caption).foregroundStyle(.secondary)
+                    Text("Süre: \(Int(duration))s (\(String(format: "%.1f", duration/60)) dk)")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
             }
         }
-        .padding()
-        .background(Color(.systemGray6))
-        .cornerRadius(12)
+        .padding(16)
+        .glassCard()
     }
 
     private func timeInput(label: String, minutes: Binding<Int>, seconds: Binding<Int>) -> some View {
         VStack(spacing: 6) {
-            Text(label).font(.caption).foregroundColor(.secondary)
-            HStack(spacing: 4) {
+            Text(label).font(.caption.bold()).foregroundStyle(.secondary)
+            HStack(spacing: 2) {
                 Picker("", selection: minutes) {
                     ForEach(0..<60) { Text(String(format: "%02d", $0)).tag($0) }
                 }
                 .frame(width: 55)
                 .clipped()
-                Text(":").font(.title3.bold())
+                Text(":").font(.title3.bold()).foregroundStyle(.secondary)
                 Picker("", selection: seconds) {
                     ForEach(0..<60) { Text(String(format: "%02d", $0)).tag($0) }
                 }
@@ -129,51 +154,70 @@ struct ClipView: View {
             .pickerStyle(.wheel)
             .frame(height: 80)
         }
+        .frame(maxWidth: .infinity)
     }
+
+    // MARK: - GIF Toggle
 
     private var gifToggle: some View {
-        Toggle(isOn: $asGif) {
-            Label("GIF olarak oluştur", systemImage: "photo.fill")
+        Toggle(isOn: $asGif.animation()) {
+            HStack(spacing: 10) {
+                Image(systemName: "photo.fill")
+                    .foregroundStyle(.orange)
+                    .frame(width: 28)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("GIF olarak oluştur").font(.subheadline.bold())
+                    Text("Video yerine animasyonlu GIF üret")
+                        .font(.caption).foregroundStyle(.secondary)
+                }
+            }
         }
-        .padding()
-        .background(Color(.systemGray6))
-        .cornerRadius(12)
+        .padding(16)
+        .glassCard()
     }
 
+    // MARK: - GIF Options
+
     private var gifOptions: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("GIF Ayarları").font(.subheadline.bold())
-            HStack {
-                Text("FPS: \(gifFps)")
+        VStack(alignment: .leading, spacing: 12) {
+            Text("GIF Ayarları")
+                .font(.caption.bold())
+                .foregroundStyle(.secondary)
+            HStack(spacing: 12) {
+                Text("FPS")
+                    .font(.subheadline.bold())
+                    .frame(width: 30)
                 Slider(value: .init(
                     get: { Double(gifFps) },
                     set: { gifFps = Int($0) }
                 ), in: 5...24, step: 1)
+                Text("\(gifFps)")
+                    .font(.subheadline.bold())
+                    .foregroundStyle(.purple)
+                    .frame(width: 28, alignment: .trailing)
             }
-            Text("Düşük FPS → küçük dosya, yüksek FPS → akıcı animasyon")
-                .font(.caption2).foregroundColor(.secondary)
+            Text("Düşük FPS → küçük dosya • Yüksek FPS → akıcı animasyon")
+                .font(.caption2)
+                .foregroundStyle(.secondary)
         }
-        .padding()
-        .background(Color(.systemGray6))
-        .cornerRadius(12)
+        .padding(16)
+        .glassCard()
     }
+
+    // MARK: - Download
 
     private var downloadButton: some View {
         Button {
             Task { await startClip() }
         } label: {
-            HStack {
-                if isDownloading { ProgressView().tint(.white) }
-                else { Image(systemName: asGif ? "photo.fill" : "scissors") }
-                Text(isDownloading ? "Hazırlanıyor..." : asGif ? "GIF Oluştur" : "Klibi İndir")
-                    .fontWeight(.semibold)
-            }
-            .frame(maxWidth: .infinity)
-            .padding()
-            .background(!isValid || isDownloading ? Color.gray : Color.purple)
-            .foregroundColor(.white)
-            .cornerRadius(12)
+            LoadingLabel(
+                isLoading: isDownloading,
+                icon: asGif ? "photo.fill" : "scissors",
+                loadingText: "Hazırlanıyor...",
+                idleText: asGif ? "GIF Oluştur" : "Klibi İndir"
+            )
         }
+        .buttonStyle(PrimaryButtonStyle(enabled: isValid && !isDownloading))
         .disabled(!isValid || isDownloading)
     }
 

@@ -13,32 +13,23 @@ struct SubtitleView: View {
 
     var body: some View {
         ScrollView {
-            VStack(spacing: 20) {
-                header
+            VStack(spacing: 16) {
+                headerCard
                 urlSection
-
-                if !tracks.isEmpty {
+                if isFetching {
+                    fetchingIndicator
+                } else if !tracks.isEmpty {
                     trackSelection
                     embedToggle
                     downloadButton
-                } else if isFetching {
-                    HStack {
-                        ProgressView()
-                        Text("Altyazılar aranıyor...")
-                            .foregroundColor(.secondary)
-                    }
-                    .padding()
-                } else if !urlText.isEmpty {
-                    fetchButton
                 }
-
                 if let task = downloadTask {
-                    DownloadProgressView(taskId: task.taskId) {
-                        downloadTask = nil
-                    }
+                    DownloadProgressView(taskId: task.taskId) { downloadTask = nil }
                 }
             }
-            .padding()
+            .padding(.horizontal)
+            .padding(.top, 8)
+            .padding(.bottom, 32)
         }
         .alert("Hata", isPresented: .init(
             get: { errorMessage != nil },
@@ -47,27 +38,39 @@ struct SubtitleView: View {
         message: { Text(errorMessage ?? "") }
     }
 
-    private var header: some View {
-        HStack(spacing: 16) {
-            Image(systemName: "captions.bubble.fill")
-                .font(.system(size: 32))
-                .foregroundColor(.purple)
-            VStack(alignment: .leading, spacing: 2) {
-                Text("Altyazı İndirme").font(.title3.bold())
+    // MARK: - Header
+
+    private var headerCard: some View {
+        HStack(spacing: 14) {
+            ZStack {
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(Color.brand.opacity(0.14))
+                    .frame(width: 52, height: 52)
+                Image(systemName: "captions.bubble.fill")
+                    .font(.system(size: 22))
+                    .foregroundStyle(Color.brand)
+            }
+            VStack(alignment: .leading, spacing: 3) {
+                Text("Altyazı İndirme").font(.headline)
                 Text("Video ile birlikte altyazı dosyasını al")
-                    .font(.caption).foregroundColor(.secondary)
+                    .font(.caption).foregroundStyle(.secondary)
             }
             Spacer()
         }
-        .padding()
-        .background(Color(.systemGray6))
-        .cornerRadius(12)
+        .padding(16)
+        .glassCard()
     }
 
+    // MARK: - URL
+
     private var urlSection: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("Video URL'si").font(.headline)
-            HStack {
+        VStack(alignment: .leading, spacing: 10) {
+            Text("Video URL'si")
+                .font(.caption.bold())
+                .foregroundStyle(.secondary)
+                .padding(.horizontal, 4)
+
+            HStack(spacing: 10) {
                 TextField("YouTube, TikTok, Instagram...", text: $urlText)
                     .textFieldStyle(.plain)
                     .keyboardType(.URL)
@@ -77,100 +80,132 @@ struct SubtitleView: View {
                 Button {
                     urlText = UIPasteboard.general.string ?? ""
                 } label: {
-                    Image(systemName: "doc.on.clipboard")
+                    Image(systemName: "doc.on.clipboard").foregroundStyle(.purple)
                 }
             }
-            .padding()
-            .background(Color(.systemGray6))
-            .cornerRadius(10)
+            .padding(14)
+            .glassInput()
 
-            if tracks.isEmpty && !urlText.isEmpty {
-                Button { Task { await fetchTracks() } } label: {
+            if tracks.isEmpty && !urlText.isEmpty && !isFetching {
+                Button {
+                    Task { await fetchTracks() }
+                } label: {
                     Label("Altyazıları Getir", systemImage: "magnifyingglass")
                         .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(Color.purple)
-                        .foregroundColor(.white)
-                        .cornerRadius(12)
                 }
+                .buttonStyle(PrimaryButtonStyle())
             }
         }
     }
 
-    private var fetchButton: some View {
-        EmptyView()
+    // MARK: - Fetching
+
+    private var fetchingIndicator: some View {
+        HStack(spacing: 10) {
+            ProgressView().tint(.purple)
+            Text("Altyazılar aranıyor...")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(20)
+        .glassCard()
     }
+
+    // MARK: - Track Selection
 
     private var trackSelection: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            Text("\(tracks.count) altyazı dili bulundu")
-                .font(.subheadline.bold())
-            ForEach(tracks) { track in
-                Button {
-                    selectedLanguage = track.language
-                } label: {
-                    HStack {
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text(track.languageName).font(.subheadline)
-                            Text("\(track.language.uppercased()) • \(track.format.uppercased())")
-                                .font(.caption)
-                                .foregroundColor(.secondary)
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                Text("\(tracks.count) altyazı dili bulundu")
+                    .font(.caption.bold())
+                    .foregroundStyle(.secondary)
+                Spacer()
+            }
+            .padding(.horizontal, 4)
+
+            VStack(spacing: 8) {
+                ForEach(tracks) { track in
+                    Button {
+                        selectedLanguage = track.language
+                    } label: {
+                        HStack(spacing: 12) {
+                            ZStack {
+                                Circle()
+                                    .stroke(selectedLanguage == track.language ? Color.brand : Color.white.opacity(0.3), lineWidth: 1.5)
+                                    .frame(width: 20, height: 20)
+                                if selectedLanguage == track.language {
+                                    Circle()
+                                        .fill(Color.brand)
+                                        .frame(width: 10, height: 10)
+                                }
+                            }
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(track.languageName).font(.subheadline.bold())
+                                Text("\(track.language.uppercased()) • \(track.format.uppercased())")
+                                    .font(.caption2)
+                                    .foregroundStyle(.secondary)
+                            }
+                            Spacer()
+                            if selectedLanguage == track.language {
+                                Image(systemName: "checkmark.circle.fill")
+                                    .foregroundStyle(Color.brand)
+                            }
                         }
-                        Spacer()
-                        if selectedLanguage == track.language {
-                            Image(systemName: "checkmark.circle.fill")
-                                .foregroundColor(.purple)
-                        }
+                        .padding(14)
+                        .background(
+                            selectedLanguage == track.language ? Color.brand.opacity(0.1) : Color.clear,
+                            in: RoundedRectangle(cornerRadius: 12)
+                        )
+                        .glassCard(radius: 12)
                     }
-                    .padding()
-                    .background(selectedLanguage == track.language ?
-                        Color.purple.opacity(0.1) : Color(.systemGray6))
-                    .cornerRadius(10)
+                    .buttonStyle(.plain)
+                    .animation(.spring(response: 0.2), value: selectedLanguage)
                 }
-                .buttonStyle(.plain)
             }
         }
-        .padding()
-        .background(Color(.systemGray6))
-        .cornerRadius(12)
     }
 
+    // MARK: - Embed Toggle
+
     private var embedToggle: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Toggle(isOn: $embedInVideo) {
+        Toggle(isOn: $embedInVideo) {
+            HStack(spacing: 10) {
+                Image(systemName: embedInVideo ? "film.fill" : "doc.text.fill")
+                    .foregroundStyle(embedInVideo ? Color.brand : .secondary)
+                    .frame(width: 28)
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("Videoya Göm")
+                    Text("Videoya Göm").font(.subheadline.bold())
                     Text(embedInVideo ?
-                        "Altyazı videoyla birleştirilir (tek dosya)" :
-                        "Ayrı .srt dosyası olarak indirilir")
+                         "Altyazı videoyla birleştirilir (tek dosya)" :
+                         "Ayrı .srt dosyası olarak indirilir")
                         .font(.caption)
-                        .foregroundColor(.secondary)
+                        .foregroundStyle(.secondary)
                 }
             }
         }
-        .padding()
-        .background(Color(.systemGray6))
-        .cornerRadius(12)
+        .padding(16)
+        .glassCard()
     }
+
+    // MARK: - Download
 
     private var downloadButton: some View {
         Button {
             Task { await startDownload() }
         } label: {
-            HStack {
-                if isDownloading { ProgressView().tint(.white) }
-                else { Image(systemName: "captions.bubble.fill") }
-                Text(isDownloading ? "İndiriliyor..." : embedInVideo ? "Video + Altyazı İndir" : "Altyazı Dosyası İndir")
-                    .fontWeight(.semibold)
-            }
-            .frame(maxWidth: .infinity)
-            .padding()
-            .background(selectedLanguage.isEmpty || isDownloading ? Color.gray : Color.purple)
-            .foregroundColor(.white)
-            .cornerRadius(12)
+            LoadingLabel(
+                isLoading: isDownloading,
+                icon: "captions.bubble.fill",
+                loadingText: "İndiriliyor...",
+                idleText: embedInVideo ? "Video + Altyazı İndir" : "Altyazı Dosyası İndir"
+            )
         }
+        .buttonStyle(PrimaryButtonStyle(enabled: !selectedLanguage.isEmpty && !isDownloading))
         .disabled(selectedLanguage.isEmpty || isDownloading)
     }
+
+    // MARK: - Actions
 
     private func fetchTracks() async {
         isFetching = true

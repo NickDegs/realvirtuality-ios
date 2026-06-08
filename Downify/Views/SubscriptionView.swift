@@ -46,23 +46,28 @@ struct SubscriptionView: View {
 
     var body: some View {
         NavigationStack {
-            ScrollView {
-                VStack(spacing: 16) {
-                    headerSection
-                    ForEach(plans) { plan in
-                        PlanCard(plan: plan, isLoading: isLoading) {
-                            Task { await purchase(plan: plan.id) }
+            ZStack {
+                AppBackground()
+                ScrollView {
+                    VStack(spacing: 16) {
+                        headerSection
+                        ForEach(plans) { plan in
+                            PlanCard(plan: plan, isLoading: isLoading) {
+                                Task { await purchase(plan: plan.id) }
+                            }
+                        }
+                        if let error = errorMessage {
+                            Text(error)
+                                .font(.caption)
+                                .foregroundStyle(.red)
+                                .multilineTextAlignment(.center)
+                                .padding(.horizontal)
                         }
                     }
-                    if let error = errorMessage {
-                        Text(error)
-                            .font(.caption)
-                            .foregroundColor(.red)
-                            .multilineTextAlignment(.center)
-                            .padding(.horizontal)
-                    }
+                    .padding(.horizontal)
+                    .padding(.top, 8)
+                    .padding(.bottom, 32)
                 }
-                .padding()
             }
             .navigationTitle("Premium")
             .navigationBarTitleDisplayMode(.inline)
@@ -123,45 +128,51 @@ struct PlanCard: View {
     let action: () -> Void
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            HStack {
+        VStack(alignment: .leading, spacing: 14) {
+            HStack(alignment: .top) {
                 VStack(alignment: .leading, spacing: 4) {
                     Text(plan.name).font(.headline)
                     HStack(alignment: .firstTextBaseline, spacing: 2) {
-                        Text(plan.price).font(.title2.bold()).foregroundColor(.purple)
-                        Text(plan.period).font(.caption).foregroundColor(.secondary)
+                        Text(plan.price)
+                            .font(.title2.bold())
+                            .foregroundStyle(Color.brand)
+                        Text(plan.period)
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
                     }
                 }
                 Spacer()
                 Button(action: action) {
-                    if isLoading {
-                        ProgressView().tint(.white)
-                            .frame(width: 70, height: 34)
-                            .background(Color.purple)
-                            .cornerRadius(8)
-                    } else {
-                        Text("Satın Al")
-                            .fontWeight(.semibold)
-                            .frame(width: 70, height: 34)
-                            .background(Color.purple)
-                            .foregroundColor(.white)
-                            .cornerRadius(8)
+                    Group {
+                        if isLoading {
+                            ProgressView().tint(.white)
+                        } else {
+                            Text("Satın Al").fontWeight(.semibold).foregroundStyle(.white)
+                        }
                     }
+                    .frame(width: 76, height: 36)
+                    .background(LinearGradient.brand, in: RoundedRectangle(cornerRadius: 10))
                 }
                 .disabled(isLoading)
             }
-            Divider()
-            VStack(alignment: .leading, spacing: 6) {
+
+            Divider().opacity(0.2)
+
+            VStack(alignment: .leading, spacing: 8) {
                 ForEach(plan.features, id: \.self) { feature in
-                    Label(feature, systemImage: "checkmark.circle.fill")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
+                    HStack(spacing: 8) {
+                        Image(systemName: "checkmark.circle.fill")
+                            .font(.caption.bold())
+                            .foregroundStyle(Color.brand)
+                        Text(feature)
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
                 }
             }
         }
-        .padding()
-        .background(Color(.systemGray6))
-        .cornerRadius(16)
+        .padding(16)
+        .glassCard()
     }
 }
 

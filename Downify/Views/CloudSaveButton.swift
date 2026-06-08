@@ -23,11 +23,12 @@ struct CloudSaveButton: View {
             }
             .frame(maxWidth: .infinity)
             .padding()
-            .background(Color(.systemGray6))
-            .foregroundColor(.primary)
-            .cornerRadius(12)
+            .foregroundStyle(.primary)
         }
         .disabled(isDownloading)
+        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 14))
+        .overlay(RoundedRectangle(cornerRadius: 14).stroke(Color.white.opacity(0.15), lineWidth: 0.7))
+        .shadow(color: .black.opacity(0.07), radius: 8, y: 3)
         .fileExporter(
             isPresented: $showPicker,
             document: localURL.map { VideoFile(url: $0) },

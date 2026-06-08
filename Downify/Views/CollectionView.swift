@@ -11,14 +11,19 @@ struct CollectionView: View {
 
     var body: some View {
         NavigationStack {
-            Group {
-                if isLoading && collections.isEmpty {
-                    ProgressView("Yükleniyor...")
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
-                } else if collections.isEmpty {
-                    emptyState
-                } else {
-                    collectionGrid
+            ZStack {
+                AppBackground()
+                Group {
+                    if isLoading && collections.isEmpty {
+                        VStack(spacing: 14) {
+                            ProgressView().tint(.purple)
+                            Text("Yükleniyor...").font(.caption).foregroundStyle(.secondary)
+                        }
+                    } else if collections.isEmpty {
+                        emptyState
+                    } else {
+                        collectionGrid
+                    }
                 }
             }
             .navigationTitle("Koleksiyonlar")
@@ -44,32 +49,19 @@ struct CollectionView: View {
         .task { await load() }
     }
 
+    // MARK: - Empty
+
     private var emptyState: some View {
-        VStack(spacing: 20) {
-            Spacer()
-            Image(systemName: "rectangle.stack.fill")
-                .font(.system(size: 64))
-                .foregroundStyle(LinearGradient(colors: [.purple, .pink], startPoint: .top, endPoint: .bottom))
-            Text("Koleksiyon Yok")
-                .font(.title2.bold())
-            Text("Galerindeki videoları düzenlemek için koleksiyonlar oluştur")
-                .font(.subheadline)
-                .foregroundColor(.secondary)
-                .multilineTextAlignment(.center)
-                .padding(.horizontal)
-            Button { showCreate = true } label: {
-                Label("Koleksiyon Oluştur", systemImage: "plus")
-                    .fontWeight(.semibold)
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(Color.purple)
-                    .foregroundColor(.white)
-                    .cornerRadius(12)
-            }
-            .padding(.horizontal, 40)
-            Spacer()
-        }
+        EmptyStateView(
+            icon: "rectangle.stack.fill",
+            title: "Koleksiyon Yok",
+            subtitle: "Galerindeki videoları düzenlemek için koleksiyonlar oluştur",
+            action: { showCreate = true },
+            actionLabel: "Koleksiyon Oluştur"
+        )
     }
+
+    // MARK: - Grid
 
     private var collectionGrid: some View {
         ScrollView {
@@ -82,18 +74,20 @@ struct CollectionView: View {
                     .contentShape(Rectangle())
                     .onTapGesture { selectedCollection = col }
                     .contextMenu {
-                        Button(role: .destructive) {
-                            deleteCollection(col)
-                        } label: {
+                        Button(role: .destructive) { deleteCollection(col) } label: {
                             Label("Sil", systemImage: "trash")
                         }
                     }
                 }
             }
-            .padding()
+            .padding(.horizontal)
+            .padding(.top, 8)
+            .padding(.bottom, 24)
         }
         .refreshable { await load() }
     }
+
+    // MARK: - Actions
 
     private func load() async {
         isLoading = true
@@ -111,14 +105,12 @@ struct CollectionView: View {
     }
 
     private func loadCollections() async throws -> [MediaCollection] {
-        let stored = UserDefaults.standard.data(forKey: "rv_collections")
-        guard let data = stored else { return [] }
+        guard let data = UserDefaults.standard.data(forKey: "rv_collections") else { return [] }
         return (try? JSONDecoder().decode([MediaCollection].self, from: data)) ?? []
     }
 
     private func saveCollections() {
-        let data = try? JSONEncoder().encode(collections)
-        UserDefaults.standard.set(data, forKey: "rv_collections")
+        UserDefaults.standard.set(try? JSONEncoder().encode(collections), forKey: "rv_collections")
     }
 
     private func deleteCollection(_ col: MediaCollection) {
@@ -127,6 +119,8 @@ struct CollectionView: View {
     }
 }
 
+// MARK: - Collection Card
+
 struct CollectionCard: View {
     let collection: MediaCollection
     let items: [DownloadHistoryItem]
@@ -134,53 +128,48 @@ struct CollectionCard: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             ZStack {
-                if items.isEmpty {
-                    RoundedRectangle(cornerRadius: 10)
-                        .fill(Color(.systemGray5))
-                        .aspectRatio(16/9, contentMode: .fit)
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(Color(.systemGray5))
+                    .aspectRatio(16/9, contentMode: .fit)
+
+                if let urlStr = items.first?.thumbnailUrl, let url = URL(string: urlStr) {
+                    AsyncImage(url: url) { img in img.resizable().scaledToFill() }
+                        placeholder: { Color(.systemGray5) }
+                        .aspectRatio(16/9, contentMode: .fill)
+                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                } else {
                     Image(systemName: "photo.stack.fill")
                         .font(.largeTitle)
-                        .foregroundColor(.secondary)
-                } else {
-                    thumbnailGrid
+                        .foregroundStyle(.tertiary)
+                }
+
+                VStack {
+                    HStack {
+                        Spacer()
+                        Text("\(collection.itemIds.count)")
+                            .font(.caption2.bold())
+                            .foregroundStyle(.white)
+                            .padding(.horizontal, 7)
+                            .padding(.vertical, 3)
+                            .background(.black.opacity(0.55), in: Capsule())
+                            .padding(8)
+                    }
+                    Spacer()
                 }
             }
-            .cornerRadius(10)
+            .clipShape(RoundedRectangle(cornerRadius: 12))
 
-            VStack(alignment: .leading, spacing: 2) {
-                Text(collection.name)
-                    .font(.subheadline.bold())
-                    .lineLimit(1)
-                Text("\(collection.itemIds.count) video")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-            }
+            Text(collection.name)
+                .font(.caption.bold())
+                .lineLimit(1)
+                .padding(.horizontal, 4)
         }
-    }
-
-    private var thumbnailGrid: some View {
-        let thumb = items.first?.thumbnailUrl
-        return Group {
-            if let urlStr = thumb, let url = URL(string: urlStr) {
-                AsyncImage(url: url) { img in
-                    img.resizable().scaledToFill()
-                } placeholder: {
-                    Color(.systemGray5)
-                }
-                .aspectRatio(16/9, contentMode: .fill)
-                .clipped()
-            } else {
-                RoundedRectangle(cornerRadius: 0)
-                    .fill(Color(.systemGray4))
-                    .aspectRatio(16/9, contentMode: .fit)
-                    .overlay(
-                        Image(systemName: "photo.stack.fill")
-                            .foregroundColor(.secondary)
-                    )
-            }
-        }
+        .padding(10)
+        .glassCard(radius: 16)
     }
 }
+
+// MARK: - Collection Detail
 
 struct CollectionDetailView: View {
     let collection: MediaCollection
@@ -193,36 +182,34 @@ struct CollectionDetailView: View {
 
     var body: some View {
         NavigationStack {
-            Group {
-                if items.isEmpty {
-                    VStack(spacing: 16) {
-                        Spacer()
-                        Image(systemName: "photo.stack")
-                            .font(.system(size: 56))
-                            .foregroundColor(.secondary)
-                        Text("Bu koleksiyon boş")
-                            .font(.headline)
-                            .foregroundColor(.secondary)
-                        Spacer()
-                    }
-                } else {
-                    ScrollView {
-                        LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())], spacing: 2) {
-                            ForEach(items) { item in
-                                Group {
-                                    if let urlStr = item.thumbnailUrl, let url = URL(string: urlStr) {
-                                        AsyncImage(url: url) { img in
-                                            img.resizable().scaledToFill()
-                                        } placeholder: {
+            ZStack {
+                AppBackground()
+                Group {
+                    if items.isEmpty {
+                        EmptyStateView(
+                            icon: "photo.stack",
+                            title: "Bu koleksiyon boş",
+                            subtitle: "Galeri'den video ekleyebilirsin"
+                        )
+                    } else {
+                        ScrollView {
+                            LazyVGrid(
+                                columns: [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())],
+                                spacing: 2
+                            ) {
+                                ForEach(items) { item in
+                                    Group {
+                                        if let urlStr = item.thumbnailUrl, let url = URL(string: urlStr) {
+                                            AsyncImage(url: url) { img in img.resizable().scaledToFill() }
+                                                placeholder: { Color(.systemGray5) }
+                                        } else {
                                             Color(.systemGray5)
+                                                .overlay(Image(systemName: "video.fill").foregroundStyle(.secondary))
                                         }
-                                    } else {
-                                        Color(.systemGray5)
-                                            .overlay(Image(systemName: "video.fill").foregroundColor(.secondary))
                                     }
+                                    .aspectRatio(1, contentMode: .fill)
+                                    .clipped()
                                 }
-                                .aspectRatio(1, contentMode: .fill)
-                                .clipped()
                             }
                         }
                     }
@@ -239,6 +226,8 @@ struct CollectionDetailView: View {
     }
 }
 
+// MARK: - Create Sheet
+
 struct CreateCollectionSheet: View {
     @Environment(\.dismiss) private var dismiss
     let existingHistory: [DownloadHistoryItem]
@@ -247,43 +236,73 @@ struct CreateCollectionSheet: View {
 
     var body: some View {
         NavigationStack {
-            Form {
-                Section("Koleksiyon Adı") {
-                    TextField("Örn: En Sevdiklerim", text: $name)
-                }
+            ZStack {
+                AppBackground()
+                ScrollView {
+                    VStack(spacing: 16) {
+                        VStack(alignment: .leading, spacing: 10) {
+                            Text("Koleksiyon Adı")
+                                .font(.caption.bold())
+                                .foregroundStyle(.secondary)
+                                .padding(.horizontal, 4)
+                            TextField("Örn: En Sevdiklerim", text: $name)
+                                .textFieldStyle(.plain)
+                                .padding(14)
+                                .glassInput()
+                        }
 
-                if !existingHistory.isEmpty {
-                    Section("Video Ekle (\(selectedIds.count) seçili)") {
-                        ForEach(existingHistory.prefix(50)) { item in
-                            Button {
-                                if selectedIds.contains(item.id) { selectedIds.remove(item.id) }
-                                else { selectedIds.insert(item.id) }
-                            } label: {
-                                HStack(spacing: 12) {
-                                    if let urlStr = item.thumbnailUrl, let url = URL(string: urlStr) {
-                                        AsyncImage(url: url) { img in img.resizable().scaledToFill() }
-                                            placeholder: { Color(.systemGray5) }
-                                            .frame(width: 56, height: 36)
-                                            .cornerRadius(6)
-                                    } else {
-                                        RoundedRectangle(cornerRadius: 6)
-                                            .fill(Color(.systemGray5))
-                                            .frame(width: 56, height: 36)
+                        if !existingHistory.isEmpty {
+                            VStack(alignment: .leading, spacing: 10) {
+                                HStack {
+                                    Text("Video Ekle")
+                                        .font(.caption.bold())
+                                        .foregroundStyle(.secondary)
+                                    if selectedIds.count > 0 {
+                                        Text("(\(selectedIds.count) seçili)")
+                                            .font(.caption.bold())
+                                            .foregroundStyle(Color.brand)
                                     }
-                                    Text(item.filename)
-                                        .font(.subheadline)
-                                        .lineLimit(2)
-                                        .foregroundColor(.primary)
-                                    Spacer()
-                                    if selectedIds.contains(item.id) {
-                                        Image(systemName: "checkmark.circle.fill")
-                                            .foregroundColor(.purple)
+                                }
+                                .padding(.horizontal, 4)
+
+                                VStack(spacing: 8) {
+                                    ForEach(existingHistory.prefix(50)) { item in
+                                        Button {
+                                            if selectedIds.contains(item.id) { selectedIds.remove(item.id) }
+                                            else { selectedIds.insert(item.id) }
+                                        } label: {
+                                            HStack(spacing: 12) {
+                                                if let urlStr = item.thumbnailUrl, let url = URL(string: urlStr) {
+                                                    AsyncImage(url: url) { img in img.resizable().scaledToFill() }
+                                                        placeholder: { Color(.systemGray5) }
+                                                        .frame(width: 56, height: 36)
+                                                        .clipShape(RoundedRectangle(cornerRadius: 6))
+                                                } else {
+                                                    RoundedRectangle(cornerRadius: 6)
+                                                        .fill(Color(.systemGray5))
+                                                        .frame(width: 56, height: 36)
+                                                }
+                                                Text(item.filename)
+                                                    .font(.caption)
+                                                    .lineLimit(2)
+                                                    .foregroundStyle(.primary)
+                                                Spacer()
+                                                Image(systemName: selectedIds.contains(item.id) ? "checkmark.circle.fill" : "circle")
+                                                    .foregroundStyle(selectedIds.contains(item.id) ? Color.brand : .secondary)
+                                            }
+                                            .padding(12)
+                                            .glassCard(radius: 12)
+                                        }
+                                        .buttonStyle(.plain)
+                                        .animation(.spring(response: 0.2), value: selectedIds.contains(item.id))
                                     }
                                 }
                             }
-                            .buttonStyle(.plain)
                         }
                     }
+                    .padding(.horizontal)
+                    .padding(.top, 8)
+                    .padding(.bottom, 32)
                 }
             }
             .navigationTitle("Koleksiyon Oluştur")
@@ -294,8 +313,9 @@ struct CreateCollectionSheet: View {
                 }
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("Oluştur") { create() }
-                        .disabled(name.trimmingCharacters(in: .whitespaces).isEmpty)
                         .fontWeight(.semibold)
+                        .foregroundStyle(Color.brand)
+                        .disabled(name.trimmingCharacters(in: .whitespaces).isEmpty)
                 }
             }
         }
