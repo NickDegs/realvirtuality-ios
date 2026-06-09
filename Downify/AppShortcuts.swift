@@ -60,9 +60,9 @@ struct DownifyShortcuts: AppShortcutsProvider {
         AppShortcut(
             intent: DownloadVideoIntent(),
             phrases: [
-                "Downify ile indir",
-                "\(\.$url) Downify ile indir",
-                "Bu videoyu Downify'a gönder"
+                "\(.applicationName) ile indir",
+                "\(\.$url) \(.applicationName) ile indir",
+                "Bu videoyu \(.applicationName)'a gönder"
             ],
             shortTitle: "Video İndir",
             systemImageName: "arrow.down.circle.fill"
