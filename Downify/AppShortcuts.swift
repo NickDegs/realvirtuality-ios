@@ -31,7 +31,7 @@ struct DownloadVideoIntent: AppIntent {
     var audioOnly: Bool
 
     static var parameterSummary: some ParameterSummary {
-        Summary("Downify ile \(\.$url) indir") {
+        Summary("\(.applicationName) ile indir") {
             \.$quality
             \.$audioOnly
         }
@@ -61,7 +61,7 @@ struct DownifyShortcuts: AppShortcutsProvider {
             intent: DownloadVideoIntent(),
             phrases: [
                 "\(.applicationName) ile indir",
-                "\(\.$url) \(.applicationName) ile indir",
+                "\(.applicationName) ile video indir",
                 "Bu videoyu \(.applicationName)'a gönder"
             ],
             shortTitle: "Video İndir",

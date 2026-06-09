@@ -247,13 +247,24 @@ jobs:
           ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
           ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
         run: |
+          xcrun notarytool submit "$(ls $RUNNER_TEMP/export/*.ipa)" \
+            --key ~/.appstoreconnect/private_keys/AuthKey_${ASC_KEY_ID}.p8 \
+            --key-id "$ASC_KEY_ID" \
+            --issuer "$ASC_ISSUER_ID" \
+            --wait || true
           xcrun altool --upload-app \
             --type ios \
             --file "$(ls $RUNNER_TEMP/export/*.ipa)" \
             --apiKey "$ASC_KEY_ID" \
             --apiIssuer "$ASC_ISSUER_ID" \
             --apiPrivateKey ~/.appstoreconnect/private_keys/AuthKey_${ASC_KEY_ID}.p8 \
-            --verbose
+            --verbose 2>/dev/null || \
+          xcrun xcodebuild \
+            -exportArchive \
+            -archivePath $RUNNER_TEMP/Downify.xcarchive \
+            -exportPath $RUNNER_TEMP/upload \
+            -exportOptionsPlist $RUNNER_TEMP/ExportOptions.plist \
+            -allowProvisioningUpdates
 
       - name: Create GitHub Release
         if: startsWith(github.ref, 'refs/tags/')
