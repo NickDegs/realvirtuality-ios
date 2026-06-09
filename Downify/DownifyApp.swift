@@ -1,4 +1,5 @@
 import SwiftUI
+import GoogleSignIn
 
 @main
 struct DownifyApp: App {
@@ -20,6 +21,9 @@ struct DownifyApp: App {
     }
 
     private func handleDeepLink(_ url: URL) {
+        // Google Sign-In OAuth callback (reversed client ID URL scheme)
+        if GIDSignIn.sharedInstance.handle(url) { return }
+
         guard url.scheme == "downify" else { return }
         switch url.host {
         case "payment":
