@@ -346,11 +346,3 @@ struct SessionRow: View {
     }
 }
 
-// MARK: - Model
-
-struct PlatformSession: Codable, Identifiable {
-    let id: String
-    let platform: String
-    let username: String?
-    let connectedAt: String?
-}

@@ -1,5 +1,16 @@
 import AppIntents
 
+enum IntentError: Error, LocalizedError {
+    case notFound
+    case invalidURL
+    var errorDescription: String? {
+        switch self {
+        case .notFound:    return "Bulunamadı"
+        case .invalidURL:  return "Geçersiz URL"
+        }
+    }
+}
+
 // MARK: - Download Video Intent (iOS 16+)
 
 @available(iOS 16.0, *)

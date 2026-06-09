@@ -332,26 +332,6 @@ struct ShortcutCard: View {
     }
 }
 
-// MARK: - Premium Badge
-
-struct PremiumBadge: View {
-    var body: some View {
-        HStack(spacing: 3) {
-            Image(systemName: "crown.fill")
-                .font(.system(size: 9))
-            Text("FULL")
-                .font(.system(size: 9, weight: .black))
-        }
-        .foregroundStyle(.white)
-        .padding(.horizontal, 8)
-        .padding(.vertical, 4)
-        .background(
-            LinearGradient(colors: [.yellow, .orange], startPoint: .leading, endPoint: .trailing),
-            in: Capsule()
-        )
-    }
-}
-
 // MARK: - Share Extension Setup
 
 struct ShareExtensionSetupView: View {

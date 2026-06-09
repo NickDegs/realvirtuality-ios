@@ -206,7 +206,7 @@ struct SubscriptionPlan: Identifiable {
     let period: String
     let features: [String]
     let tier: SubscriptionTier
-    let highlighted: Bool
+    var highlighted: Bool = false
 }
 
 // MARK: - Cloud

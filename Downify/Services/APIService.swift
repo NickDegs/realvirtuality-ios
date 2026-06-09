@@ -138,7 +138,7 @@ final class APIService {
     // MARK: - Clip / GIF
 
     func startClip(url: String, startTime: Double, endTime: Double, asGif: Bool = false, quality: String? = nil) async throws -> DownloadResponse {
-        let body = ClipRequest(url: url, startTime: startTime, endTime: endTime, asGif: asGif, quality: quality)
+        let body = ClipRequest(url: url, startTime: startTime, endTime: endTime, asGif: asGif, fps: nil, quality: quality)
         return try await request("/download/clip", method: "POST", body: body)
     }
 

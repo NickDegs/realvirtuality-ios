@@ -113,7 +113,7 @@ struct DownloadProgressView: View {
         // Timeout: failed olarak işaretle
         if status == nil || (status?.status != "completed" && status?.status != "failed") {
             status = DownloadStatus(taskId: taskId, status: "failed", progress: nil,
-                                    downloadUrl: nil, filename: nil, error: "Zaman aşımı")
+                                    downloadUrl: nil, filename: nil, fileSize: nil, error: "Zaman aşımı")
         }
     }
 }
