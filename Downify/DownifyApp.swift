@@ -3,18 +3,13 @@ import SwiftUI
 @main
 struct DownifyApp: App {
     @StateObject private var authState = AuthState()
-    @ObservedObject private var adManager = AdManager.shared
 
     var body: some Scene {
         WindowGroup {
             ContentView()
                 .environmentObject(authState)
-                .environmentObject(adManager)
                 .onOpenURL { url in
                     handleDeepLink(url)
-                }
-                .task {
-                    AdManager.shared.initialize()
                 }
         }
     }

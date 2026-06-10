@@ -57,9 +57,7 @@ targets:
           CODE_SIGN_STYLE: Manual
           CODE_SIGN_IDENTITY: "Apple Distribution"
           PROVISIONING_PROFILE_SPECIFIER: "Downify AppStore Distribution"
-    dependencies:
-      - package: GoogleMobileAds
-        product: GoogleMobileAds
+    dependencies: []
 
   DownifyShareExtension:
     type: app-extension
@@ -85,10 +83,7 @@ targets:
           PROVISIONING_PROFILE_SPECIFIER: "DownifyShare AppStore Distribution"
     dependencies: []
 
-packages:
-  GoogleMobileAds:
-    url: https://github.com/googleads/swift-package-manager-google-mobile-ads
-    from: "13.0.0"
+packages: {}
 
 schemes:
   Downify:
