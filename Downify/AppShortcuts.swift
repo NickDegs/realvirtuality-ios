@@ -31,7 +31,7 @@ struct DownloadVideoIntent: AppIntent {
     var audioOnly: Bool
 
     static var parameterSummary: some ParameterSummary {
-        Summary("\(.applicationName) ile indir") {
+        Summary("Video İndir") {
             \.$quality
             \.$audioOnly
         }

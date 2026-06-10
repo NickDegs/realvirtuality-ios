@@ -19,7 +19,7 @@ class AdManager: ObservableObject {
         guard !isInitialized else { return }
         isInitialized = true
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
-            GADMobileAds.sharedInstance().start { [weak self] _ in
+            MobileAds.shared.start { [weak self] _ in
                 DispatchQueue.main.async {
                     self?.consentObtained = true
                     self?.requestATT()
