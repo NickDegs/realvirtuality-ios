@@ -6,47 +6,95 @@ struct AccountView: View {
 
     var body: some View {
         NavigationStack {
-            ZStack {
-                AppBackground()
-                ScrollView {
-                    VStack(spacing: 16) {
-                        profileCard
-                        subscriptionCard
-                        featuresCard
-                        actionsCard
+            List {
+                Section {
+                    profileRow
+                }
+
+                Section("Abonelik") {
+                    subscriptionRow
+                }
+
+                Section("Özellikler") {
+                    NavigationLink(destination: PrivateAccountsView()) {
+                        Label {
+                            VStack(alignment: .leading, spacing: 2) {
+                                HStack(spacing: 6) {
+                                    Text("Özel Hesaplar")
+                                    if authState.user?.tier != .full {
+                                        Image(systemName: "crown.fill")
+                                            .font(.system(size: 10))
+                                            .foregroundStyle(.yellow)
+                                    }
+                                }
+                                Text("Instagram özel içerik erişimi")
+                                    .font(.caption).foregroundStyle(.secondary)
+                            }
+                        } icon: {
+                            Image(systemName: "lock.open.fill")
+                                .foregroundStyle(.purple)
+                        }
                     }
-                    .padding(.horizontal)
-                    .padding(.top, 8)
-                    .padding(.bottom, 24)
+
+                    NavigationLink(destination: ShortcutView()) {
+                        Label {
+                            VStack(alignment: .leading, spacing: 2) {
+                                HStack(spacing: 6) {
+                                    Text("Kestirmeler")
+                                    if authState.user?.tier != .full {
+                                        Image(systemName: "crown.fill")
+                                            .font(.system(size: 10))
+                                            .foregroundStyle(.yellow)
+                                    }
+                                }
+                                Text("Siri & paylaşım menüsü")
+                                    .font(.caption).foregroundStyle(.secondary)
+                            }
+                        } icon: {
+                            Image(systemName: "bolt.fill")
+                                .foregroundStyle(.orange)
+                        }
+                    }
+
+                    NavigationLink(destination: AutoDownloadView()) {
+                        Label {
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text("Otomatik İndirme")
+                                Text("Profil takibi & zamanlama")
+                                    .font(.caption).foregroundStyle(.secondary)
+                            }
+                        } icon: {
+                            Image(systemName: "clock.arrow.2.circlepath")
+                                .foregroundStyle(.green)
+                        }
+                    }
+                }
+
+                Section {
+                    Button(role: .destructive) {
+                        authState.logout()
+                    } label: {
+                        Label("Çıkış Yap", systemImage: "rectangle.portrait.and.arrow.right")
+                    }
                 }
             }
+            .listStyle(.insetGrouped)
             .navigationTitle("Hesabım")
             .sheet(isPresented: $showSubscription) { SubscriptionView() }
         }
     }
 
-    // MARK: - Profile Card
+    // MARK: - Profile Row
 
-    private var profileCard: some View {
-        HStack(spacing: 16) {
-            ZStack {
-                Circle()
-                    .fill(
-                        LinearGradient(
-                            colors: [Color.purple.opacity(0.5), Color.indigo.opacity(0.3)],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
-                    .frame(width: 64, height: 64)
-                Image(systemName: "person.fill")
-                    .font(.system(size: 28))
-                    .foregroundStyle(.white)
-            }
+    private var profileRow: some View {
+        HStack(spacing: 14) {
+            Image(systemName: "person.circle.fill")
+                .font(.system(size: 48))
+                .foregroundStyle(.purple)
 
             VStack(alignment: .leading, spacing: 4) {
                 Text(authState.user?.username ?? "")
-                    .font(.title3.bold())
+                    .font(.headline)
                 Text(authState.user?.email ?? "")
                     .font(.caption)
                     .foregroundStyle(.secondary)
@@ -56,132 +104,42 @@ struct AccountView: View {
 
             tierBadge
         }
-        .padding(20)
-        .glassCard()
+        .padding(.vertical, 6)
     }
 
     private var tierBadge: some View {
-        HStack(spacing: 5) {
-            Image(systemName: tierIcon)
-                .font(.caption.bold())
-            Text(tierShortName)
-                .font(.caption.bold())
-        }
-        .foregroundStyle(tierColor)
-        .padding(.horizontal, 12)
-        .padding(.vertical, 6)
-        .background(tierColor.opacity(0.15), in: Capsule())
-        .overlay(Capsule().stroke(tierColor.opacity(0.3), lineWidth: 0.7))
+        Text(tierShortName)
+            .font(.caption.bold())
+            .foregroundStyle(tierColor)
+            .padding(.horizontal, 10)
+            .padding(.vertical, 5)
+            .background(tierColor.opacity(0.15), in: Capsule())
     }
 
-    // MARK: - Subscription Card
+    // MARK: - Subscription Row
 
-    private var subscriptionCard: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            Text("Abonelik")
-                .font(.caption.bold())
-                .foregroundStyle(.secondary)
-                .padding(.horizontal, 4)
-
-            HStack {
-                VStack(alignment: .leading, spacing: 4) {
-                    HStack(spacing: 8) {
-                        Image(systemName: tierIcon)
-                            .foregroundStyle(tierColor)
-                        Text(tierName)
-                            .font(.headline)
-                    }
-                    Text(tierDescription)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+    private var subscriptionRow: some View {
+        HStack {
+            VStack(alignment: .leading, spacing: 4) {
+                HStack(spacing: 8) {
+                    Image(systemName: tierIcon)
+                        .foregroundStyle(tierColor)
+                    Text(tierName).font(.subheadline.bold())
                 }
+                Text(tierDescription)
+                    .font(.caption).foregroundStyle(.secondary)
+            }
 
-                Spacer()
+            Spacer()
 
-                if authState.user?.tier != .full {
-                    Button("Yükselt") { showSubscription = true }
-                        .font(.subheadline.bold())
-                        .foregroundStyle(.white)
-                        .padding(.horizontal, 16)
-                        .padding(.vertical, 8)
-                        .background(
-                            LinearGradient(
-                                colors: [Color(red: 0.55, green: 0.18, blue: 0.90),
-                                         Color(red: 0.38, green: 0.08, blue: 0.72)],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            ),
-                            in: Capsule()
-                        )
-                        .shadow(color: .purple.opacity(0.35), radius: 6, y: 3)
-                }
+            if authState.user?.tier != .full {
+                Button("Yükselt") { showSubscription = true }
+                    .buttonStyle(.borderedProminent)
+                    .tint(.purple)
+                    .controlSize(.small)
             }
         }
-        .padding(20)
-        .glassCard()
-    }
-
-    // MARK: - Features Card
-
-    private var featuresCard: some View {
-        VStack(spacing: 0) {
-            NavigationLink(destination: PrivateAccountsView()) {
-                AccountRow(
-                    icon: "lock.open.fill",
-                    iconColor: .purple,
-                    title: "Özel Hesaplar",
-                    subtitle: "Instagram özel içerik erişimi",
-                    showBadge: authState.user?.tier != .full
-                )
-            }
-            .buttonStyle(.plain)
-
-            Divider().padding(.leading, 56)
-
-            NavigationLink(destination: ShortcutView()) {
-                AccountRow(
-                    icon: "bolt.fill",
-                    iconColor: .orange,
-                    title: "Kestirmeler",
-                    subtitle: "Siri & paylaşım menüsü",
-                    showBadge: authState.user?.tier != .full
-                )
-            }
-            .buttonStyle(.plain)
-
-            Divider().padding(.leading, 56)
-
-            NavigationLink(destination: AutoDownloadView()) {
-                AccountRow(
-                    icon: "clock.arrow.2.circlepath",
-                    iconColor: .green,
-                    title: "Otomatik İndirme",
-                    subtitle: "Profil takibi & zamanlama",
-                    showBadge: false
-                )
-            }
-            .buttonStyle(.plain)
-        }
-        .glassCard()
-    }
-
-    // MARK: - Actions Card
-
-    private var actionsCard: some View {
-        VStack(spacing: 0) {
-            Button(role: .destructive) {
-                authState.logout()
-            } label: {
-                HStack {
-                    Image(systemName: "rectangle.portrait.and.arrow.right")
-                    Text("Çıkış Yap")
-                    Spacer()
-                }
-                .padding(18)
-                .foregroundStyle(.red)
-            }
-        }
-        .glassCard()
+        .padding(.vertical, 4)
     }
 
     // MARK: - Helpers
@@ -219,45 +177,6 @@ struct AccountView: View {
         case .adFree: return "star.fill"
         case .full:   return "crown.fill"
         case .none:   return "star"
-        }
-    }
-
-    // MARK: - Account Row Helper
-
-    private struct AccountRow: View {
-        let icon: String
-        let iconColor: Color
-        let title: String
-        let subtitle: String
-        let showBadge: Bool
-
-        var body: some View {
-            HStack(spacing: 14) {
-                Image(systemName: icon)
-                    .font(.subheadline.bold())
-                    .foregroundStyle(iconColor)
-                    .frame(width: 36, height: 36)
-                    .background(iconColor.opacity(0.12), in: RoundedRectangle(cornerRadius: 10))
-
-                VStack(alignment: .leading, spacing: 2) {
-                    HStack(spacing: 6) {
-                        Text(title).font(.subheadline.bold())
-                        if showBadge {
-                            Image(systemName: "crown.fill")
-                                .font(.system(size: 9))
-                                .foregroundStyle(.yellow)
-                        }
-                    }
-                    Text(subtitle).font(.caption).foregroundStyle(.secondary)
-                }
-
-                Spacer()
-
-                Image(systemName: "chevron.right")
-                    .font(.caption.bold())
-                    .foregroundStyle(.tertiary)
-            }
-            .padding(16)
         }
     }
 

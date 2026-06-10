@@ -10,65 +10,50 @@ struct SubscriptionView: View {
     @State private var errorMessage: String?
 
     let plans: [SubscriptionPlan] = [
-        SubscriptionPlan(
-            id: "ad_free",
-            name: "Pro",
-            price: "$3",
-            period: "tek seferlik",
-            features: ["Öncelikli indirme", "Temel indirme", "Tüm platformlar"],
-            tier: .adFree
-        ),
-        SubscriptionPlan(
-            id: "full_monthly",
-            name: "Full — Aylık",
-            price: "$5",
-            period: "/ ay",
-            features: ["Tüm özellikler", "⚡ Kestirme & Siri desteği", "🔒 Özel hesap indirme", "Öncelikli indirme", "HD kalite"],
-            tier: .full
-        ),
-        SubscriptionPlan(
-            id: "full_yearly",
-            name: "Full — Yıllık",
-            price: "$30",
-            period: "/ yıl",
-            features: ["Tüm özellikler", "⚡ Kestirme & Siri desteği", "🔒 Özel hesap indirme", "Öncelikli indirme", "HD kalite", "%50 tasarruf"],
-            tier: .full
-        ),
-        SubscriptionPlan(
-            id: "full_lifetime",
-            name: "Ömür Boyu",
-            price: "$50",
-            period: "tek seferlik",
-            features: ["Tüm özellikler", "⚡ Kestirme & Siri desteği", "🔒 Özel hesap indirme", "Sınırsız indirme", "Kalıcı lisans"],
-            tier: .full
-        )
+        SubscriptionPlan(id: "ad_free", name: "Pro", price: "$3", period: "tek seferlik",
+                         features: ["Öncelikli indirme", "Temel indirme", "Tüm platformlar"], tier: .adFree),
+        SubscriptionPlan(id: "full_monthly", name: "Full — Aylık", price: "$5", period: "/ ay",
+                         features: ["Tüm özellikler", "Kestirme & Siri desteği", "Özel hesap indirme", "HD kalite"], tier: .full, highlighted: true),
+        SubscriptionPlan(id: "full_yearly", name: "Full — Yıllık", price: "$30", period: "/ yıl",
+                         features: ["Tüm özellikler", "Kestirme & Siri desteği", "Özel hesap indirme", "%50 tasarruf"], tier: .full),
+        SubscriptionPlan(id: "full_lifetime", name: "Ömür Boyu", price: "$50", period: "tek seferlik",
+                         features: ["Tüm özellikler", "Sınırsız indirme", "Kalıcı lisans"], tier: .full),
     ]
 
     var body: some View {
         NavigationStack {
-            ZStack {
-                AppBackground()
-                ScrollView {
-                    VStack(spacing: 16) {
-                        headerSection
-                        ForEach(plans) { plan in
-                            PlanCard(plan: plan, isLoading: isLoading) {
-                                Task { await purchase(plan: plan.id) }
-                            }
-                        }
-                        if let error = errorMessage {
-                            Text(error)
-                                .font(.caption)
-                                .foregroundStyle(.red)
-                                .multilineTextAlignment(.center)
-                                .padding(.horizontal)
-                        }
+            List {
+                Section {
+                    VStack(spacing: 8) {
+                        Image(systemName: "crown.fill")
+                            .font(.system(size: 48))
+                            .foregroundStyle(.yellow)
+                        Text("Premium'a Geç").font(.title2.bold())
+                        Text("Tüm platformlardan sınırsız indirme")
+                            .foregroundStyle(.secondary)
+                            .multilineTextAlignment(.center)
                     }
-                    .padding(.horizontal)
-                    .padding(.top, 8)
-                    .padding(.bottom, 32)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 8)
+                }
+                .listRowBackground(Color.clear)
+                .listRowSeparator(.hidden)
+
+                ForEach(plans) { plan in
+                    Section {
+                        planRow(plan)
+                    }
+                }
+
+                if let error = errorMessage {
+                    Section {
+                        Text(error).font(.caption).foregroundStyle(.red)
+                            .multilineTextAlignment(.center)
+                    }
+                    .listRowBackground(Color.clear)
                 }
             }
+            .listStyle(.insetGrouped)
             .navigationTitle("Premium")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -77,33 +62,60 @@ struct SubscriptionView: View {
                 }
             }
             .sheet(isPresented: $showSafari) {
-                if let url = safariURL {
-                    SafariView(url: url)
-                }
+                if let url = safariURL { SafariView(url: url) }
             }
             .onReceive(NotificationCenter.default.publisher(for: .paymentResult)) { notification in
                 if let success = notification.object as? Bool, success {
-                    Task {
-                        await authState.refreshUser()
-                        dismiss()
-                    }
+                    Task { await authState.refreshUser(); dismiss() }
                 }
             }
         }
     }
 
-    private var headerSection: some View {
-        VStack(spacing: 8) {
-            Image(systemName: "crown.fill")
-                .font(.system(size: 52))
-                .foregroundColor(.yellow)
-            Text("Premium'a Geç")
-                .font(.title2.bold())
-            Text("Tüm platformlardan sınırsız indirme")
-                .foregroundColor(.secondary)
-                .multilineTextAlignment(.center)
+    private func planRow(_ plan: SubscriptionPlan) -> some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(alignment: .top) {
+                VStack(alignment: .leading, spacing: 4) {
+                    HStack(spacing: 6) {
+                        Text(plan.name).font(.headline)
+                        if plan.highlighted {
+                            Text("Popüler")
+                                .font(.caption2.bold()).foregroundStyle(.white)
+                                .padding(.horizontal, 7).padding(.vertical, 3)
+                                .background(Color.purple, in: Capsule())
+                        }
+                    }
+                    HStack(alignment: .firstTextBaseline, spacing: 2) {
+                        Text(plan.price).font(.title2.bold()).foregroundStyle(.purple)
+                        Text(plan.period).font(.caption).foregroundStyle(.secondary)
+                    }
+                }
+                Spacer()
+                Button {
+                    Task { await purchase(plan: plan.id) }
+                } label: {
+                    if isLoading {
+                        ProgressView().frame(width: 76, height: 36)
+                    } else {
+                        Text("Satın Al")
+                            .fontWeight(.semibold)
+                            .frame(width: 76, height: 36)
+                    }
+                }
+                .buttonStyle(.borderedProminent)
+                .tint(.purple)
+                .disabled(isLoading)
+            }
+
+            VStack(alignment: .leading, spacing: 6) {
+                ForEach(plan.features, id: \.self) { feature in
+                    Label(feature, systemImage: "checkmark.circle.fill")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+            }
         }
-        .padding(.vertical)
+        .padding(.vertical, 4)
     }
 
     private func purchase(plan: String) async {
@@ -111,10 +123,7 @@ struct SubscriptionView: View {
         errorMessage = nil
         do {
             let urlString = try await APIService.shared.getCheckoutURL(plan: plan)
-            if let url = URL(string: urlString) {
-                safariURL = url
-                showSafari = true
-            }
+            if let url = URL(string: urlString) { safariURL = url; showSafari = true }
         } catch {
             errorMessage = error.localizedDescription
         }
@@ -122,64 +131,8 @@ struct SubscriptionView: View {
     }
 }
 
-struct PlanCard: View {
-    let plan: SubscriptionPlan
-    let isLoading: Bool
-    let action: () -> Void
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            HStack(alignment: .top) {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(plan.name).font(.headline)
-                    HStack(alignment: .firstTextBaseline, spacing: 2) {
-                        Text(plan.price)
-                            .font(.title2.bold())
-                            .foregroundStyle(Color.brand)
-                        Text(plan.period)
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
-                }
-                Spacer()
-                Button(action: action) {
-                    Group {
-                        if isLoading {
-                            ProgressView().tint(.white)
-                        } else {
-                            Text("Satın Al").fontWeight(.semibold).foregroundStyle(.white)
-                        }
-                    }
-                    .frame(width: 76, height: 36)
-                    .background(LinearGradient.brand, in: RoundedRectangle(cornerRadius: 10))
-                }
-                .disabled(isLoading)
-            }
-
-            Divider().opacity(0.2)
-
-            VStack(alignment: .leading, spacing: 8) {
-                ForEach(plan.features, id: \.self) { feature in
-                    HStack(spacing: 8) {
-                        Image(systemName: "checkmark.circle.fill")
-                            .font(.caption.bold())
-                            .foregroundStyle(Color.brand)
-                        Text(feature)
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
-                }
-            }
-        }
-        .padding(16)
-        .glassCard()
-    }
-}
-
 struct SafariView: UIViewControllerRepresentable {
     let url: URL
-    func makeUIViewController(context: Context) -> SFSafariViewController {
-        SFSafariViewController(url: url)
-    }
+    func makeUIViewController(context: Context) -> SFSafariViewController { SFSafariViewController(url: url) }
     func updateUIViewController(_ uiViewController: SFSafariViewController, context: Context) {}
 }

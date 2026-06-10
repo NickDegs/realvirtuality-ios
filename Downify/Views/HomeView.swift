@@ -74,39 +74,28 @@ struct DownloadTab: View {
 
     var body: some View {
         NavigationStack {
-            ZStack {
-                AppBackground()
-                ScrollView {
-                    VStack(spacing: 0) {
-                        urlInputSection
+            ScrollView {
+                VStack(spacing: 16) {
+                    urlInputCard
+                    modeSelector
+                    modeContent
+                        .padding(.horizontal)
+                    if downloadMode == .single {
+                        platformSupportRow
                             .padding(.horizontal)
-                            .padding(.top, 8)
-
-                        modeSelector
-                            .padding(.top, 16)
-
-                        modeContent
-                            .padding(.horizontal)
-                            .padding(.top, 12)
-
-                        if downloadMode == .single {
-                            platformSupportSection
-                                .padding(.horizontal)
-                                .padding(.top, 20)
-                        }
                     }
-                    .padding(.bottom, 32)
                 }
+                .padding(.top, 8)
+                .padding(.bottom, 32)
             }
             .navigationTitle("Downify")
             .navigationBarTitleDisplayMode(.large)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button { showSettings = true } label: {
-                        Image(systemName: "gearshape.fill")
-                            .foregroundStyle(.purple)
-                            .padding(8)
-                            .glassInput(radius: 10)
+                    Button {
+                        showSettings = true
+                    } label: {
+                        Image(systemName: "gearshape")
                     }
                 }
             }
@@ -131,11 +120,10 @@ struct DownloadTab: View {
         }
     }
 
-    // MARK: - URL Input Section
+    // MARK: - URL Input Card
 
-    private var urlInputSection: some View {
+    private var urlInputCard: some View {
         VStack(spacing: 12) {
-            // URL Field
             HStack(spacing: 10) {
                 platformIcon
                     .frame(width: 28)
@@ -158,10 +146,7 @@ struct DownloadTab: View {
                     }
                 } else {
                     Button {
-                        withAnimation {
-                            urlText = ""
-                            detectedPlatform = nil
-                        }
+                        withAnimation { urlText = ""; detectedPlatform = nil }
                     } label: {
                         Image(systemName: "xmark.circle.fill")
                             .foregroundStyle(.secondary)
@@ -171,10 +156,8 @@ struct DownloadTab: View {
             .padding(14)
             .glassInput()
 
-            // Options
             optionsRow
 
-            // Download Button
             Button {
                 Task { await startDownload() }
             } label: {
@@ -185,12 +168,16 @@ struct DownloadTab: View {
                         Image(systemName: "arrow.down.circle.fill").font(.body.bold())
                     }
                     Text(isDownloading ? "İndiriliyor..." : "İndir")
+                        .fontWeight(.semibold)
                 }
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 4)
             }
-            .buttonStyle(PrimaryButtonStyle(enabled: !urlText.isEmpty && !isDownloading))
+            .buttonStyle(.borderedProminent)
+            .controlSize(.large)
+            .tint(.purple)
             .disabled(urlText.isEmpty || isDownloading)
 
-            // Progress
             if let task = downloadTask {
                 DownloadProgressView(taskId: task.taskId) {
                     downloadTask = nil
@@ -202,25 +189,23 @@ struct DownloadTab: View {
         }
         .padding(16)
         .glassCard()
+        .padding(.horizontal)
         .animation(.spring(response: 0.35, dampingFraction: 0.8), value: downloadTask != nil)
     }
 
     @ViewBuilder
     private var platformIcon: some View {
-        Group {
-            if let p = detectedPlatform {
-                Image(systemName: platformSFSymbol(p))
-                    .foregroundStyle(platformColor(p))
-                    .font(.title3)
-                    .transition(.scale.combined(with: .opacity))
-                    .id(p)
-            } else {
-                Image(systemName: "link")
-                    .foregroundStyle(.purple)
-                    .font(.title3)
-            }
+        if let p = detectedPlatform {
+            Image(systemName: platformSFSymbol(p))
+                .foregroundStyle(platformColor(p))
+                .font(.title3)
+                .transition(.scale.combined(with: .opacity))
+                .id(p)
+        } else {
+            Image(systemName: "link")
+                .foregroundStyle(.purple)
+                .font(.title3)
         }
-        .animation(.spring(response: 0.25), value: detectedPlatform)
     }
 
     // MARK: - Options Row
@@ -230,18 +215,13 @@ struct DownloadTab: View {
             HStack(spacing: 8) {
                 GlassPill("Watermark'sız",
                           icon: removeWatermark ? "checkmark.seal.fill" : "seal",
-                          isSelected: removeWatermark) {
-                    removeWatermark.toggle()
-                }
+                          isSelected: removeWatermark) { removeWatermark.toggle() }
 
                 GlassPill(audioOnly ? "MP3" : "Video",
                           icon: audioOnly ? "music.note" : "video",
-                          isSelected: audioOnly) {
-                    audioOnly.toggle()
-                }
+                          isSelected: audioOnly) { audioOnly.toggle() }
 
                 privateToggle
-
                 qualityMenu
             }
             .padding(.vertical, 2)
@@ -251,36 +231,22 @@ struct DownloadTab: View {
     @ViewBuilder
     private var privateToggle: some View {
         Button {
-            if !isFullTier {
-                showSubscription = true
-            } else {
-                withAnimation { usePrivateAccount.toggle() }
-            }
+            if !isFullTier { showSubscription = true }
+            else { withAnimation { usePrivateAccount.toggle() } }
         } label: {
             HStack(spacing: 5) {
                 Image(systemName: usePrivateAccount && isFullTier ? "lock.fill" : "lock.open")
                     .font(.caption.bold())
-                Text("Özel Hesap")
-                    .font(.caption.bold())
+                Text("Özel Hesap").font(.caption.bold())
                 if !isFullTier {
-                    Image(systemName: "crown.fill")
-                        .font(.system(size: 9))
-                        .foregroundStyle(.yellow)
+                    Image(systemName: "crown.fill").font(.system(size: 9)).foregroundStyle(.yellow)
                 }
             }
-            .padding(.horizontal, 12)
-            .padding(.vertical, 8)
-            .foregroundStyle(usePrivateAccount && isFullTier ? .white : .secondary)
-            .background(.thinMaterial, in: Capsule())
-            .background {
-                if usePrivateAccount && isFullTier {
-                    Color.purple.clipShape(Capsule())
-                }
-            }
-            .overlay(Capsule().stroke(Color.white.opacity(0.15), lineWidth: 0.6))
-            .shadow(color: Color.purple.opacity(usePrivateAccount && isFullTier ? 0.3 : 0), radius: 6, y: 3)
+            .padding(.horizontal, 14).padding(.vertical, 8)
+            .foregroundStyle(usePrivateAccount && isFullTier ? .white : .primary)
         }
         .buttonStyle(.plain)
+        .modifier(PillStyle(isSelected: usePrivateAccount && isFullTier))
         .animation(.spring(response: 0.25, dampingFraction: 0.7), value: usePrivateAccount)
     }
 
@@ -295,12 +261,9 @@ struct DownloadTab: View {
                 Text(defaultQuality == "best" ? "En İyi" : "\(defaultQuality)p")
             }
             .font(.caption.bold())
-            .foregroundStyle(.secondary)
-            .padding(.horizontal, 12)
-            .padding(.vertical, 8)
-            .background(.thinMaterial, in: Capsule())
-            .overlay(Capsule().stroke(Color.white.opacity(0.12), lineWidth: 0.6))
+            .padding(.horizontal, 14).padding(.vertical, 8)
         }
+        .glassEffect(in: .capsule)
     }
 
     // MARK: - Mode Selector
@@ -309,11 +272,7 @@ struct DownloadTab: View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 8) {
                 ForEach(DownloadMode.allCases) { mode in
-                    GlassPill(
-                        mode.rawValue,
-                        icon: mode.icon,
-                        isSelected: downloadMode == mode
-                    ) {
+                    GlassPill(mode.rawValue, icon: mode.icon, isSelected: downloadMode == mode) {
                         withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
                             downloadMode = mode
                         }
@@ -340,7 +299,7 @@ struct DownloadTab: View {
 
     // MARK: - Platform Support
 
-    private var platformSupportSection: some View {
+    private var platformSupportRow: some View {
         VStack(alignment: .leading, spacing: 10) {
             Text("Desteklenen Platformlar")
                 .font(.caption)
@@ -351,24 +310,16 @@ struct DownloadTab: View {
                 HStack(spacing: 8) {
                     ForEach(supportedPlatforms, id: \.name) { p in
                         HStack(spacing: 5) {
-                            Image(systemName: p.icon)
-                                .font(.caption.bold())
-                                .foregroundStyle(p.color)
-                            Text(p.name)
-                                .font(.caption.bold())
+                            Image(systemName: p.icon).font(.caption.bold()).foregroundStyle(p.color)
+                            Text(p.name).font(.caption.bold())
                         }
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 7)
-                        .background(.thinMaterial, in: Capsule())
-                        .overlay(Capsule().stroke(p.color.opacity(0.3), lineWidth: 0.7))
+                        .padding(.horizontal, 12).padding(.vertical, 7)
+                        .glassEffect(in: .capsule)
                     }
                     Text("1000+ platform")
-                        .font(.caption.bold())
-                        .foregroundStyle(.purple)
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 7)
-                        .background(.thinMaterial, in: Capsule())
-                        .overlay(Capsule().stroke(Color.purple.opacity(0.25), lineWidth: 0.7))
+                        .font(.caption.bold()).foregroundStyle(.purple)
+                        .padding(.horizontal, 12).padding(.vertical, 7)
+                        .glassEffect(in: .capsule)
                 }
             }
         }
@@ -376,19 +327,15 @@ struct DownloadTab: View {
 
     // MARK: - Platform Data
 
-    private struct PlatformInfo {
-        let name: String; let icon: String; let color: Color
-    }
+    private struct PlatformInfo { let name: String; let icon: String; let color: Color }
 
     private let supportedPlatforms: [PlatformInfo] = [
-        .init(name: "Instagram",  icon: "camera.fill",          color: .pink),
-        .init(name: "TikTok",     icon: "music.note",           color: .primary),
-        .init(name: "YouTube",    icon: "play.rectangle.fill",  color: .red),
-        .init(name: "Twitter/X",  icon: "bird.fill",            color: .blue),
-        .init(name: "Facebook",   icon: "f.circle.fill",        color: Color(red: 0.2, green: 0.4, blue: 0.8)),
+        .init(name: "Instagram",  icon: "camera.fill",         color: .pink),
+        .init(name: "TikTok",     icon: "music.note",          color: .primary),
+        .init(name: "YouTube",    icon: "play.rectangle.fill", color: .red),
+        .init(name: "Twitter/X",  icon: "bird.fill",           color: .blue),
+        .init(name: "Facebook",   icon: "f.circle.fill",       color: Color(red: 0.2, green: 0.4, blue: 0.8)),
         .init(name: "Reddit",     icon: "arrow.up.circle.fill", color: .orange),
-        .init(name: "Twitch",     icon: "tv.fill",              color: .purple),
-        .init(name: "Vimeo",      icon: "play.circle.fill",     color: Color(red: 0.1, green: 0.6, blue: 0.8)),
     ]
 
     private func platformSFSymbol(_ platform: String) -> String {
@@ -402,16 +349,14 @@ struct DownloadTab: View {
     private func detectPlatform(_ url: String) {
         let lower = url.lowercased()
         let detected: String?
-        if lower.contains("instagram.com")                  { detected = "Instagram" }
-        else if lower.contains("tiktok.com")                { detected = "TikTok" }
-        else if lower.contains("youtu")                     { detected = "YouTube" }
+        if lower.contains("instagram.com")                             { detected = "Instagram" }
+        else if lower.contains("tiktok.com")                           { detected = "TikTok" }
+        else if lower.contains("youtu")                                { detected = "YouTube" }
         else if lower.contains("twitter.com") || lower.contains("x.com") { detected = "Twitter/X" }
-        else if lower.contains("facebook.com")              { detected = "Facebook" }
-        else if lower.contains("reddit.com")                { detected = "Reddit" }
-        else if lower.contains("twitch.tv")                 { detected = "Twitch" }
-        else if lower.contains("vimeo.com")                 { detected = "Vimeo" }
-        else if url.isEmpty                                  { detected = nil }
-        else                                                 { detected = nil }
+        else if lower.contains("facebook.com")                         { detected = "Facebook" }
+        else if lower.contains("reddit.com")                           { detected = "Reddit" }
+        else if url.isEmpty                                            { detected = nil }
+        else                                                           { detected = nil }
         withAnimation(.easeInOut(duration: 0.2)) { detectedPlatform = detected }
     }
 
@@ -437,3 +382,4 @@ struct DownloadTab: View {
         isDownloading = false
     }
 }
+

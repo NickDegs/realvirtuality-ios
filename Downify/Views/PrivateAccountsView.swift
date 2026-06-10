@@ -14,14 +14,11 @@ struct PrivateAccountsView: View {
 
     var body: some View {
         NavigationStack {
-            ZStack {
-                AppBackground()
-                Group {
-                    if isFullTier {
-                        fullContent
-                    } else {
-                        lockedContent
-                    }
+            Group {
+                if isFullTier {
+                    fullContent
+                } else {
+                    lockedContent
                 }
             }
             .navigationTitle("Özel Hesaplar")
@@ -41,11 +38,8 @@ struct PrivateAccountsView: View {
             .alert("Hata", isPresented: .init(
                 get: { errorMessage != nil },
                 set: { if !$0 { errorMessage = nil } }
-            )) {
-                Button("Tamam") { errorMessage = nil }
-            } message: {
-                Text(errorMessage ?? "")
-            }
+            )) { Button("Tamam") { errorMessage = nil } }
+            message: { Text(errorMessage ?? "") }
             .task { if isFullTier { await loadSessions() } }
         }
     }
@@ -53,202 +47,70 @@ struct PrivateAccountsView: View {
     // MARK: - Full Content
 
     private var fullContent: some View {
-        ScrollView {
-            VStack(spacing: 20) {
-                infoCard
-                connectSection
-                if !sessions.isEmpty { connectedList }
-                howItWorksCard
-            }
-            .padding(.horizontal)
-            .padding(.vertical)
-        }
-    }
-
-    private var infoCard: some View {
-        HStack(spacing: 14) {
-            Image(systemName: "lock.open.fill")
-                .font(.title2)
-                .foregroundStyle(.purple)
-                .frame(width: 44, height: 44)
-                .background(Color.purple.opacity(0.12), in: Circle())
-
-            VStack(alignment: .leading, spacing: 3) {
-                Text("Özel Hesap İndirme")
-                    .font(.subheadline.bold())
-                Text("Takip ettiğin özel hesapların içeriklerini indir. Cookie veya şifre paylaşmana gerek yok — oturumun güvenli şekilde saklanır.")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-            }
-        }
-        .padding(16)
-        .glassCard()
-    }
-
-    private var connectSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text("Hesap Bağla")
-                .font(.headline)
-
-            PlatformConnectButton(
-                platform: "Instagram",
-                icon: "camera.fill",
-                color: .pink,
-                isConnected: sessions.contains(where: { $0.platform == "Instagram" })
-            ) {
-                showInstagramLogin = true
-            }
-
-            PlatformConnectButton(
-                platform: "TikTok",
-                icon: "music.note",
-                color: .primary,
-                isConnected: sessions.contains(where: { $0.platform == "TikTok" }),
-                comingSoon: true
-            ) {}
-
-            PlatformConnectButton(
-                platform: "Twitter / X",
-                icon: "bird.fill",
-                color: .blue,
-                isConnected: sessions.contains(where: { $0.platform == "Twitter" }),
-                comingSoon: true
-            ) {}
-        }
-    }
-
-    private var connectedList: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text("Bağlı Hesaplar")
-                .font(.headline)
-
-            ForEach(sessions) { session in
-                SessionRow(session: session) {
-                    deleteTarget = session
-                    showDeleteConfirm = true
-                }
-            }
-        }
-    }
-
-    private var howItWorksCard: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Label("Güvenlik Notu", systemImage: "shield.fill")
-                .font(.subheadline.bold())
-                .foregroundStyle(.green)
-
-            VStack(alignment: .leading, spacing: 8) {
-                securityPoint("Şifreni asla görmüyoruz, sadece oturum çerezleri saklanır")
-                securityPoint("Oturum verisi şifreli sunucuda tutulur")
-                securityPoint("İstediğin zaman oturumu silebilirsin")
-                securityPoint("Yalnızca takip ettiğin özel hesaplara erişilir")
-            }
-        }
-        .padding(16)
-        .glassCard()
-    }
-
-    private func securityPoint(_ text: String) -> some View {
-        HStack(alignment: .top, spacing: 8) {
-            Image(systemName: "checkmark.circle.fill")
-                .font(.caption)
-                .foregroundStyle(.green)
-            Text(text)
-                .font(.caption)
-                .foregroundStyle(.secondary)
-        }
-    }
-
-    // MARK: - Locked
-
-    private var lockedContent: some View {
-        VStack(spacing: 24) {
-            Spacer()
-
-            VStack(spacing: 16) {
-                ZStack {
-                    Circle()
-                        .fill(Color.purple.opacity(0.12))
-                        .frame(width: 90, height: 90)
-                    Image(systemName: "lock.fill")
-                        .font(.system(size: 40))
-                        .foregroundStyle(.purple)
-                }
-
-                VStack(spacing: 8) {
-                    HStack(spacing: 6) {
-                        Text("Özel Hesaplar")
-                            .font(.title2.bold())
-                        PremiumBadge()
-                    }
-                    Text("Özel Instagram ve diğer platform hesaplarından içerik indirmek Full üyelik gerektirir.")
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                        .multilineTextAlignment(.center)
-                        .padding(.horizontal)
-                }
-
-                Button {
-                    showSubscription = true
-                } label: {
-                    HStack(spacing: 6) {
-                        Image(systemName: "crown.fill")
-                        Text("Full'e Geç")
+        List {
+            Section {
+                HStack(spacing: 14) {
+                    Image(systemName: "lock.open.fill")
+                        .font(.title2).foregroundStyle(.purple)
+                        .frame(width: 44, height: 44)
+                        .background(Color.purple.opacity(0.12), in: Circle())
+                    VStack(alignment: .leading, spacing: 3) {
+                        Text("Özel Hesap İndirme").font(.subheadline.bold())
+                        Text("Takip ettiğin özel hesapların içeriklerini indir. Şifreni asla görmüyoruz.")
+                            .font(.caption).foregroundStyle(.secondary)
                     }
                 }
-                .buttonStyle(PrimaryButtonStyle())
-                .padding(.horizontal, 40)
+                .padding(.vertical, 4)
             }
 
-            Spacer()
+            Section("Hesap Bağla") {
+                platformConnectRow("Instagram", icon: "camera.fill", color: .pink,
+                                   isConnected: sessions.contains(where: { $0.platform == "Instagram" }),
+                                   comingSoon: false) { showInstagramLogin = true }
+
+                platformConnectRow("TikTok", icon: "music.note", color: .primary,
+                                   isConnected: false, comingSoon: true) {}
+
+                platformConnectRow("Twitter / X", icon: "bird.fill", color: .blue,
+                                   isConnected: false, comingSoon: true) {}
+            }
+
+            if !sessions.isEmpty {
+                Section("Bağlı Hesaplar") {
+                    ForEach(sessions) { session in
+                        sessionRow(session)
+                    }
+                }
+            }
+
+            Section {
+                Label("Şifreni asla görmüyoruz, sadece oturum çerezleri saklanır", systemImage: "checkmark.shield.fill")
+                    .font(.caption).foregroundStyle(.green)
+                Label("Oturum verisi şifreli sunucuda tutulur", systemImage: "checkmark.shield.fill")
+                    .font(.caption).foregroundStyle(.green)
+                Label("İstediğin zaman oturumu silebilirsin", systemImage: "checkmark.shield.fill")
+                    .font(.caption).foregroundStyle(.green)
+            } header: {
+                Label("Güvenlik", systemImage: "shield.fill").foregroundStyle(.green)
+            }
         }
-        .sheet(isPresented: $showSubscription) { SubscriptionView() }
+        .listStyle(.insetGrouped)
     }
 
-    // MARK: - Actions
-
-    private func loadSessions() async {
-        isLoading = true
-        do {
-            sessions = try await APIService.shared.getPrivateSessions()
-        } catch {
-            errorMessage = error.localizedDescription
-        }
-        isLoading = false
-    }
-
-    private func deleteSession(_ session: PlatformSession) async {
-        do {
-            try await APIService.shared.deletePrivateSession(platform: session.platform)
-            sessions.removeAll { $0.id == session.id }
-        } catch {
-            errorMessage = error.localizedDescription
-        }
-    }
-}
-
-// MARK: - Platform Connect Button
-
-struct PlatformConnectButton: View {
-    let platform: String
-    let icon: String
-    let color: Color
-    let isConnected: Bool
-    var comingSoon: Bool = false
-    let action: () -> Void
-
-    var body: some View {
+    private func platformConnectRow(_ platform: String, icon: String, color: Color,
+                                    isConnected: Bool, comingSoon: Bool,
+                                    action: @escaping () -> Void) -> some View {
         Button(action: action) {
             HStack(spacing: 14) {
                 Image(systemName: icon)
                     .font(.title3)
                     .foregroundStyle(comingSoon ? .secondary : color)
                     .frame(width: 44, height: 44)
-                    .background((comingSoon ? Color.secondary : color).opacity(0.12), in: RoundedRectangle(cornerRadius: 12))
+                    .background((comingSoon ? Color.secondary : color).opacity(0.12),
+                                in: RoundedRectangle(cornerRadius: 12))
 
                 VStack(alignment: .leading, spacing: 2) {
-                    Text(platform)
-                        .font(.subheadline.bold())
+                    Text(platform).font(.subheadline.bold())
                         .foregroundStyle(comingSoon ? .secondary : .primary)
                     Text(comingSoon ? "Yakında" : isConnected ? "Bağlı" : "Bağla")
                         .font(.caption)
@@ -258,73 +120,94 @@ struct PlatformConnectButton: View {
                 Spacer()
 
                 if comingSoon {
-                    Text("Yakında")
-                        .font(.caption.bold())
-                        .foregroundStyle(.white)
-                        .padding(.horizontal, 10)
-                        .padding(.vertical, 5)
+                    Text("Yakında").font(.caption.bold()).foregroundStyle(.white)
+                        .padding(.horizontal, 8).padding(.vertical, 4)
                         .background(Color.secondary, in: Capsule())
                 } else if isConnected {
-                    Image(systemName: "checkmark.circle.fill")
-                        .foregroundStyle(.green)
-                        .font(.title3)
+                    Image(systemName: "checkmark.circle.fill").foregroundStyle(.green).font(.title3)
                 } else {
-                    Image(systemName: "plus.circle.fill")
-                        .foregroundStyle(.purple)
-                        .font(.title3)
+                    Image(systemName: "plus.circle.fill").foregroundStyle(.purple).font(.title3)
                 }
             }
-            .padding(14)
-            .glassCard()
+            .contentShape(Rectangle())
         }
-        .buttonStyle(.plain)
         .disabled(comingSoon)
+        .foregroundStyle(.primary)
     }
-}
 
-// MARK: - Session Row
-
-struct SessionRow: View {
-    let session: PlatformSession
-    let onDelete: () -> Void
-
-    var body: some View {
+    private func sessionRow(_ session: PlatformSession) -> some View {
         HStack(spacing: 14) {
             Image(systemName: platformIcon(session.platform))
                 .font(.title3)
                 .foregroundStyle(platformColor(session.platform))
                 .frame(width: 44, height: 44)
-                .background(platformColor(session.platform).opacity(0.12), in: RoundedRectangle(cornerRadius: 12))
+                .background(platformColor(session.platform).opacity(0.12),
+                            in: RoundedRectangle(cornerRadius: 12))
 
             VStack(alignment: .leading, spacing: 2) {
-                Text(session.platform)
-                    .font(.subheadline.bold())
+                Text(session.platform).font(.subheadline.bold())
                 if let username = session.username {
-                    Text("@\(username)")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
-                if let date = session.connectedAt {
-                    Text("Bağlandı: \(date)")
-                        .font(.caption2)
-                        .foregroundStyle(.tertiary)
+                    Text("@\(username)").font(.caption).foregroundStyle(.secondary)
                 }
             }
 
             Spacer()
 
             Menu {
-                Button(role: .destructive, action: onDelete) {
+                Button(role: .destructive) {
+                    deleteTarget = session; showDeleteConfirm = true
+                } label: {
                     Label("Oturumu Sil", systemImage: "trash")
                 }
             } label: {
-                Image(systemName: "ellipsis.circle")
-                    .foregroundStyle(.secondary)
-                    .font(.title3)
+                Image(systemName: "ellipsis.circle").foregroundStyle(.secondary).font(.title3)
             }
         }
-        .padding(14)
-        .glassCard()
+        .padding(.vertical, 4)
+    }
+
+    // MARK: - Locked
+
+    private var lockedContent: some View {
+        VStack(spacing: 24) {
+            Spacer()
+            Image(systemName: "lock.fill")
+                .font(.system(size: 52)).foregroundStyle(.purple)
+            VStack(spacing: 8) {
+                HStack(spacing: 6) {
+                    Text("Özel Hesaplar").font(.title2.bold())
+                    PremiumBadge()
+                }
+                Text("Özel hesaplardan içerik indirmek Full üyelik gerektirir.")
+                    .font(.subheadline).foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center).padding(.horizontal)
+            }
+            Button {
+                showSubscription = true
+            } label: {
+                Label("Full'e Geç", systemImage: "crown.fill")
+            }
+            .buttonStyle(.borderedProminent)
+            .tint(.purple)
+            Spacer()
+        }
+        .sheet(isPresented: $showSubscription) { SubscriptionView() }
+    }
+
+    // MARK: - Actions
+
+    private func loadSessions() async {
+        isLoading = true
+        do { sessions = try await APIService.shared.getPrivateSessions() }
+        catch { errorMessage = error.localizedDescription }
+        isLoading = false
+    }
+
+    private func deleteSession(_ session: PlatformSession) async {
+        do {
+            try await APIService.shared.deletePrivateSession(platform: session.platform)
+            sessions.removeAll { $0.id == session.id }
+        } catch { errorMessage = error.localizedDescription }
     }
 
     private func platformIcon(_ p: String) -> String {
@@ -345,4 +228,3 @@ struct SessionRow: View {
         }
     }
 }
-

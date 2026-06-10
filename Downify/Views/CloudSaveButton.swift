@@ -14,21 +14,14 @@ struct CloudSaveButton: View {
             Task { await downloadAndSave() }
         } label: {
             HStack {
-                if isDownloading {
-                    ProgressView().tint(.white)
-                } else {
-                    Image(systemName: "icloud.and.arrow.up")
-                }
+                if isDownloading { ProgressView().tint(.primary) }
+                else { Image(systemName: "icloud.and.arrow.up") }
                 Text(isDownloading ? "Hazırlanıyor..." : "Files / iCloud'a Kaydet")
             }
             .frame(maxWidth: .infinity)
-            .padding()
-            .foregroundStyle(.primary)
         }
         .disabled(isDownloading)
-        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 14))
-        .overlay(RoundedRectangle(cornerRadius: 14).stroke(Color.white.opacity(0.15), lineWidth: 0.7))
-        .shadow(color: .black.opacity(0.07), radius: 8, y: 3)
+        .glassEffect(in: RoundedRectangle(cornerRadius: 14))
         .fileExporter(
             isPresented: $showPicker,
             document: localURL.map { VideoFile(url: $0) },
@@ -55,9 +48,7 @@ struct CloudSaveButton: View {
             try FileManager.default.moveItem(at: tempURL, to: destURL)
             localURL = destURL
             showPicker = true
-        } catch {
-            errorMessage = error.localizedDescription
-        }
+        } catch { errorMessage = error.localizedDescription }
         isDownloading = false
     }
 }
@@ -65,13 +56,10 @@ struct CloudSaveButton: View {
 struct VideoFile: FileDocument {
     static var readableContentTypes: [UTType] { [.movie, .video, .mpeg4Movie] }
     let url: URL
-
     init(url: URL) { self.url = url }
-
     init(configuration: ReadConfiguration) throws {
         url = FileManager.default.temporaryDirectory.appendingPathComponent("video.mp4")
     }
-
     func fileWrapper(configuration: WriteConfiguration) throws -> FileWrapper {
         try FileWrapper(url: url)
     }

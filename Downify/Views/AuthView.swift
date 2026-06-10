@@ -9,68 +9,49 @@ struct AuthView: View {
     @State private var password = ""
 
     var body: some View {
-        ZStack {
-            AppBackground()
-            RadialGradient(
-                colors: [Color.purple.opacity(0.35), Color.clear],
-                center: .top,
-                startRadius: 0,
-                endRadius: 400
-            )
-            .ignoresSafeArea()
+        ScrollView {
+            VStack(spacing: 24) {
+                header
+                    .padding(.top, 60)
 
-            ScrollView {
-                VStack(spacing: 24) {
-                    header
-                    socialButtons
-                    divider
-                    formCard
-                    actionButton
-                    toggleSection
+                SignInWithAppleButton(
+                    isLogin ? .signIn : .signUp,
+                    onRequest: { $0.requestedScopes = [.fullName, .email] },
+                    onCompletion: { handleAppleSignIn($0) }
+                )
+                .signInWithAppleButtonStyle(.whiteOutline)
+                .frame(height: 50)
+                .clipShape(RoundedRectangle(cornerRadius: 13))
+                .padding(.horizontal)
+
+                HStack(spacing: 12) {
+                    Rectangle().fill(.separator).frame(height: 0.5)
+                    Text("veya").font(.caption).foregroundStyle(.secondary)
+                    Rectangle().fill(.separator).frame(height: 0.5)
                 }
-                .padding(.horizontal, 24)
-                .padding(.top, 60)
-                .padding(.bottom, 40)
+                .padding(.horizontal)
+
+                formSection
+
+                actionButton
+                    .padding(.horizontal)
+
+                toggleSection
             }
+            .padding(.bottom, 40)
         }
     }
 
     // MARK: - Header
 
     private var header: some View {
-        VStack(spacing: 16) {
-            ZStack {
-                Circle()
-                    .fill(
-                        LinearGradient(
-                            colors: [Color.purple.opacity(0.4), Color.indigo.opacity(0.2)],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
-                    .frame(width: 90, height: 90)
-                    .blur(radius: 20)
-
-                Image(systemName: "arrow.down.circle.fill")
-                    .font(.system(size: 56, weight: .medium))
-                    .foregroundStyle(
-                        LinearGradient(
-                            colors: [.white, Color(red: 0.85, green: 0.65, blue: 1.0)],
-                            startPoint: .top,
-                            endPoint: .bottom
-                        )
-                    )
-            }
+        VStack(spacing: 12) {
+            Image(systemName: "arrow.down.circle.fill")
+                .font(.system(size: 64, weight: .medium))
+                .foregroundStyle(.purple)
 
             Text("Downify")
                 .font(.system(size: 34, weight: .bold, design: .rounded))
-                .foregroundStyle(
-                    LinearGradient(
-                        colors: [.primary, Color.purple.opacity(0.8)],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
 
             Text(isLogin ? "Hesabınıza giriş yapın" : "Yeni hesap oluşturun")
                 .font(.subheadline)
@@ -78,105 +59,56 @@ struct AuthView: View {
         }
     }
 
-    // MARK: - Social Buttons
+    // MARK: - Form Section
 
-    private var socialButtons: some View {
-        SignInWithAppleButton(
-            isLogin ? .signIn : .signUp,
-            onRequest: { request in
-                request.requestedScopes = [.fullName, .email]
-            },
-            onCompletion: { result in
-                handleAppleSignIn(result)
+    private var formSection: some View {
+        VStack(spacing: 0) {
+            HStack(spacing: 10) {
+                Image(systemName: "envelope").foregroundStyle(.purple).frame(width: 18)
+                TextField("E-posta", text: $email)
+                    .textContentType(.emailAddress)
+                    .keyboardType(.emailAddress)
+                    .autocorrectionDisabled()
+                    .textInputAutocapitalization(.never)
             }
-        )
-        .signInWithAppleButtonStyle(.whiteOutline)
-        .frame(height: 50)
-        .clipShape(RoundedRectangle(cornerRadius: 13))
-    }
-
-    // MARK: - Divider
-
-    private var divider: some View {
-        HStack(spacing: 12) {
-            Rectangle()
-                .fill(Color.white.opacity(0.15))
-                .frame(height: 0.5)
-            Text("veya")
-                .font(.caption)
-                .foregroundStyle(.secondary)
-            Rectangle()
-                .fill(Color.white.opacity(0.15))
-                .frame(height: 0.5)
-        }
-    }
-
-    // MARK: - Form Card
-
-    private var formCard: some View {
-        VStack(spacing: 12) {
-            inputField("envelope", placeholder: "E-posta", text: $email,
-                       contentType: .emailAddress, keyboard: .emailAddress)
+            .padding(14)
+            .glassInput()
+            .padding(.horizontal)
 
             if !isLogin {
-                inputField("person", placeholder: "Kullanıcı adı", text: $username)
+                HStack(spacing: 10) {
+                    Image(systemName: "person").foregroundStyle(.purple).frame(width: 18)
+                    TextField("Kullanıcı adı", text: $username)
+                        .autocorrectionDisabled()
+                        .textInputAutocapitalization(.never)
+                }
+                .padding(14)
+                .glassInput()
+                .padding(.horizontal)
+                .padding(.top, 8)
             }
 
-            secureField("lock", placeholder: "Şifre", text: $password,
-                        contentType: isLogin ? .password : .newPassword)
+            HStack(spacing: 10) {
+                Image(systemName: "lock").foregroundStyle(.purple).frame(width: 18)
+                SecureField("Şifre", text: $password)
+                    .textContentType(isLogin ? .password : .newPassword)
+            }
+            .padding(14)
+            .glassInput()
+            .padding(.horizontal)
+            .padding(.top, 8)
 
             if let error = authState.error {
                 HStack(spacing: 6) {
-                    Image(systemName: "exclamationmark.circle.fill")
-                        .foregroundStyle(.red)
-                    Text(error)
-                        .font(.caption)
-                        .foregroundStyle(.red)
+                    Image(systemName: "exclamationmark.circle.fill").foregroundStyle(.red)
+                    Text(error).font(.caption).foregroundStyle(.red)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.top, 4)
+                .padding(.horizontal)
+                .padding(.top, 8)
             }
         }
-        .padding(20)
-        .glassCard()
-    }
-
-    private func inputField(
-        _ icon: String,
-        placeholder: String,
-        text: Binding<String>,
-        contentType: UITextContentType? = nil,
-        keyboard: UIKeyboardType = .default
-    ) -> some View {
-        HStack(spacing: 10) {
-            Image(systemName: icon)
-                .foregroundStyle(.purple)
-                .frame(width: 18)
-            TextField(placeholder, text: text)
-                .textContentType(contentType)
-                .keyboardType(keyboard)
-                .autocorrectionDisabled()
-                .textInputAutocapitalization(.never)
-        }
-        .padding(14)
-        .glassInput()
-    }
-
-    private func secureField(
-        _ icon: String,
-        placeholder: String,
-        text: Binding<String>,
-        contentType: UITextContentType? = nil
-    ) -> some View {
-        HStack(spacing: 10) {
-            Image(systemName: icon)
-                .foregroundStyle(.purple)
-                .frame(width: 18)
-            SecureField(placeholder, text: text)
-                .textContentType(contentType)
-        }
-        .padding(14)
-        .glassInput()
+        .animation(.spring(response: 0.35, dampingFraction: 0.8), value: isLogin)
     }
 
     // MARK: - Action Button
@@ -192,15 +124,14 @@ struct AuthView: View {
             }
         } label: {
             HStack(spacing: 8) {
-                if authState.isLoading {
-                    ProgressView().tint(.white).scaleEffect(0.85)
-                }
-                Text(isLogin ? "Giriş Yap" : "Kayıt Ol")
+                if authState.isLoading { ProgressView().tint(.white).scaleEffect(0.85) }
+                Text(isLogin ? "Giriş Yap" : "Kayıt Ol").fontWeight(.semibold)
             }
+            .frame(maxWidth: .infinity)
         }
-        .buttonStyle(PrimaryButtonStyle(
-            enabled: !authState.isLoading && !email.isEmpty && !password.isEmpty
-        ))
+        .buttonStyle(.borderedProminent)
+        .controlSize(.large)
+        .tint(.purple)
         .disabled(authState.isLoading || email.isEmpty || password.isEmpty)
     }
 
@@ -225,7 +156,7 @@ struct AuthView: View {
         }
     }
 
-    // MARK: - Social Auth Handlers
+    // MARK: - Apple Sign In
 
     private func handleAppleSignIn(_ result: Result<ASAuthorization, Error>) {
         switch result {
@@ -234,17 +165,16 @@ struct AuthView: View {
                   let tokenData = credential.identityToken,
                   let token = String(data: tokenData, encoding: .utf8) else { return }
             let fullName = [credential.fullName?.givenName, credential.fullName?.familyName]
-                .compactMap { $0 }
-                .joined(separator: " ")
+                .compactMap { $0 }.joined(separator: " ")
             Task {
                 await authState.loginWithApple(identityToken: token, fullName: fullName.isEmpty ? nil : fullName)
             }
         case .failure(let error):
             let nsErr = error as NSError
-            if nsErr.domain != ASAuthorizationErrorDomain || nsErr.code != ASAuthorizationError.Code.canceled.rawValue {
+            if nsErr.domain != ASAuthorizationErrorDomain ||
+               nsErr.code != ASAuthorizationError.Code.canceled.rawValue {
                 authState.error = error.localizedDescription
             }
         }
     }
-
 }

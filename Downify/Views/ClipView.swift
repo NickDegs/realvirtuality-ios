@@ -28,7 +28,7 @@ struct ClipView: View {
                 timeSection
                 gifToggle
                 if asGif { gifOptions }
-                downloadButton
+                downloadButtonView
                 if let task = downloadTask {
                     DownloadProgressView(taskId: task.taskId) { downloadTask = nil }
                 }
@@ -48,20 +48,16 @@ struct ClipView: View {
 
     private var modeHeader: some View {
         HStack(spacing: 14) {
-            ZStack {
-                RoundedRectangle(cornerRadius: 12)
-                    .fill((asGif ? Color.orange : Color.brand).opacity(0.14))
-                    .frame(width: 52, height: 52)
-                Image(systemName: asGif ? "photo.fill" : "scissors")
-                    .font(.system(size: 22))
-                    .foregroundStyle(asGif ? Color.orange : Color.brand)
-            }
+            Image(systemName: asGif ? "photo.fill" : "scissors")
+                .font(.system(size: 22))
+                .foregroundStyle(asGif ? Color.orange : Color.brand)
+                .frame(width: 52, height: 52)
+                .background((asGif ? Color.orange : Color.brand).opacity(0.14),
+                            in: RoundedRectangle(cornerRadius: 12))
             VStack(alignment: .leading, spacing: 3) {
-                Text(asGif ? "GIF Oluşturucu" : "Klip Kesici")
-                    .font(.headline)
+                Text(asGif ? "GIF Oluşturucu" : "Klip Kesici").font(.headline)
                 Text(asGif ? "Seçilen kısımdan animasyonlu GIF üret" : "Videonun istediğin bölümünü indir")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .font(.caption).foregroundStyle(.secondary)
             }
             Spacer()
         }
@@ -72,26 +68,19 @@ struct ClipView: View {
     // MARK: - URL
 
     private var urlSection: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            Text("Video URL'si")
-                .font(.caption.bold())
-                .foregroundStyle(.secondary)
-                .padding(.horizontal, 4)
-            HStack(spacing: 10) {
-                TextField("Instagram, TikTok, YouTube...", text: $urlText)
-                    .textFieldStyle(.plain)
-                    .keyboardType(.URL)
-                    .autocorrectionDisabled()
-                    .textInputAutocapitalization(.never)
-                Button {
-                    urlText = UIPasteboard.general.string ?? ""
-                } label: {
-                    Image(systemName: "doc.on.clipboard").foregroundStyle(.purple)
-                }
+        HStack(spacing: 10) {
+            TextField("Instagram, TikTok, YouTube...", text: $urlText)
+                .keyboardType(.URL)
+                .autocorrectionDisabled()
+                .textInputAutocapitalization(.never)
+            Button {
+                urlText = UIPasteboard.general.string ?? ""
+            } label: {
+                Image(systemName: "doc.on.clipboard").foregroundStyle(.purple)
             }
-            .padding(14)
-            .glassInput()
         }
+        .padding(14)
+        .glassInput()
     }
 
     // MARK: - Time
@@ -99,36 +88,22 @@ struct ClipView: View {
     private var timeSection: some View {
         VStack(alignment: .leading, spacing: 14) {
             Text("Zaman Aralığı")
-                .font(.caption.bold())
-                .foregroundStyle(.secondary)
-                .padding(.horizontal, 4)
+                .font(.caption.bold()).foregroundStyle(.secondary).padding(.horizontal, 4)
 
             HStack(spacing: 12) {
                 timeInput(label: "Başlangıç", minutes: $startMinutes, seconds: $startSeconds)
-                VStack {
-                    Spacer()
-                    Image(systemName: "arrow.right")
-                        .foregroundStyle(.secondary)
-                        .padding(.bottom, 16)
-                }
+                Image(systemName: "arrow.right").foregroundStyle(.secondary).padding(.bottom, 8)
                 timeInput(label: "Bitiş", minutes: $endMinutes, seconds: $endSeconds)
             }
 
-            HStack(spacing: 6) {
-                if endTime <= startTime {
-                    Image(systemName: "exclamationmark.triangle.fill")
-                        .foregroundStyle(.orange)
-                        .font(.caption)
-                    Text("Bitiş zamanı başlangıçtan büyük olmalı")
-                        .font(.caption)
-                        .foregroundStyle(.orange)
-                } else {
-                    let duration = endTime - startTime
-                    Image(systemName: "clock").font(.caption).foregroundStyle(.secondary)
-                    Text("Süre: \(Int(duration))s (\(String(format: "%.1f", duration/60)) dk)")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
+            if endTime <= startTime {
+                Label("Bitiş zamanı başlangıçtan büyük olmalı", systemImage: "exclamationmark.triangle.fill")
+                    .font(.caption).foregroundStyle(.orange)
+            } else {
+                let duration = endTime - startTime
+                Label("Süre: \(Int(duration))s (\(String(format: "%.1f", duration/60)) dk)",
+                      systemImage: "clock")
+                    .font(.caption).foregroundStyle(.secondary)
             }
         }
         .padding(16)
@@ -142,14 +117,12 @@ struct ClipView: View {
                 Picker("", selection: minutes) {
                     ForEach(0..<60) { Text(String(format: "%02d", $0)).tag($0) }
                 }
-                .frame(width: 55)
-                .clipped()
+                .frame(width: 55).clipped()
                 Text(":").font(.title3.bold()).foregroundStyle(.secondary)
                 Picker("", selection: seconds) {
                     ForEach(0..<60) { Text(String(format: "%02d", $0)).tag($0) }
                 }
-                .frame(width: 55)
-                .clipped()
+                .frame(width: 55).clipped()
             }
             .pickerStyle(.wheel)
             .frame(height: 80)
@@ -162,9 +135,7 @@ struct ClipView: View {
     private var gifToggle: some View {
         Toggle(isOn: $asGif.animation()) {
             HStack(spacing: 10) {
-                Image(systemName: "photo.fill")
-                    .foregroundStyle(.orange)
-                    .frame(width: 28)
+                Image(systemName: "photo.fill").foregroundStyle(.orange).frame(width: 28)
                 VStack(alignment: .leading, spacing: 2) {
                     Text("GIF olarak oluştur").font(.subheadline.bold())
                     Text("Video yerine animasyonlu GIF üret")
@@ -172,6 +143,7 @@ struct ClipView: View {
                 }
             }
         }
+        .tint(.orange)
         .padding(16)
         .glassCard()
     }
@@ -180,63 +152,50 @@ struct ClipView: View {
 
     private var gifOptions: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("GIF Ayarları")
-                .font(.caption.bold())
-                .foregroundStyle(.secondary)
+            Text("GIF Ayarları").font(.caption.bold()).foregroundStyle(.secondary)
             HStack(spacing: 12) {
-                Text("FPS")
-                    .font(.subheadline.bold())
-                    .frame(width: 30)
-                Slider(value: .init(
-                    get: { Double(gifFps) },
-                    set: { gifFps = Int($0) }
-                ), in: 5...24, step: 1)
-                Text("\(gifFps)")
-                    .font(.subheadline.bold())
-                    .foregroundStyle(.purple)
-                    .frame(width: 28, alignment: .trailing)
+                Text("FPS").font(.subheadline.bold()).frame(width: 30)
+                Slider(value: .init(get: { Double(gifFps) }, set: { gifFps = Int($0) }),
+                       in: 5...24, step: 1)
+                    .tint(.orange)
+                Text("\(gifFps)").font(.subheadline.bold()).foregroundStyle(.orange).frame(width: 28, alignment: .trailing)
             }
             Text("Düşük FPS → küçük dosya • Yüksek FPS → akıcı animasyon")
-                .font(.caption2)
-                .foregroundStyle(.secondary)
+                .font(.caption2).foregroundStyle(.secondary)
         }
         .padding(16)
         .glassCard()
     }
 
-    // MARK: - Download
+    // MARK: - Download Button
 
-    private var downloadButton: some View {
+    private var downloadButtonView: some View {
         Button {
             Task { await startClip() }
         } label: {
-            LoadingLabel(
-                isLoading: isDownloading,
-                icon: asGif ? "photo.fill" : "scissors",
-                loadingText: "Hazırlanıyor...",
-                idleText: asGif ? "GIF Oluştur" : "Klibi İndir"
-            )
+            HStack {
+                Spacer()
+                LoadingLabel(isLoading: isDownloading,
+                             icon: asGif ? "photo.fill" : "scissors",
+                             loadingText: "Hazırlanıyor...",
+                             idleText: asGif ? "GIF Oluştur" : "Klibi İndir")
+                Spacer()
+            }
         }
-        .buttonStyle(PrimaryButtonStyle(enabled: isValid && !isDownloading))
+        .buttonStyle(.borderedProminent)
+        .controlSize(.large)
+        .tint(asGif ? .orange : .purple)
         .disabled(!isValid || isDownloading)
     }
 
     private func startClip() async {
-        isDownloading = true
-        errorMessage = nil
+        isDownloading = true; errorMessage = nil
         do {
             downloadTask = try await APIService.shared.startClip(
-                url: urlText,
-                startTime: startTime,
-                endTime: endTime,
-                asGif: asGif,
-                quality: quality == "best" ? nil : quality
-            )
-        } catch APIError.unauthorized {
-            authState.logout()
-        } catch {
-            errorMessage = error.localizedDescription
-        }
+                url: urlText, startTime: startTime, endTime: endTime,
+                asGif: asGif, quality: quality == "best" ? nil : quality)
+        } catch APIError.unauthorized { authState.logout() }
+        catch { errorMessage = error.localizedDescription }
         isDownloading = false
     }
 }

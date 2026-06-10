@@ -12,52 +12,42 @@ struct GalleryView: View {
 
     var body: some View {
         NavigationStack {
-            ZStack {
-                AppBackground()
-                Group {
-                    if isLoading && items.isEmpty {
-                        VStack(spacing: 14) {
-                            ProgressView().tint(.purple)
-                            Text("Yükleniyor...").font(.caption).foregroundStyle(.secondary)
+            Group {
+                if isLoading && items.isEmpty {
+                    ProgressView().tint(.purple)
+                } else if items.isEmpty {
+                    EmptyStateView(
+                        icon: "photo.stack",
+                        title: "Henüz indirme yok",
+                        subtitle: "İndirdiğiniz içerikler burada görünecek"
+                    )
+                } else {
+                    ScrollView {
+                        LazyVGrid(columns: columns, spacing: 12) {
+                            ForEach(items) { item in
+                                GalleryItemCard(item: item)
+                                    .onTapGesture { selectedItem = item }
+                                    .onAppear {
+                                        if item.id == items.last?.id && hasMore {
+                                            Task { await loadMore() }
+                                        }
+                                    }
+                            }
                         }
-                    } else if items.isEmpty {
-                        EmptyStateView(
-                            icon: "photo.stack",
-                            title: "Henüz indirme yok",
-                            subtitle: "İndirdiğiniz içerikler burada görünecek"
-                        )
-                    } else {
-                        contentGrid
+                        .padding(.horizontal)
+                        .padding(.top, 8)
+
+                        if isLoading {
+                            ProgressView().tint(.purple).padding()
+                        }
                     }
+                    .refreshable { await refresh() }
                 }
             }
             .navigationTitle("Galeri")
             .task { await load() }
-            .refreshable { await refresh() }
             .sheet(item: $selectedItem) { item in
                 GalleryDetailView(item: item)
-            }
-        }
-    }
-
-    private var contentGrid: some View {
-        ScrollView {
-            LazyVGrid(columns: columns, spacing: 12) {
-                ForEach(items) { item in
-                    GalleryItemCard(item: item)
-                        .onTapGesture { selectedItem = item }
-                        .onAppear {
-                            if item.id == items.last?.id && hasMore {
-                                Task { await loadMore() }
-                            }
-                        }
-                }
-            }
-            .padding(.horizontal)
-            .padding(.top, 8)
-
-            if isLoading {
-                ProgressView().tint(.purple).padding()
             }
         }
     }
@@ -68,17 +58,12 @@ struct GalleryView: View {
             items = try await APIService.shared.getDownloadHistory(page: 1)
             hasMore = items.count >= 20
             page = 1
-        } catch APIError.unauthorized {
-            authState.logout()
-        } catch {}
+        } catch APIError.unauthorized { authState.logout() }
+        catch {}
         isLoading = false
     }
 
-    private func refresh() async {
-        page = 1
-        hasMore = true
-        await load()
-    }
+    private func refresh() async { page = 1; hasMore = true; await load() }
 
     private func loadMore() async {
         guard !isLoading else { return }
@@ -110,44 +95,33 @@ struct GalleryItemCard: View {
                         image.resizable().scaledToFill()
                     } placeholder: {
                         Image(systemName: "play.rectangle.fill")
-                            .font(.largeTitle)
-                            .foregroundStyle(.tertiary)
+                            .font(.largeTitle).foregroundStyle(.tertiary)
                             .frame(maxWidth: .infinity, maxHeight: .infinity)
                     }
                     .clipShape(RoundedRectangle(cornerRadius: 12))
                 } else {
                     Image(systemName: "play.rectangle.fill")
-                        .font(.largeTitle)
-                        .foregroundStyle(.tertiary)
+                        .font(.largeTitle).foregroundStyle(.tertiary)
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                 }
 
                 if let platform = item.platform {
                     Text(platform)
-                        .font(.caption2.bold())
-                        .foregroundStyle(.white)
-                        .padding(.horizontal, 7)
-                        .padding(.vertical, 3)
-                        .background(LinearGradient.brand, in: Capsule())
+                        .font(.caption2.bold()).foregroundStyle(.white)
+                        .padding(.horizontal, 7).padding(.vertical, 3)
+                        .background(Color.purple, in: Capsule())
                         .padding(8)
                 }
             }
 
             VStack(alignment: .leading, spacing: 3) {
-                Text(item.filename)
-                    .font(.caption.bold())
-                    .lineLimit(2)
+                Text(item.filename).font(.caption.bold()).lineLimit(2)
                 HStack(spacing: 4) {
                     Text(formatDate(item.completedAt))
-                        .font(.caption2)
-                        .foregroundStyle(.secondary)
+                        .font(.caption2).foregroundStyle(.secondary)
                     if !item.formattedSize.isEmpty {
-                        Text("•")
-                            .font(.caption2)
-                            .foregroundStyle(.secondary)
-                        Text(item.formattedSize)
-                            .font(.caption2)
-                            .foregroundStyle(.secondary)
+                        Text("• \(item.formattedSize)")
+                            .font(.caption2).foregroundStyle(.secondary)
                     }
                 }
             }
@@ -175,55 +149,42 @@ struct GalleryDetailView: View {
 
     var body: some View {
         NavigationStack {
-            ZStack {
-                AppBackground()
-                ScrollView {
-                    VStack(spacing: 16) {
-                        if let thumb = item.thumbnailUrl, let url = URL(string: thumb) {
-                            AsyncImage(url: url) { image in
-                                image.resizable().scaledToFit()
-                            } placeholder: {
-                                Rectangle()
-                                    .fill(Color(.systemGray5))
-                                    .overlay(ProgressView().tint(.purple))
-                            }
-                            .frame(maxHeight: 260)
-                            .clipShape(RoundedRectangle(cornerRadius: 16))
-                            .shadow(color: .black.opacity(0.2), radius: 12, y: 6)
+            List {
+                if let thumb = item.thumbnailUrl, let url = URL(string: thumb) {
+                    Section {
+                        AsyncImage(url: url) { image in
+                            image.resizable().scaledToFit()
+                        } placeholder: {
+                            Rectangle().fill(Color(.systemGray5))
+                                .overlay(ProgressView().tint(.purple))
                         }
-
-                        VStack(alignment: .leading, spacing: 10) {
-                            InfoRow(label: "Dosya", value: item.filename)
-                            if !item.formattedSize.isEmpty {
-                                Divider()
-                                InfoRow(label: "Boyut", value: item.formattedSize)
-                            }
-                            if let platform = item.platform {
-                                Divider()
-                                InfoRow(label: "Platform", value: platform)
-                            }
-                        }
-                        .padding(16)
-                        .glassCard()
-
-                        if let url = URL(string: item.downloadUrl) {
-                            VStack(spacing: 12) {
-                                ShareLink(item: url) {
-                                    Label("Paylaş / Kaydet", systemImage: "square.and.arrow.up")
-                                }
-                                .buttonStyle(PrimaryButtonStyle())
-
-                                CloudSaveButton(downloadURL: url, filename: item.filename)
-                            }
-                        }
-
-                        Spacer(minLength: 20)
+                        .frame(maxHeight: 260)
+                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                        .listRowInsets(EdgeInsets())
                     }
-                    .padding(.horizontal)
-                    .padding(.top, 16)
-                    .padding(.bottom, 32)
+                    .listRowBackground(Color.clear)
+                }
+
+                Section("Dosya Bilgileri") {
+                    LabeledContent("Dosya") { Text(item.filename).lineLimit(2) }
+                    if !item.formattedSize.isEmpty {
+                        LabeledContent("Boyut", value: item.formattedSize)
+                    }
+                    if let platform = item.platform {
+                        LabeledContent("Platform", value: platform)
+                    }
+                }
+
+                if let url = URL(string: item.downloadUrl) {
+                    Section {
+                        ShareLink(item: url) {
+                            Label("Paylaş / Kaydet", systemImage: "square.and.arrow.up")
+                        }
+                        CloudSaveButton(downloadURL: url, filename: item.filename)
+                    }
                 }
             }
+            .listStyle(.insetGrouped)
             .navigationTitle("Detay")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {

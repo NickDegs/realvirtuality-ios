@@ -11,19 +11,16 @@ struct CollectionView: View {
 
     var body: some View {
         NavigationStack {
-            ZStack {
-                AppBackground()
-                Group {
-                    if isLoading && collections.isEmpty {
-                        VStack(spacing: 14) {
-                            ProgressView().tint(.purple)
-                            Text("Yükleniyor...").font(.caption).foregroundStyle(.secondary)
-                        }
-                    } else if collections.isEmpty {
-                        emptyState
-                    } else {
-                        collectionGrid
+            Group {
+                if isLoading && collections.isEmpty {
+                    VStack(spacing: 14) {
+                        ProgressView().tint(.purple)
+                        Text("Yükleniyor...").font(.caption).foregroundStyle(.secondary)
                     }
+                } else if collections.isEmpty {
+                    emptyState
+                } else {
+                    collectionGrid
                 }
             }
             .navigationTitle("Koleksiyonlar")
@@ -182,34 +179,31 @@ struct CollectionDetailView: View {
 
     var body: some View {
         NavigationStack {
-            ZStack {
-                AppBackground()
-                Group {
-                    if items.isEmpty {
-                        EmptyStateView(
-                            icon: "photo.stack",
-                            title: "Bu koleksiyon boş",
-                            subtitle: "Galeri'den video ekleyebilirsin"
-                        )
-                    } else {
-                        ScrollView {
-                            LazyVGrid(
-                                columns: [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())],
-                                spacing: 2
-                            ) {
-                                ForEach(items) { item in
-                                    Group {
-                                        if let urlStr = item.thumbnailUrl, let url = URL(string: urlStr) {
-                                            AsyncImage(url: url) { img in img.resizable().scaledToFill() }
-                                                placeholder: { Color(.systemGray5) }
-                                        } else {
-                                            Color(.systemGray5)
-                                                .overlay(Image(systemName: "video.fill").foregroundStyle(.secondary))
-                                        }
+            Group {
+                if items.isEmpty {
+                    EmptyStateView(
+                        icon: "photo.stack",
+                        title: "Bu koleksiyon boş",
+                        subtitle: "Galeri'den video ekleyebilirsin"
+                    )
+                } else {
+                    ScrollView {
+                        LazyVGrid(
+                            columns: [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())],
+                            spacing: 2
+                        ) {
+                            ForEach(items) { item in
+                                Group {
+                                    if let urlStr = item.thumbnailUrl, let url = URL(string: urlStr) {
+                                        AsyncImage(url: url) { img in img.resizable().scaledToFill() }
+                                            placeholder: { Color(.systemGray5) }
+                                    } else {
+                                        Color(.systemGray5)
+                                            .overlay(Image(systemName: "video.fill").foregroundStyle(.secondary))
                                     }
-                                    .aspectRatio(1, contentMode: .fill)
-                                    .clipped()
                                 }
+                                .aspectRatio(1, contentMode: .fill)
+                                .clipped()
                             }
                         }
                     }
@@ -236,9 +230,7 @@ struct CreateCollectionSheet: View {
 
     var body: some View {
         NavigationStack {
-            ZStack {
-                AppBackground()
-                ScrollView {
+            ScrollView {
                     VStack(spacing: 16) {
                         VStack(alignment: .leading, spacing: 10) {
                             Text("Koleksiyon Adı")

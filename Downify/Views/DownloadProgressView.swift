@@ -17,8 +17,7 @@ struct DownloadProgressView: View {
             } else {
                 HStack(spacing: 12) {
                     ProgressView().tint(.purple)
-                    Text("Hazırlanıyor...")
-                        .foregroundStyle(.secondary)
+                    Text("Hazırlanıyor...").foregroundStyle(.secondary)
                 }
                 .padding(.vertical, 8)
             }
@@ -31,86 +30,60 @@ struct DownloadProgressView: View {
     private func progressView(_ status: DownloadStatus) -> some View {
         VStack(spacing: 10) {
             HStack {
-                HStack(spacing: 6) {
-                    Image(systemName: "arrow.down.circle")
-                        .foregroundStyle(.purple)
-                    Text("İndiriliyor")
-                        .fontWeight(.medium)
-                }
+                Label("İndiriliyor", systemImage: "arrow.down.circle")
+                    .foregroundStyle(.purple).fontWeight(.medium)
                 Spacer()
                 Text("\(Int((status.progress ?? 0) * 100))%")
-                    .font(.subheadline.bold())
-                    .foregroundStyle(.purple)
+                    .font(.subheadline.bold()).foregroundStyle(.purple)
             }
             ProgressView(value: status.progress ?? 0)
                 .tint(.purple)
-                .scaleEffect(y: 1.4)
         }
     }
 
     @ViewBuilder
     private func completedView(_ status: DownloadStatus) -> some View {
         VStack(spacing: 14) {
-            ZStack {
-                Circle()
-                    .fill(Color.green.opacity(0.15))
-                    .frame(width: 56, height: 56)
-                Image(systemName: "checkmark.circle.fill")
-                    .font(.system(size: 32))
-                    .foregroundStyle(.green)
-            }
-            Text("İndirme tamamlandı!")
-                .fontWeight(.semibold)
+            Image(systemName: "checkmark.circle.fill")
+                .font(.system(size: 40)).foregroundStyle(.green)
+            Text("İndirme tamamlandı!").fontWeight(.semibold)
 
             if let urlStr = status.downloadUrl, let url = URL(string: urlStr) {
                 ShareLink(item: url) {
                     Label("Paylaş / Kaydet", systemImage: "square.and.arrow.up")
+                        .frame(maxWidth: .infinity)
                 }
-                .buttonStyle(PrimaryButtonStyle())
+                .buttonStyle(.borderedProminent)
+                .tint(.purple)
             }
 
             Button("Kapat", action: onDismiss)
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
+                .font(.subheadline).foregroundStyle(.secondary)
         }
     }
 
     private func failedView(_ status: DownloadStatus) -> some View {
         VStack(spacing: 14) {
-            ZStack {
-                Circle()
-                    .fill(Color.red.opacity(0.12))
-                    .frame(width: 56, height: 56)
-                Image(systemName: "xmark.circle.fill")
-                    .font(.system(size: 32))
-                    .foregroundStyle(.red)
-            }
-            Text("İndirme başarısız")
-                .fontWeight(.semibold)
+            Image(systemName: "xmark.circle.fill")
+                .font(.system(size: 40)).foregroundStyle(.red)
+            Text("İndirme başarısız").fontWeight(.semibold)
             if let error = status.error {
-                Text(error)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                    .multilineTextAlignment(.center)
+                Text(error).font(.caption).foregroundStyle(.secondary).multilineTextAlignment(.center)
             }
             Button("Kapat", action: onDismiss)
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
+                .font(.subheadline).foregroundStyle(.secondary)
         }
     }
 
     private func pollStatus() async {
-        let maxAttempts = 150 // 5 dakika (150 × 2sn)
+        let maxAttempts = 150
         for _ in 0..<maxAttempts {
             do {
                 status = try await APIService.shared.getDownloadStatus(taskId: taskId)
                 if status?.status == "completed" || status?.status == "failed" { return }
                 try await Task.sleep(nanoseconds: 2_000_000_000)
-            } catch {
-                return
-            }
+            } catch { return }
         }
-        // Timeout: failed olarak işaretle
         if status == nil || (status?.status != "completed" && status?.status != "failed") {
             status = DownloadStatus(taskId: taskId, status: "failed", progress: nil,
                                     downloadUrl: nil, filename: nil, fileSize: nil, error: "Zaman aşımı")
