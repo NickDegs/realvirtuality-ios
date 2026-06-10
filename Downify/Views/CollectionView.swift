@@ -310,7 +310,6 @@ struct CreateCollectionSheet: View {
                         .disabled(name.trimmingCharacters(in: .whitespaces).isEmpty)
                 }
             }
-        }
     }
 
     private func create() {
