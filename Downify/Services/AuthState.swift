@@ -62,19 +62,6 @@ final class AuthState: ObservableObject {
         isLoading = false
     }
 
-    func loginWithGoogle(idToken: String) async {
-        isLoading = true
-        error = nil
-        do {
-            let response = try await APIService.shared.loginWithGoogle(idToken: idToken)
-            KeychainService.shared.saveToken(response.accessToken)
-            user = response.user
-        } catch {
-            self.error = error.localizedDescription
-        }
-        isLoading = false
-    }
-
     func logout() {
         KeychainService.shared.deleteToken()
         user = nil

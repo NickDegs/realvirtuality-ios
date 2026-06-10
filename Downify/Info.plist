@@ -30,14 +30,6 @@
 				<string>downify</string>
 			</array>
 		</dict>
-		<dict>
-			<key>CFBundleURLName</key>
-			<string>com.google.signin</string>
-			<key>CFBundleURLSchemes</key>
-			<array>
-				<string>REVERSED_CLIENT_ID_PLACEHOLDER</string>
-			</array>
-		</dict>
 	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>

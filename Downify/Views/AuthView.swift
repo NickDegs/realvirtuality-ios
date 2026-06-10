@@ -1,7 +1,5 @@
 import SwiftUI
 import AuthenticationServices
-import GoogleSignIn
-import GoogleSignInSwift
 
 struct AuthView: View {
     @EnvironmentObject var authState: AuthState
@@ -83,42 +81,18 @@ struct AuthView: View {
     // MARK: - Social Buttons
 
     private var socialButtons: some View {
-        VStack(spacing: 12) {
-            SignInWithAppleButton(
-                isLogin ? .signIn : .signUp,
-                onRequest: { request in
-                    request.requestedScopes = [.fullName, .email]
-                },
-                onCompletion: { result in
-                    handleAppleSignIn(result)
-                }
-            )
-            .signInWithAppleButtonStyle(.whiteOutline)
-            .frame(height: 50)
-            .clipShape(RoundedRectangle(cornerRadius: 13))
-
-            Button {
-                handleGoogleSignIn()
-            } label: {
-                HStack(spacing: 10) {
-                    Image("google_logo")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 20, height: 20)
-                    Text(isLogin ? "Google ile Giriş Yap" : "Google ile Kayıt Ol")
-                        .font(.system(size: 16, weight: .medium))
-                        .foregroundStyle(.primary)
-                }
-                .frame(maxWidth: .infinity)
-                .frame(height: 50)
-                .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 13))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 13)
-                        .stroke(Color.white.opacity(0.2), lineWidth: 0.8)
-                )
+        SignInWithAppleButton(
+            isLogin ? .signIn : .signUp,
+            onRequest: { request in
+                request.requestedScopes = [.fullName, .email]
+            },
+            onCompletion: { result in
+                handleAppleSignIn(result)
             }
-            .disabled(authState.isLoading)
-        }
+        )
+        .signInWithAppleButtonStyle(.whiteOutline)
+        .frame(height: 50)
+        .clipShape(RoundedRectangle(cornerRadius: 13))
     }
 
     // MARK: - Divider
@@ -273,28 +247,4 @@ struct AuthView: View {
         }
     }
 
-    private func handleGoogleSignIn() {
-        // GIDClientID is configured programmatically — must be set before calling signIn
-        let clientID = GoogleClientID.value
-        guard !clientID.isEmpty else {
-            authState.error = "Google Sign-In henüz yapılandırılmadı"
-            return
-        }
-        GIDSignIn.sharedInstance.configuration = GIDConfiguration(clientID: clientID)
-
-        guard let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-              let rootVC = scene.keyWindow?.rootViewController else { return }
-        GIDSignIn.sharedInstance.signIn(withPresenting: rootVC) { result, error in
-            if let error {
-                let nsErr = error as NSError
-                let isCanceled = nsErr.domain == "com.google.GIDSignIn" && nsErr.code == -5
-                if !isCanceled {
-                    DispatchQueue.main.async { self.authState.error = error.localizedDescription }
-                }
-                return
-            }
-            guard let idToken = result?.user.idToken?.tokenString else { return }
-            Task { await self.authState.loginWithGoogle(idToken: idToken) }
-        }
-    }
 }
