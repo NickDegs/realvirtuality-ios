@@ -18,7 +18,7 @@ enum APIError: LocalizedError {
 
 final class APIService {
     static let shared = APIService()
-    private let baseURL = "https://api.downify.app"
+    private let baseURL = "https://realvirtuality.app/downify-api"
     private let session = URLSession.shared
 
     private init() {}
