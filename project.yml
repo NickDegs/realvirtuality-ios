@@ -70,6 +70,16 @@ targets:
       - path: ShareExtension
     info:
       path: ShareExtension/Info.plist
+      properties:
+        CFBundleDisplayName: Downify
+        NSPhotoLibraryAddUsageDescription: "Videolar ve görseller fotoğraf kütüphanenize kaydedilecek."
+        NSExtension:
+          NSExtensionAttributes:
+            NSExtensionActivationRule:
+              NSExtensionActivationSupportsWebURLWithMaxCount: 1
+              NSExtensionActivationSupportsWebPageWithMaxCount: 1
+          NSExtensionPointIdentifier: com.apple.share-services
+          NSExtensionPrincipalClass: "$(PRODUCT_MODULE_NAME).ShareViewController"
     settings:
       base:
         PRODUCT_NAME: DownifyShareExtension
