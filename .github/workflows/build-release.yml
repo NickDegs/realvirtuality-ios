@@ -123,7 +123,8 @@ jobs:
     name: "Release → TestFlight"
     runs-on: macos-15
     # Otomatik: main'e push + tag + manuel tetikleme → TestFlight'a direkt yollar
-    if: github.event_name == 'push' || inputs.upload_to_testflight == 'true'
+    # (boolean input doğrudan kullanılır; 'true' string karşılaştırması boolean'da hep false döner)
+    if: github.event_name == 'push' || inputs.upload_to_testflight
 
     steps:
       - name: Checkout
