@@ -118,11 +118,12 @@ jobs:
             CODE_SIGN_IDENTITY="" \
             -quiet
 
-  # ── 2. Release build → TestFlight (sadece tag'de) ────────────────────────
+  # ── 2. Release build → TestFlight (main'e her push'ta otomatik) ──────────
   release:
     name: "Release → TestFlight"
     runs-on: macos-15
-    if: startsWith(github.ref, 'refs/tags/') || inputs.upload_to_testflight == 'true'
+    # Otomatik: main'e push + tag + manuel tetikleme → TestFlight'a direkt yollar
+    if: github.event_name == 'push' || inputs.upload_to_testflight == 'true'
 
     steps:
       - name: Checkout
@@ -242,29 +243,47 @@ jobs:
           path: ${{ runner.temp }}/export/*.ipa
           retention-days: 30
 
+      # TestFlight'a yükleme — Xcode 16/26'da altool kaldırıldı.
+      # Modern yol: ExportOptions'ta destination=upload ile xcodebuild -exportArchive doğrudan yükler.
       - name: Upload to TestFlight
         env:
           ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
           ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
         run: |
-          xcrun notarytool submit "$(ls $RUNNER_TEMP/export/*.ipa)" \
-            --key ~/.appstoreconnect/private_keys/AuthKey_${ASC_KEY_ID}.p8 \
-            --key-id "$ASC_KEY_ID" \
-            --issuer "$ASC_ISSUER_ID" \
-            --wait || true
-          xcrun altool --upload-app \
-            --type ios \
-            --file "$(ls $RUNNER_TEMP/export/*.ipa)" \
-            --apiKey "$ASC_KEY_ID" \
-            --apiIssuer "$ASC_ISSUER_ID" \
-            --apiPrivateKey ~/.appstoreconnect/private_keys/AuthKey_${ASC_KEY_ID}.p8 \
-            --verbose 2>/dev/null || \
-          xcrun xcodebuild \
-            -exportArchive \
+          cat > $RUNNER_TEMP/UploadOptions.plist << EOF
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+            <key>method</key>
+            <string>app-store-connect</string>
+            <key>destination</key>
+            <string>upload</string>
+            <key>teamID</key>
+            <string>${APPLE_TEAM_ID}</string>
+            <key>uploadSymbols</key>
+            <true/>
+            <key>signingStyle</key>
+            <string>manual</string>
+            <key>provisioningProfiles</key>
+            <dict>
+              <key>app.downify</key>
+              <string>Downify AppStore Distribution</string>
+              <key>app.downify.share</key>
+              <string>DownifyShare AppStore Distribution</string>
+            </dict>
+          </dict>
+          </plist>
+          EOF
+          xcodebuild -exportArchive \
             -archivePath $RUNNER_TEMP/Downify.xcarchive \
             -exportPath $RUNNER_TEMP/upload \
-            -exportOptionsPlist $RUNNER_TEMP/ExportOptions.plist \
-            -allowProvisioningUpdates
+            -exportOptionsPlist $RUNNER_TEMP/UploadOptions.plist \
+            -authenticationKeyPath ~/.appstoreconnect/private_keys/AuthKey_${ASC_KEY_ID}.p8 \
+            -authenticationKeyID "$ASC_KEY_ID" \
+            -authenticationKeyIssuerID "$ASC_ISSUER_ID"
+          echo "✅ TestFlight'a yüklendi (App Store Connect işleme alacak, birkaç dk sonra TestFlight'ta görünür)"
 
       - name: Create GitHub Release
         if: startsWith(github.ref, 'refs/tags/')
