@@ -3,11 +3,15 @@ import SwiftUI
 @main
 struct DownifyApp: App {
     @StateObject private var authState = AuthState()
+    @StateObject private var fontManager = FontManager()
 
     var body: some Scene {
         WindowGroup {
             ContentView()
                 .environmentObject(authState)
+                .environmentObject(fontManager)
+                .tint(Theme.accent)
+                .fontDesign(fontManager.design)
                 .onOpenURL { url in
                     handleDeepLink(url)
                 }

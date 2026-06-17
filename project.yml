@@ -5,6 +5,7 @@ options:
     iOS: "26.0"
   xcodeVersion: "16.2"
   createIntermediateGroups: true
+  developmentLanguage: tr
 
 settings:
   base:

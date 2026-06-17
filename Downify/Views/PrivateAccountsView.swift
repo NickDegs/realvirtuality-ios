@@ -51,9 +51,9 @@ struct PrivateAccountsView: View {
             Section {
                 HStack(spacing: 14) {
                     Image(systemName: "lock.open.fill")
-                        .font(.title2).foregroundStyle(.purple)
+                        .font(.title2).foregroundStyle(Theme.accent)
                         .frame(width: 44, height: 44)
-                        .background(Color.purple.opacity(0.12), in: Circle())
+                        .background(Theme.accent.opacity(0.12), in: Circle())
                     VStack(alignment: .leading, spacing: 3) {
                         Text("Özel Hesap İndirme").font(.subheadline.bold())
                         Text("Takip ettiğin özel hesapların içeriklerini indir. Şifreni asla görmüyoruz.")
@@ -114,7 +114,7 @@ struct PrivateAccountsView: View {
                         .foregroundStyle(comingSoon ? .secondary : .primary)
                     Text(comingSoon ? "Yakında" : isConnected ? "Bağlı" : "Bağla")
                         .font(.caption)
-                        .foregroundStyle(isConnected ? .green : comingSoon ? .secondary : .purple)
+                        .foregroundStyle(isConnected ? .green : comingSoon ? .secondary : Theme.accent)
                 }
 
                 Spacer()
@@ -126,7 +126,7 @@ struct PrivateAccountsView: View {
                 } else if isConnected {
                     Image(systemName: "checkmark.circle.fill").foregroundStyle(.green).font(.title3)
                 } else {
-                    Image(systemName: "plus.circle.fill").foregroundStyle(.purple).font(.title3)
+                    Image(systemName: "plus.circle.fill").foregroundStyle(Theme.accent).font(.title3)
                 }
             }
             .contentShape(Rectangle())
@@ -172,7 +172,7 @@ struct PrivateAccountsView: View {
         VStack(spacing: 24) {
             Spacer()
             Image(systemName: "lock.fill")
-                .font(.system(size: 52)).foregroundStyle(.purple)
+                .font(.system(size: 52)).foregroundStyle(Theme.accent)
             VStack(spacing: 8) {
                 HStack(spacing: 6) {
                     Text("Özel Hesaplar").font(.title2.bold())
@@ -188,7 +188,7 @@ struct PrivateAccountsView: View {
                 Label("Full'e Geç", systemImage: "crown.fill")
             }
             .buttonStyle(.borderedProminent)
-            .tint(.purple)
+            .tint(Theme.accent)
             Spacer()
         }
         .sheet(isPresented: $showSubscription) { SubscriptionView() }
@@ -224,7 +224,7 @@ struct PrivateAccountsView: View {
         case "Instagram": return .pink
         case "TikTok":    return .primary
         case "Twitter":   return .blue
-        default:          return .purple
+        default:          return Theme.accent
         }
     }
 }

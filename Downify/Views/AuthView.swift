@@ -48,7 +48,7 @@ struct AuthView: View {
         VStack(spacing: 12) {
             Image(systemName: "arrow.down.circle.fill")
                 .font(.system(size: 64, weight: .medium))
-                .foregroundStyle(.purple)
+                .foregroundStyle(Theme.accent)
 
             Text("Downify")
                 .font(.system(size: 34, weight: .bold, design: .rounded))
@@ -64,7 +64,7 @@ struct AuthView: View {
     private var formSection: some View {
         VStack(spacing: 0) {
             HStack(spacing: 10) {
-                Image(systemName: "envelope").foregroundStyle(.purple).frame(width: 18)
+                Image(systemName: "envelope").foregroundStyle(Theme.accent).frame(width: 18)
                 TextField("E-posta", text: $email)
                     .textContentType(.emailAddress)
                     .keyboardType(.emailAddress)
@@ -77,7 +77,7 @@ struct AuthView: View {
 
             if !isLogin {
                 HStack(spacing: 10) {
-                    Image(systemName: "person").foregroundStyle(.purple).frame(width: 18)
+                    Image(systemName: "person").foregroundStyle(Theme.accent).frame(width: 18)
                     TextField("Kullanıcı adı", text: $username)
                         .autocorrectionDisabled()
                         .textInputAutocapitalization(.never)
@@ -89,7 +89,7 @@ struct AuthView: View {
             }
 
             HStack(spacing: 10) {
-                Image(systemName: "lock").foregroundStyle(.purple).frame(width: 18)
+                Image(systemName: "lock").foregroundStyle(Theme.accent).frame(width: 18)
                 SecureField("Şifre", text: $password)
                     .textContentType(isLogin ? .password : .newPassword)
             }
@@ -131,7 +131,7 @@ struct AuthView: View {
         }
         .buttonStyle(.borderedProminent)
         .controlSize(.large)
-        .tint(.purple)
+        .tint(Theme.accent)
         .disabled(authState.isLoading || email.isEmpty || password.isEmpty)
     }
 

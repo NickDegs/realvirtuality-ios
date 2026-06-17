@@ -11,7 +11,7 @@ struct ScheduledDownloadView: View {
         NavigationStack {
             Group {
                 if isLoading && scheduled.isEmpty {
-                    ProgressView().tint(.purple)
+                    ProgressView().tint(Theme.accent)
                 } else if scheduled.isEmpty {
                     EmptyStateView(
                         icon: "calendar.badge.clock",
@@ -136,7 +136,7 @@ struct AddScheduledSheet: View {
                         Button {
                             urlText = UIPasteboard.general.string ?? ""
                         } label: {
-                            Image(systemName: "doc.on.clipboard").foregroundStyle(.purple)
+                            Image(systemName: "doc.on.clipboard").foregroundStyle(Theme.accent)
                         }
                     }
                 }

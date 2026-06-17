@@ -31,7 +31,7 @@ struct KeyMomentsView: View {
             VStack(spacing: 16) {
                 VStack(spacing: 12) {
                     Image(systemName: "sparkles")
-                        .font(.system(size: 40)).foregroundStyle(.purple)
+                        .font(.system(size: 40)).foregroundStyle(Theme.accent)
                     Text("Önemli Anlar").font(.title2.bold())
                     Text("Video bölümlerini veya AI ile tespit edilen sahneleri indir")
                         .font(.subheadline).foregroundStyle(.secondary).multilineTextAlignment(.center)
@@ -45,7 +45,7 @@ struct KeyMomentsView: View {
                     Button {
                         urlText = UIPasteboard.general.string ?? ""
                     } label: {
-                        Image(systemName: "doc.on.clipboard").foregroundStyle(.purple)
+                        Image(systemName: "doc.on.clipboard").foregroundStyle(Theme.accent)
                     }
                 }
                 .padding(14).glassInput()
@@ -62,7 +62,7 @@ struct KeyMomentsView: View {
                 }
                 .buttonStyle(.borderedProminent)
                 .controlSize(.large)
-                .tint(.purple)
+                .tint(Theme.accent)
                 .disabled(urlText.isEmpty || isFetching)
 
                 VStack(alignment: .leading, spacing: 10) {
@@ -95,7 +95,7 @@ struct KeyMomentsView: View {
                     if selectedIds.count == info.chapters.count { selectedIds.removeAll() }
                     else { selectedIds = Set(info.chapters.map(\.id)) }
                 }
-                .font(.caption.bold()).foregroundStyle(.purple)
+                .font(.caption.bold()).foregroundStyle(Theme.accent)
             }
             .padding(.horizontal).padding(.vertical, 8)
 
@@ -131,7 +131,7 @@ struct KeyMomentsView: View {
                 }
                 .buttonStyle(.borderedProminent)
                 .controlSize(.large)
-                .tint(.purple)
+                .tint(Theme.accent)
                 .disabled(selectedIds.isEmpty || isDownloading)
             }
             .padding(.horizontal).padding(.vertical, 12)
@@ -151,7 +151,7 @@ struct KeyMomentsView: View {
                 Text(info.title).font(.subheadline.bold()).lineLimit(2)
                 HStack(spacing: 8) {
                     if info.hasAiChapters {
-                        Label("AI Tespiti", systemImage: "sparkles").font(.caption2.bold()).foregroundStyle(.purple)
+                        Label("AI Tespiti", systemImage: "sparkles").font(.caption2.bold()).foregroundStyle(Theme.accent)
                     } else {
                         Label("Orijinal Bölümler", systemImage: "checkmark.seal.fill")
                             .font(.caption2.bold()).foregroundStyle(.green)
@@ -180,7 +180,7 @@ struct KeyMomentsView: View {
             Button("Yeni Video") {
                 done = false; videoInfo = nil; urlText = ""
             }
-            .buttonStyle(.borderedProminent).tint(.purple)
+            .buttonStyle(.borderedProminent).tint(Theme.accent)
             Spacer()
         }
         .padding()

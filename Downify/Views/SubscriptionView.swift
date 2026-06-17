@@ -82,11 +82,11 @@ struct SubscriptionView: View {
                             Text("Popüler")
                                 .font(.caption2.bold()).foregroundStyle(.white)
                                 .padding(.horizontal, 7).padding(.vertical, 3)
-                                .background(Color.purple, in: Capsule())
+                                .background(Theme.accent, in: Capsule())
                         }
                     }
                     HStack(alignment: .firstTextBaseline, spacing: 2) {
-                        Text(plan.price).font(.title2.bold()).foregroundStyle(.purple)
+                        Text(plan.price).font(.title2.bold()).foregroundStyle(Theme.accent)
                         Text(plan.period).font(.caption).foregroundStyle(.secondary)
                     }
                 }
@@ -103,7 +103,7 @@ struct SubscriptionView: View {
                     }
                 }
                 .buttonStyle(.borderedProminent)
-                .tint(.purple)
+                .tint(Theme.accent)
                 .disabled(isLoading)
             }
 

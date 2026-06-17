@@ -18,7 +18,7 @@ struct SubtitleView: View {
                 urlSection
                 if isFetching {
                     HStack(spacing: 10) {
-                        ProgressView().tint(.purple)
+                        ProgressView().tint(Theme.accent)
                         Text("Altyazılar aranıyor...").font(.subheadline).foregroundStyle(.secondary)
                     }
                     .padding(20).glassCard()
@@ -67,7 +67,7 @@ struct SubtitleView: View {
                 Button {
                     urlText = UIPasteboard.general.string ?? ""
                 } label: {
-                    Image(systemName: "doc.on.clipboard").foregroundStyle(.purple)
+                    Image(systemName: "doc.on.clipboard").foregroundStyle(Theme.accent)
                 }
             }
             .padding(14).glassInput()
@@ -81,7 +81,7 @@ struct SubtitleView: View {
                 }
                 .buttonStyle(.borderedProminent)
                 .controlSize(.regular)
-                .tint(.purple)
+                .tint(Theme.accent)
             }
         }
     }
@@ -130,7 +130,7 @@ struct SubtitleView: View {
                 }
             }
         }
-        .tint(.purple)
+        .tint(Theme.accent)
         .padding(16).glassCard()
     }
 
@@ -148,7 +148,7 @@ struct SubtitleView: View {
         }
         .buttonStyle(.borderedProminent)
         .controlSize(.large)
-        .tint(.purple)
+        .tint(Theme.accent)
         .disabled(selectedLanguage.isEmpty || isDownloading)
     }
 

@@ -76,7 +76,7 @@ struct ClipView: View {
             Button {
                 urlText = UIPasteboard.general.string ?? ""
             } label: {
-                Image(systemName: "doc.on.clipboard").foregroundStyle(.purple)
+                Image(systemName: "doc.on.clipboard").foregroundStyle(Theme.accent)
             }
         }
         .padding(14)
@@ -184,7 +184,7 @@ struct ClipView: View {
         }
         .buttonStyle(.borderedProminent)
         .controlSize(.large)
-        .tint(asGif ? .orange : .purple)
+        .tint(asGif ? .orange : Theme.accent)
         .disabled(!isValid || isDownloading)
     }
 

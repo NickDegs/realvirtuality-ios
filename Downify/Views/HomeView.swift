@@ -27,7 +27,7 @@ struct HomeView: View {
                 .tabItem { Label("Hesap", systemImage: "person.circle.fill") }
                 .tag(4)
         }
-        .tint(.purple)
+        .tint(Theme.accent)
         .sheet(isPresented: $showSubscription) { SubscriptionView() }
         .onReceive(NotificationCenter.default.publisher(for: .startDownloadFromShare)) { notification in
             if let url = notification.object as? String {
@@ -142,7 +142,7 @@ struct DownloadTab: View {
                         }
                     } label: {
                         Image(systemName: "doc.on.clipboard")
-                            .foregroundStyle(.purple)
+                            .foregroundStyle(Theme.accent)
                     }
                 } else {
                     Button {
@@ -175,7 +175,7 @@ struct DownloadTab: View {
             }
             .buttonStyle(.borderedProminent)
             .controlSize(.large)
-            .tint(.purple)
+            .tint(Theme.accent)
             .disabled(urlText.isEmpty || isDownloading)
 
             if let task = downloadTask {
@@ -203,7 +203,7 @@ struct DownloadTab: View {
                 .id(p)
         } else {
             Image(systemName: "link")
-                .foregroundStyle(.purple)
+                .foregroundStyle(Theme.accent)
                 .font(.title3)
         }
     }
@@ -317,7 +317,7 @@ struct DownloadTab: View {
                         .glassEffect(in: .capsule)
                     }
                     Text("1000+ platform")
-                        .font(.caption.bold()).foregroundStyle(.purple)
+                        .font(.caption.bold()).foregroundStyle(Theme.accent)
                         .padding(.horizontal, 12).padding(.vertical, 7)
                         .glassEffect(in: .capsule)
                 }
@@ -343,7 +343,7 @@ struct DownloadTab: View {
     }
 
     private func platformColor(_ platform: String) -> Color {
-        supportedPlatforms.first { $0.name.lowercased().contains(platform.lowercased()) }?.color ?? .purple
+        supportedPlatforms.first { $0.name.lowercased().contains(platform.lowercased()) }?.color ?? Theme.accent
     }
 
     private func detectPlatform(_ url: String) {

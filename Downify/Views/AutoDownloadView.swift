@@ -11,7 +11,7 @@ struct AutoDownloadView: View {
         NavigationStack {
             Group {
                 if isLoading && subscriptions.isEmpty {
-                    ProgressView().tint(.purple)
+                    ProgressView().tint(Theme.accent)
                 } else if subscriptions.isEmpty {
                     EmptyStateView(
                         icon: "clock.arrow.2.circlepath",
@@ -72,7 +72,7 @@ struct AutoDownloadView: View {
                         .font(.caption2).foregroundStyle(.secondary)
                     if sub.downloadCount > 0 {
                         Text("• \(sub.downloadCount) indirme")
-                            .font(.caption2).foregroundStyle(.purple)
+                            .font(.caption2).foregroundStyle(Theme.accent)
                     }
                 }
             }
@@ -150,7 +150,7 @@ struct AddAutoSubscriptionSheet: View {
                         Button {
                             urlText = UIPasteboard.general.string ?? ""
                         } label: {
-                            Image(systemName: "doc.on.clipboard").foregroundStyle(.purple)
+                            Image(systemName: "doc.on.clipboard").foregroundStyle(Theme.accent)
                         }
                     }
                 }

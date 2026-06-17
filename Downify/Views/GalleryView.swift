@@ -14,7 +14,7 @@ struct GalleryView: View {
         NavigationStack {
             Group {
                 if isLoading && items.isEmpty {
-                    ProgressView().tint(.purple)
+                    ProgressView().tint(Theme.accent)
                 } else if items.isEmpty {
                     EmptyStateView(
                         icon: "photo.stack",
@@ -38,7 +38,7 @@ struct GalleryView: View {
                         .padding(.top, 8)
 
                         if isLoading {
-                            ProgressView().tint(.purple).padding()
+                            ProgressView().tint(Theme.accent).padding()
                         }
                     }
                     .refreshable { await refresh() }
@@ -109,7 +109,7 @@ struct GalleryItemCard: View {
                     Text(platform)
                         .font(.caption2.bold()).foregroundStyle(.white)
                         .padding(.horizontal, 7).padding(.vertical, 3)
-                        .background(Color.purple, in: Capsule())
+                        .background(Theme.accent, in: Capsule())
                         .padding(8)
                 }
             }
@@ -156,7 +156,7 @@ struct GalleryDetailView: View {
                             image.resizable().scaledToFit()
                         } placeholder: {
                             Rectangle().fill(Color(.systemGray5))
-                                .overlay(ProgressView().tint(.purple))
+                                .overlay(ProgressView().tint(Theme.accent))
                         }
                         .frame(maxHeight: 260)
                         .clipShape(RoundedRectangle(cornerRadius: 12))

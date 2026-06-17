@@ -1,64 +1,30 @@
-/* Genel */
-"app_name" = "Downify";
-"ok" = "Tamam";
-"cancel" = "İptal";
-"close" = "Kapat";
-"error" = "Hata";
-"loading" = "Yükleniyor...";
-
-/* Auth */
-"login" = "Giriş Yap";
-"register" = "Kayıt Ol";
-"email" = "E-posta";
-"username" = "Kullanıcı Adı";
-"password" = "Şifre";
-"login_subtitle" = "Hesabınıza giriş yapın";
-"register_subtitle" = "Yeni hesap oluşturun";
-"no_account" = "Hesabınız yok mu?";
-"have_account" = "Zaten hesabınız var mı?";
-"logout" = "Çıkış Yap";
-
-/* Home */
-"download" = "İndir";
-"downloading" = "İndiriliyor...";
-"media_url" = "Medya URL'si";
-"url_placeholder" = "Instagram, TikTok, YouTube...";
-"supported_platforms" = "Desteklenen Platformlar";
-
-/* Download */
-"preparing" = "Hazırlanıyor...";
-"download_complete" = "İndirme tamamlandı!";
-"download_failed" = "İndirme başarısız";
-"share_save" = "Paylaş / Kaydet";
-
-/* Account */
-"my_account" = "Hesabım";
-"subscription" = "Abonelik";
-"upgrade" = "Yükselt";
-"free_plan" = "Ücretsiz Plan";
-"adfree_plan" = "Reklamsız Plan";
-"full_plan" = "Full Plan";
-
-/* Subscription */
-"premium" = "Premium";
-"go_premium" = "Premium'a Geç";
-"unlimited_download" = "Tüm platformlardan sınırsız indirme";
-"buy" = "Satın Al";
-"one_time" = "tek seferlik";
-
-/* Settings */
-"settings" = "Ayarlar";
-"quality" = "Kalite";
-"best" = "En İyi";
-"audio_only" = "Yalnızca Ses (MP3)";
-"instagram_session" = "Özel Hesap Girişi";
-"manage_plan" = "Planı Yönet";
-"version" = "Versiyon";
-"privacy_policy" = "Gizlilik Politikası";
-"support" = "Destek";
-"terms" = "Kullanım Koşulları";
-
-/* Instagram */
-"instagram_login" = "Instagram Girişi";
-"instagram_saved" = "Instagram oturumunuz kaydedildi. Artık özel içerikleri indirebilirsiniz.";
-"saving" = "Kaydediliyor...";
+/* Downify — auto-generated. Keys = Turkish source literals. */
+"İndir" = "İndir";
+"Toplu" = "Toplu";
+"Galeri" = "Galeri";
+"Kestirme" = "Kısayol";
+"Hesap" = "Hesap";
+"Ayarlar" = "Ayarlar";
+"İndiriliyor..." = "İndiriliyor...";
+"Tamam" = "Tamam";
+"Kapat" = "Kapat";
+"İptal" = "İptal";
+"Hata" = "Hata";
+"Yükleniyor..." = "Yükleniyor...";
+"İndirme" = "İndirme";
+"Varsayılan Kalite" = "Varsayılan Kalite";
+"En İyi" = "En İyi";
+"Yalnızca Ses (MP3)" = "Yalnızca Ses (MP3)";
+"Abonelik" = "Abonelik";
+"Planı Yönet" = "Planı Yönet";
+"Hakkında" = "Hakkında";
+"Versiyon" = "Versiyon";
+"Gizlilik Politikası" = "Gizlilik Politikası";
+"Destek" = "Destek";
+"Kullanım Koşulları" = "Kullanım Koşulları";
+"Yazı Tipi" = "Yazı Tipi";
+"Sistem (Varsayılan)" = "Sistem (Varsayılan)";
+"Editorial (Serif)" = "Editorial (Serif)";
+"Yuvarlak" = "Yuvarlak";
+"Daktilo" = "Daktilo";
+"Editorial, Yuvarlak ve Daktilo yazı tipleri Full üyelikle açılır." = "Editorial, Yuvarlak ve Daktilo yazı tipleri Full üyelikle açılır.";

@@ -3,9 +3,12 @@ import SwiftUI
 struct SettingsView: View {
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject var authState: AuthState
+    @EnvironmentObject var fontManager: FontManager
     @State private var showSubscription = false
     @AppStorage("defaultQuality") private var defaultQuality = "best"
     @AppStorage("audioOnly") private var audioOnly = false
+
+    private var isFull: Bool { authState.user?.tier == .full }
 
     var body: some View {
         NavigationStack {
@@ -26,7 +29,38 @@ struct SettingsView: View {
                     Toggle(isOn: $audioOnly) {
                         Label("Yalnızca Ses (MP3)", systemImage: "music.note")
                     }
-                    .tint(.purple)
+                }
+
+                Section {
+                    ForEach(AppFontStyle.allCases) { style in
+                        Button {
+                            if style.isPremium && !isFull {
+                                showSubscription = true
+                            } else {
+                                fontManager.style = style
+                            }
+                        } label: {
+                            HStack(spacing: 10) {
+                                Text(style.titleKey)
+                                    .fontDesign(style.design)
+                                    .foregroundStyle(.primary)
+                                if style.isPremium && !isFull {
+                                    Image(systemName: "lock.fill")
+                                        .font(.caption2)
+                                        .foregroundStyle(.secondary)
+                                }
+                                Spacer()
+                                if fontManager.style == style {
+                                    Image(systemName: "checkmark")
+                                        .foregroundStyle(Theme.accent)
+                                }
+                            }
+                        }
+                    }
+                } header: {
+                    Label("Yazı Tipi", systemImage: "textformat")
+                } footer: {
+                    Text("Editorial, Yuvarlak ve Daktilo yazı tipleri Full üyelikle açılır.")
                 }
 
                 Section("Abonelik") {
@@ -49,15 +83,15 @@ struct SettingsView: View {
                     LabeledContent("Versiyon") {
                         Text(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0")
                     }
-                    Link(destination: URL(string: "https://downify.app/privacy")!) {
+                    Link(destination: URL(string: "https://realvirtuality.app/downify-privacy.html")!) {
                         Label("Gizlilik Politikası", systemImage: "hand.raised.fill")
                             .foregroundStyle(.primary)
                     }
-                    Link(destination: URL(string: "https://downify.app/support")!) {
+                    Link(destination: URL(string: "https://realvirtuality.app/support.html")!) {
                         Label("Destek", systemImage: "questionmark.circle.fill")
                             .foregroundStyle(.primary)
                     }
-                    Link(destination: URL(string: "https://downify.app/terms")!) {
+                    Link(destination: URL(string: "https://realvirtuality.app/terms.html")!) {
                         Label("Kullanım Koşulları", systemImage: "doc.text.fill")
                             .foregroundStyle(.primary)
                     }

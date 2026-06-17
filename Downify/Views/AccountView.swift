@@ -32,7 +32,7 @@ struct AccountView: View {
                             }
                         } icon: {
                             Image(systemName: "lock.open.fill")
-                                .foregroundStyle(.purple)
+                                .foregroundStyle(Theme.accent)
                         }
                     }
 
@@ -90,7 +90,7 @@ struct AccountView: View {
         HStack(spacing: 14) {
             Image(systemName: "person.circle.fill")
                 .font(.system(size: 48))
-                .foregroundStyle(.purple)
+                .foregroundStyle(Theme.accent)
 
             VStack(alignment: .leading, spacing: 4) {
                 Text(authState.user?.username ?? "")
@@ -135,7 +135,7 @@ struct AccountView: View {
             if authState.user?.tier != .full {
                 Button("Yükselt") { showSubscription = true }
                     .buttonStyle(.borderedProminent)
-                    .tint(.purple)
+                    .tint(Theme.accent)
                     .controlSize(.small)
             }
         }
@@ -183,7 +183,7 @@ struct AccountView: View {
     private var tierColor: Color {
         switch authState.user?.tier {
         case .full:   return .yellow
-        case .adFree: return .purple
+        case .adFree: return Theme.accent
         default:      return .secondary
         }
     }

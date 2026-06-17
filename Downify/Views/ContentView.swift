@@ -7,7 +7,7 @@ struct ContentView: View {
         Group {
             if authState.isLoading {
                 ProgressView()
-                    .tint(.purple)
+                    .tint(Theme.accent)
             } else if authState.isAuthenticated {
                 HomeView()
             } else {

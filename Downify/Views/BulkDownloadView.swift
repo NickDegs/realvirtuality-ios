@@ -40,7 +40,7 @@ struct BulkDownloadView: View {
                 VStack(spacing: 10) {
                     Image(systemName: "square.stack.3d.up.fill")
                         .font(.system(size: 40))
-                        .foregroundStyle(.purple)
+                        .foregroundStyle(Theme.accent)
                     Text("Toplu İndirme").font(.title3.bold())
                     Text("Profil veya playlist URL'si gir, içerikleri listele ve istediğin videoları seç")
                         .font(.caption).foregroundStyle(.secondary)
@@ -62,7 +62,7 @@ struct BulkDownloadView: View {
                     Button {
                         urlText = UIPasteboard.general.string ?? ""
                     } label: {
-                        Image(systemName: "doc.on.clipboard").foregroundStyle(.purple)
+                        Image(systemName: "doc.on.clipboard").foregroundStyle(Theme.accent)
                     }
                 }
             }
@@ -107,7 +107,7 @@ struct BulkDownloadView: View {
                     if selectedIds.count == bulk.items.count { selectedIds.removeAll() }
                     else { selectedIds = Set(bulk.items.map(\.id)) }
                 }
-                .font(.subheadline.bold()).foregroundStyle(.purple)
+                .font(.subheadline.bold()).foregroundStyle(Theme.accent)
             }
             .padding(.horizontal)
             .padding(.vertical, 10)
@@ -135,7 +135,7 @@ struct BulkDownloadView: View {
             }
             .buttonStyle(.borderedProminent)
             .controlSize(.large)
-            .tint(.purple)
+            .tint(Theme.accent)
             .disabled(selectedIds.isEmpty || isDownloading)
             .padding()
         }
@@ -159,7 +159,7 @@ struct BulkDownloadView: View {
                 done = false; bulkResponse = nil; urlText = ""; selectedIds = []; taskIds = []
             }
             .buttonStyle(.borderedProminent)
-            .tint(.purple)
+            .tint(Theme.accent)
             Spacer()
         }
         .padding()
@@ -196,7 +196,7 @@ struct BulkItemRow: View {
     var body: some View {
         HStack(spacing: 12) {
             Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
-                .foregroundStyle(isSelected ? Color.purple : .secondary)
+                .foregroundStyle(isSelected ? Theme.accent : .secondary)
                 .font(.title3)
                 .animation(.spring(response: 0.2), value: isSelected)
 

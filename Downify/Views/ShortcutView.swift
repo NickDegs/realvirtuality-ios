@@ -29,7 +29,7 @@ struct ShortcutView: View {
                                     .frame(maxWidth: .infinity)
                             }
                             .buttonStyle(.borderedProminent)
-                            .tint(.purple)
+                            .tint(Theme.accent)
                         }
                         .padding(.vertical, 8)
                     }
@@ -46,10 +46,10 @@ struct ShortcutView: View {
                     ) { if isFullTier { showShareSetup = true } else { showSubscription = true } }
 
                     shortcutRow(
-                        icon: "waveform", iconColor: .purple,
+                        icon: "waveform", iconColor: Theme.accent,
                         title: "Siri Komutu",
                         subtitle: "\"Hey Siri, Downify ile indir\" de",
-                        badge: "Yeni", badgeColor: .purple,
+                        badge: "Yeni", badgeColor: Theme.accent,
                         isLocked: !isFullTier
                     ) { if isFullTier { showSiriSetup = true } else { showSubscription = true } }
 
@@ -128,7 +128,7 @@ struct ShortcutView: View {
             Text(num)
                 .font(.caption.bold()).foregroundStyle(.white)
                 .frame(width: 22, height: 22)
-                .background(Color.purple, in: Circle())
+                .background(Theme.accent, in: Circle())
             Text(text).font(.subheadline)
         }
         .padding(.vertical, 2)
@@ -216,7 +216,7 @@ struct SiriSetupView: View {
                 Section {
                     VStack(spacing: 12) {
                         Image(systemName: "waveform")
-                            .font(.system(size: 52)).foregroundStyle(.purple)
+                            .font(.system(size: 52)).foregroundStyle(Theme.accent)
                         Text("Siri Kısayolu Kur").font(.title2.bold())
                         Text("Sesli komutla indirme başlat").foregroundStyle(.secondary)
                     }
@@ -226,17 +226,17 @@ struct SiriSetupView: View {
 
                 Section("Örnek Komutlar") {
                     Label("\"Downify ile indir\"", systemImage: "waveform.circle.fill")
-                        .foregroundStyle(.purple)
+                        .foregroundStyle(Theme.accent)
                     Label("\"Bu videoyu Downify'a gönder\"", systemImage: "waveform.circle.fill")
-                        .foregroundStyle(.purple)
+                        .foregroundStyle(Theme.accent)
                     Label("\"Downify ile video indir\"", systemImage: "waveform.circle.fill")
-                        .foregroundStyle(.purple)
+                        .foregroundStyle(Theme.accent)
                 }
 
                 Section("Kurulum") {
                     HStack(alignment: .top, spacing: 14) {
                         Text("1").font(.subheadline.bold()).foregroundStyle(.white)
-                            .frame(width: 26, height: 26).background(Color.purple, in: Circle())
+                            .frame(width: 26, height: 26).background(Theme.accent, in: Circle())
                         VStack(alignment: .leading, spacing: 2) {
                             Text("Ayarlar → Siri ve Arama").font(.subheadline.bold())
                         }
@@ -244,7 +244,7 @@ struct SiriSetupView: View {
                     .padding(.vertical, 4)
                     HStack(alignment: .top, spacing: 14) {
                         Text("2").font(.subheadline.bold()).foregroundStyle(.white)
-                            .frame(width: 26, height: 26).background(Color.purple, in: Circle())
+                            .frame(width: 26, height: 26).background(Theme.accent, in: Circle())
                         VStack(alignment: .leading, spacing: 2) {
                             Text("Kısayollar → Kısayol Ekle").font(.subheadline.bold())
                             Text("Downify → Video İndir").font(.caption).foregroundStyle(.secondary)
@@ -253,7 +253,7 @@ struct SiriSetupView: View {
                     .padding(.vertical, 4)
                     HStack(alignment: .top, spacing: 14) {
                         Text("3").font(.subheadline.bold()).foregroundStyle(.white)
-                            .frame(width: 26, height: 26).background(Color.purple, in: Circle())
+                            .frame(width: 26, height: 26).background(Theme.accent, in: Circle())
                         VStack(alignment: .leading, spacing: 2) {
                             Text("Siri komutunu kaydet").font(.subheadline.bold())
                             Text("Yukarıdaki komutlardan birini kullan").font(.caption).foregroundStyle(.secondary)
@@ -266,7 +266,7 @@ struct SiriSetupView: View {
                     Button("Tamam") { dismiss() }
                         .frame(maxWidth: .infinity)
                         .buttonStyle(.borderedProminent)
-                        .tint(.purple)
+                        .tint(Theme.accent)
                 }
                 .listRowBackground(Color.clear)
             }

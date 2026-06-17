@@ -14,7 +14,7 @@ struct CollectionView: View {
             Group {
                 if isLoading && collections.isEmpty {
                     VStack(spacing: 14) {
-                        ProgressView().tint(.purple)
+                        ProgressView().tint(Theme.accent)
                         Text("Yükleniyor...").font(.caption).foregroundStyle(.secondary)
                     }
                 } else if collections.isEmpty {

@@ -49,7 +49,7 @@ struct PillStyle: ViewModifier {
     let isSelected: Bool
     func body(content: Content) -> some View {
         if isSelected {
-            content.background(Color.purple, in: Capsule())
+            content.background(Theme.accent, in: Capsule())
         } else {
             content.glassEffect(in: .capsule)
         }
@@ -97,7 +97,7 @@ struct EmptyStateView: View {
             if let action {
                 Button(actionLabel, action: action)
                     .buttonStyle(.borderedProminent)
-                    .tint(.purple)
+                    .tint(Theme.accent)
             }
         }
         .padding(.horizontal, 40)

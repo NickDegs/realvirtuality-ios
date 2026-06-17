@@ -16,7 +16,7 @@ struct DownloadProgressView: View {
                 }
             } else {
                 HStack(spacing: 12) {
-                    ProgressView().tint(.purple)
+                    ProgressView().tint(Theme.accent)
                     Text("Hazırlanıyor...").foregroundStyle(.secondary)
                 }
                 .padding(.vertical, 8)
@@ -31,13 +31,13 @@ struct DownloadProgressView: View {
         VStack(spacing: 10) {
             HStack {
                 Label("İndiriliyor", systemImage: "arrow.down.circle")
-                    .foregroundStyle(.purple).fontWeight(.medium)
+                    .foregroundStyle(Theme.accent).fontWeight(.medium)
                 Spacer()
                 Text("\(Int((status.progress ?? 0) * 100))%")
-                    .font(.subheadline.bold()).foregroundStyle(.purple)
+                    .font(.subheadline.bold()).foregroundStyle(Theme.accent)
             }
             ProgressView(value: status.progress ?? 0)
-                .tint(.purple)
+                .tint(Theme.accent)
         }
     }
 
@@ -54,7 +54,7 @@ struct DownloadProgressView: View {
                         .frame(maxWidth: .infinity)
                 }
                 .buttonStyle(.borderedProminent)
-                .tint(.purple)
+                .tint(Theme.accent)
             }
 
             Button("Kapat", action: onDismiss)
