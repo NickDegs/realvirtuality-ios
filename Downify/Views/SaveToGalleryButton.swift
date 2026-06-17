@@ -35,7 +35,7 @@ struct SaveToGalleryButton: View {
             .frame(maxWidth: .infinity)
         }
         .disabled(isBusy || state == .done)
-        .glassEffect(in: RoundedRectangle(cornerRadius: 14))
+        .glassEffect(.regular.interactive(), in: RoundedRectangle(cornerRadius: 14))
         .alert("Hata", isPresented: .init(
             get: { if case .failed = state { return true } else { return false } },
             set: { if !$0 { state = .idle } }

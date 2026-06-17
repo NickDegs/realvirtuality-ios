@@ -172,7 +172,7 @@ struct DownloadTab: View {
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 4)
             }
-            .buttonStyle(.borderedProminent)
+            .buttonStyle(.glassProminent)
             .controlSize(.large)
             .tint(Theme.accent)
             .disabled(urlText.isEmpty || isDownloading)
@@ -211,16 +211,18 @@ struct DownloadTab: View {
 
     private var optionsRow: some View {
         ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 8) {
-                GlassPill("Watermark'sız",
-                          icon: removeWatermark ? "checkmark.seal.fill" : "seal",
-                          isSelected: removeWatermark) { removeWatermark.toggle() }
+            GlassEffectContainer(spacing: 8) {
+                HStack(spacing: 8) {
+                    GlassPill("Watermark'sız",
+                              icon: removeWatermark ? "checkmark.seal.fill" : "seal",
+                              isSelected: removeWatermark) { removeWatermark.toggle() }
 
-                GlassPill(audioOnly ? "MP3" : "Video",
-                          icon: audioOnly ? "music.note" : "video",
-                          isSelected: audioOnly) { audioOnly.toggle() }
+                    GlassPill(audioOnly ? "MP3" : "Video",
+                              icon: audioOnly ? "music.note" : "video",
+                              isSelected: audioOnly) { audioOnly.toggle() }
 
-                qualityMenu
+                    qualityMenu
+                }
             }
             .padding(.vertical, 2)
         }
@@ -246,11 +248,13 @@ struct DownloadTab: View {
 
     private var modeSelector: some View {
         ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 8) {
-                ForEach(DownloadMode.allCases) { mode in
-                    GlassPill(mode.rawValue, icon: mode.icon, isSelected: downloadMode == mode) {
-                        withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
-                            downloadMode = mode
+            GlassEffectContainer(spacing: 8) {
+                HStack(spacing: 8) {
+                    ForEach(DownloadMode.allCases) { mode in
+                        GlassPill(mode.rawValue, icon: mode.icon, isSelected: downloadMode == mode) {
+                            withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                                downloadMode = mode
+                            }
                         }
                     }
                 }

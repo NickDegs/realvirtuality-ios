@@ -3,18 +3,30 @@ import SwiftUI
 // MARK: - Brand
 
 extension Color {
-    static let brand = Color(red: 0.52, green: 0.16, blue: 0.88)
+    /// Brand colour now follows the editorial accent (no more purple).
+    static let brand = Theme.accent
 }
 
-// MARK: - iOS 26 Native Glass Helpers
+// MARK: - iOS 26 Native Liquid Glass Helpers
+// Uses the system `glassEffect` so the real refraction + lens edge highlight
+// is rendered natively (not a faux blur). `.interactive()` adds the fluid
+// touch response; `GlassEffectContainer` lets nearby glass shapes merge.
 
 extension View {
+    /// A static glass surface (cards, sheets). Native lens edge + refraction.
     func glassCard(radius: CGFloat = 18) -> some View {
-        glassEffect(in: RoundedRectangle(cornerRadius: radius))
+        glassEffect(.regular, in: RoundedRectangle(cornerRadius: radius))
     }
 
+    /// Interactive glass for inputs — native refraction + lens edge.
     func glassInput(radius: CGFloat = 13) -> some View {
-        glassEffect(in: RoundedRectangle(cornerRadius: radius))
+        glassEffect(.regular.interactive(), in: RoundedRectangle(cornerRadius: radius))
+    }
+
+    /// Interactive glass for tappable controls (fluid lens edge on press).
+    func liquidGlass(tinted: Bool = false, radius: CGFloat = 18) -> some View {
+        glassEffect(.regular.tint(tinted ? Theme.accent : nil).interactive(),
+                    in: RoundedRectangle(cornerRadius: radius))
     }
 }
 
@@ -48,11 +60,12 @@ struct GlassPill: View {
 struct PillStyle: ViewModifier {
     let isSelected: Bool
     func body(content: Content) -> some View {
-        if isSelected {
-            content.background(Theme.accent, in: Capsule())
-        } else {
-            content.glassEffect(in: .capsule)
-        }
+        // Native iOS 26 Liquid Glass: interactive capsule with the system
+        // refraction + lens edge. Tinted when selected.
+        content.glassEffect(
+            .regular.tint(isSelected ? Theme.accent : nil).interactive(),
+            in: .capsule
+        )
     }
 }
 
@@ -96,7 +109,7 @@ struct EmptyStateView: View {
             }
             if let action {
                 Button(actionLabel, action: action)
-                    .buttonStyle(.borderedProminent)
+                    .buttonStyle(.glassProminent)
                     .tint(Theme.accent)
             }
         }
