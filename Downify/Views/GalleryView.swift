@@ -177,10 +177,13 @@ struct GalleryDetailView: View {
 
                 if let url = URL(string: item.downloadUrl) {
                     Section {
+                        SaveToGalleryButton(downloadURL: url, filename: item.filename)
                         ShareLink(item: url) {
                             Label("Paylaş / Kaydet", systemImage: "square.and.arrow.up")
                         }
                         CloudSaveButton(downloadURL: url, filename: item.filename)
+                    } footer: {
+                        Text("Bu içeriği tekrar cihaz galerine kaydedebilirsin.")
                     }
                 }
             }

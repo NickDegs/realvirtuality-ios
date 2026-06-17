@@ -27,4 +27,8 @@
 "Editorial (Serif)" = "Editorial (Serif)";
 "Yuvarlak" = "Rounded";
 "Daktilo" = "Monospaced";
+"Galeriye Kaydet" = "Save to Gallery";
+"Kaydediliyor..." = "Saving…";
+"Galeriye kaydedildi" = "Saved to Gallery";
+"Bu içeriği tekrar cihaz galerine kaydedebilirsin." = "You can save this item to your device gallery again.";
 "Editorial, Yuvarlak ve Daktilo yazı tipleri Full üyelikle açılır." = "Editorial, Rounded and Monospaced fonts are unlocked with a Full subscription.";

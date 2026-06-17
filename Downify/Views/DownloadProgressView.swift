@@ -49,12 +49,13 @@ struct DownloadProgressView: View {
             Text("İndirme tamamlandı!").fontWeight(.semibold)
 
             if let urlStr = status.downloadUrl, let url = URL(string: urlStr) {
+                SaveToGalleryButton(downloadURL: url, filename: status.filename ?? "video.mp4")
+                    .buttonStyle(.borderedProminent)
+                    .tint(Theme.accent)
                 ShareLink(item: url) {
                     Label("Paylaş / Kaydet", systemImage: "square.and.arrow.up")
                         .frame(maxWidth: .infinity)
                 }
-                .buttonStyle(.borderedProminent)
-                .tint(Theme.accent)
             }
 
             Button("Kapat", action: onDismiss)
