@@ -68,7 +68,6 @@ struct DownloadTab: View {
     @AppStorage("removeWatermark") private var removeWatermark = true
     @AppStorage("defaultQuality") private var defaultQuality = "best"
     @AppStorage("audioOnly") private var audioOnly = false
-    @AppStorage("usePrivateAccount") private var usePrivateAccount = false
 
     var isFullTier: Bool { authState.user?.tier == .full }
 
@@ -221,33 +220,10 @@ struct DownloadTab: View {
                           icon: audioOnly ? "music.note" : "video",
                           isSelected: audioOnly) { audioOnly.toggle() }
 
-                privateToggle
                 qualityMenu
             }
             .padding(.vertical, 2)
         }
-    }
-
-    @ViewBuilder
-    private var privateToggle: some View {
-        Button {
-            if !isFullTier { showSubscription = true }
-            else { withAnimation { usePrivateAccount.toggle() } }
-        } label: {
-            HStack(spacing: 5) {
-                Image(systemName: usePrivateAccount && isFullTier ? "lock.fill" : "lock.open")
-                    .font(.caption.bold())
-                Text("Özel Hesap").font(.caption.bold())
-                if !isFullTier {
-                    Image(systemName: "crown.fill").font(.system(size: 9)).foregroundStyle(.yellow)
-                }
-            }
-            .padding(.horizontal, 14).padding(.vertical, 8)
-            .foregroundStyle(usePrivateAccount && isFullTier ? .white : .primary)
-        }
-        .buttonStyle(.plain)
-        .modifier(PillStyle(isSelected: usePrivateAccount && isFullTier))
-        .animation(.spring(response: 0.25, dampingFraction: 0.7), value: usePrivateAccount)
     }
 
     private var qualityMenu: some View {
@@ -372,7 +348,7 @@ struct DownloadTab: View {
                 quality: defaultQuality == "best" ? nil : defaultQuality,
                 audioOnly: audioOnly,
                 noWatermark: removeWatermark,
-                usePrivateSession: usePrivateAccount && isFullTier
+                usePrivateSession: false
             )
         } catch APIError.unauthorized {
             authState.logout()

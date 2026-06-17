@@ -16,26 +16,6 @@ struct AccountView: View {
                 }
 
                 Section("Özellikler") {
-                    NavigationLink(destination: PrivateAccountsView()) {
-                        Label {
-                            VStack(alignment: .leading, spacing: 2) {
-                                HStack(spacing: 6) {
-                                    Text("Özel Hesaplar")
-                                    if authState.user?.tier != .full {
-                                        Image(systemName: "crown.fill")
-                                            .font(.system(size: 10))
-                                            .foregroundStyle(.yellow)
-                                    }
-                                }
-                                Text("Instagram özel içerik erişimi")
-                                    .font(.caption).foregroundStyle(.secondary)
-                            }
-                        } icon: {
-                            Image(systemName: "lock.open.fill")
-                                .foregroundStyle(Theme.accent)
-                        }
-                    }
-
                     NavigationLink(destination: ShortcutView()) {
                         Label {
                             VStack(alignment: .leading, spacing: 2) {

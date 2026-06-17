@@ -60,17 +60,6 @@ struct ShortcutView: View {
                         badge: "Güçlü", badgeColor: .orange,
                         isLocked: !isFullTier
                     ) { if isFullTier { openShortcutsApp() } else { showSubscription = true } }
-
-                    shortcutRow(
-                        icon: "rectangle.stack.fill", iconColor: .teal,
-                        title: "Özel Hesap İndirme",
-                        subtitle: "Cookie girmeden özel hesaplardan indir",
-                        badge: "Full", badgeColor: .teal,
-                        isLocked: !isFullTier
-                    ) {
-                        if isFullTier { NotificationCenter.default.post(name: .showPrivateAccounts, object: nil) }
-                        else { showSubscription = true }
-                    }
                 }
 
                 if isFullTier {
@@ -277,10 +266,4 @@ struct SiriSetupView: View {
             }
         }
     }
-}
-
-// MARK: - Notification
-
-extension Notification.Name {
-    static let showPrivateAccounts = Notification.Name("showPrivateAccounts")
 }
