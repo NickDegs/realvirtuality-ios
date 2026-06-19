@@ -74,6 +74,19 @@ final class APIService {
         return try await request("/auth/me")
     }
 
+    func deleteAccount() async throws {
+        struct Empty: Decodable {}
+        let _: Empty = try await request("/auth/account", method: "DELETE")
+    }
+
+    /// Keeps the server tier in sync after a verified StoreKit purchase.
+    @discardableResult
+    func recordIAP(productId: String, transactionId: String?) async throws -> User {
+        struct Body: Encodable { let productId: String; let transactionId: String? }
+        return try await request("/subscription/iap", method: "POST",
+                                 body: Body(productId: productId, transactionId: transactionId))
+    }
+
     func refreshToken() async throws -> AuthResponse {
         return try await request("/auth/refresh", method: "POST")
     }

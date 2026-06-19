@@ -3,6 +3,7 @@ import SwiftUI
 struct AccountView: View {
     @EnvironmentObject var authState: AuthState
     @State private var showSubscription = false
+    @State private var showDeleteConfirm = false
 
     var body: some View {
         NavigationStack {
@@ -21,7 +22,7 @@ struct AccountView: View {
                             VStack(alignment: .leading, spacing: 2) {
                                 HStack(spacing: 6) {
                                     Text("Kestirmeler")
-                                    if authState.user?.tier != .full {
+                                    if authState.tier != .full {
                                         Image(systemName: "crown.fill")
                                             .font(.system(size: 10))
                                             .foregroundStyle(.yellow)
@@ -57,10 +58,28 @@ struct AccountView: View {
                         Label("Çıkış Yap", systemImage: "rectangle.portrait.and.arrow.right")
                     }
                 }
+
+                Section {
+                    Button(role: .destructive) {
+                        showDeleteConfirm = true
+                    } label: {
+                        Label("Hesabı Sil", systemImage: "trash")
+                    }
+                } footer: {
+                    Text("Hesabın ve tüm verilerin kalıcı olarak silinir. Bu işlem geri alınamaz.")
+                }
             }
             .listStyle(.insetGrouped)
             .navigationTitle("Hesabım")
             .sheet(isPresented: $showSubscription) { SubscriptionView() }
+            .alert("Hesabı Sil", isPresented: $showDeleteConfirm) {
+                Button("İptal", role: .cancel) {}
+                Button("Hesabı Sil", role: .destructive) {
+                    Task { await authState.deleteAccount() }
+                }
+            } message: {
+                Text("Hesabın ve tüm verilerin kalıcı olarak silinecek. Bu işlem geri alınamaz.")
+            }
         }
     }
 
@@ -112,7 +131,7 @@ struct AccountView: View {
 
             Spacer()
 
-            if authState.user?.tier != .full {
+            if authState.tier != .full {
                 Button("Yükselt") { showSubscription = true }
                     .buttonStyle(.borderedProminent)
                     .tint(Theme.accent)
@@ -125,43 +144,39 @@ struct AccountView: View {
     // MARK: - Helpers
 
     private var tierName: String {
-        switch authState.user?.tier {
+        switch authState.tier {
         case .free:   return "Ücretsiz Plan"
         case .adFree: return "Pro Plan"
         case .full:   return "Full Plan"
-        case .none:   return ""
         }
     }
 
     private var tierShortName: String {
-        switch authState.user?.tier {
+        switch authState.tier {
         case .free:   return "Free"
         case .adFree: return "Pro"
         case .full:   return "Full"
-        case .none:   return ""
         }
     }
 
     private var tierDescription: String {
-        switch authState.user?.tier {
+        switch authState.tier {
         case .free:   return "Temel özellikler"
         case .adFree: return "Gelişmiş özellikler"
         case .full:   return "Tüm özellikler açık"
-        case .none:   return ""
         }
     }
 
     private var tierIcon: String {
-        switch authState.user?.tier {
+        switch authState.tier {
         case .free:   return "star"
         case .adFree: return "star.fill"
         case .full:   return "crown.fill"
-        case .none:   return "star"
         }
     }
 
     private var tierColor: Color {
-        switch authState.user?.tier {
+        switch authState.tier {
         case .full:   return .yellow
         case .adFree: return Theme.accent
         default:      return .secondary

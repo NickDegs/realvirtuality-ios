@@ -8,7 +8,7 @@ struct SettingsView: View {
     @AppStorage("defaultQuality") private var defaultQuality = "best"
     @AppStorage("audioOnly") private var audioOnly = false
 
-    private var isFull: Bool { authState.user?.tier == .full }
+    private var isFull: Bool { authState.tier == .full }
 
     var body: some View {
         NavigationStack {
@@ -109,11 +109,10 @@ struct SettingsView: View {
     }
 
     private var tierName: String {
-        switch authState.user?.tier {
+        switch authState.tier {
         case .free:   return "Ücretsiz"
         case .adFree: return "Pro"
         case .full:   return "Full"
-        case .none:   return ""
         }
     }
 }

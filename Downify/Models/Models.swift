@@ -14,16 +14,25 @@ enum SubscriptionTier: String, Codable {
         case .full:   return "Full"
         }
     }
+
+    /// Ordering so we can pick the highest of server tier vs StoreKit entitlement.
+    var rank: Int {
+        switch self {
+        case .free:   return 0
+        case .adFree: return 1
+        case .full:   return 2
+        }
+    }
 }
 
 // MARK: - Auth
 
 struct User: Codable, Identifiable {
-    let id: Int
+    let id: String
     let email: String
     let username: String
     let tier: SubscriptionTier
-    let createdAt: Date
+    let createdAt: Date?
 }
 
 struct AuthResponse: Codable {

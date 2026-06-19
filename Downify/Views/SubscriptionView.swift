@@ -1,24 +1,34 @@
 import SwiftUI
-import SafariServices
+import StoreKit
 
 struct SubscriptionView: View {
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject var authState: AuthState
-    @State private var isLoading = false
-    @State private var safariURL: URL?
-    @State private var showSafari = false
-    @State private var errorMessage: String?
+    @EnvironmentObject var store: StoreManager
 
-    let plans: [SubscriptionPlan] = [
-        SubscriptionPlan(id: "ad_free", name: "Pro", price: "$3", period: "tek seferlik",
-                         features: ["Öncelikli indirme", "Temel indirme", "Tüm platformlar"], tier: .adFree),
-        SubscriptionPlan(id: "full_monthly", name: "Full — Aylık", price: "$5", period: "/ ay",
-                         features: ["Tüm özellikler", "Kestirme & Siri desteği", "Özel hesap indirme", "HD kalite"], tier: .full, highlighted: true),
-        SubscriptionPlan(id: "full_yearly", name: "Full — Yıllık", price: "$30", period: "/ yıl",
-                         features: ["Tüm özellikler", "Kestirme & Siri desteği", "Özel hesap indirme", "%50 tasarruf"], tier: .full),
-        SubscriptionPlan(id: "full_lifetime", name: "Ömür Boyu", price: "$50", period: "tek seferlik",
-                         features: ["Tüm özellikler", "Sınırsız indirme", "Kalıcı lisans"], tier: .full),
+    private struct Meta { let title: String; let features: [String]; let highlighted: Bool }
+
+    private let meta: [String: Meta] = [
+        "app.downify.pro": Meta(
+            title: "Pro",
+            features: ["Öncelikli indirme", "Tüm platformlar", "Sınırsız indirme"],
+            highlighted: false),
+        "app.downify.full.monthly": Meta(
+            title: "Full — Aylık",
+            features: ["Tüm özellikler", "Kestirme & Siri desteği", "HD kalite"],
+            highlighted: true),
+        "app.downify.full.yearly": Meta(
+            title: "Full — Yıllık",
+            features: ["Tüm özellikler", "Yıllık avantaj", "Kestirme & Siri desteği"],
+            highlighted: false),
+        "app.downify.full.lifetime": Meta(
+            title: "Ömür Boyu",
+            features: ["Tüm özellikler", "Tek seferlik ödeme", "Kalıcı lisans"],
+            highlighted: false),
     ]
+
+    private let termsURL = URL(string: "https://realvirtuality.app/terms.html")!
+    private let privacyURL = URL(string: "https://realvirtuality.app/downify-privacy.html")!
 
     var body: some View {
         NavigationStack {
@@ -39,19 +49,47 @@ struct SubscriptionView: View {
                 .listRowBackground(Color.clear)
                 .listRowSeparator(.hidden)
 
-                ForEach(plans) { plan in
+                if store.products.isEmpty {
                     Section {
-                        planRow(plan)
+                        HStack {
+                            Spacer()
+                            if store.isLoading { ProgressView() }
+                            else { Text("Ürünler yüklenemedi").foregroundStyle(.secondary) }
+                            Spacer()
+                        }
                     }
+                    .listRowBackground(Color.clear)
                 }
 
-                if let error = errorMessage {
+                ForEach(orderedProducts, id: \.id) { product in
+                    Section { planRow(product) }
+                }
+
+                if let error = store.error {
                     Section {
                         Text(error).font(.caption).foregroundStyle(.red)
                             .multilineTextAlignment(.center)
                     }
                     .listRowBackground(Color.clear)
                 }
+
+                Section {
+                    Button {
+                        Task { await store.restore(); await syncAndMaybeDismiss() }
+                    } label: {
+                        HStack {
+                            Spacer()
+                            Text("Satın Alımları Geri Yükle")
+                            Spacer()
+                        }
+                    }
+                    .disabled(store.isLoading)
+                }
+
+                Section {
+                    disclosure
+                }
+                .listRowBackground(Color.clear)
             }
             .listStyle(.insetGrouped)
             .navigationTitle("Premium")
@@ -61,24 +99,27 @@ struct SubscriptionView: View {
                     Button("Kapat") { dismiss() }
                 }
             }
-            .sheet(isPresented: $showSafari) {
-                if let url = safariURL { SafariView(url: url) }
-            }
-            .onReceive(NotificationCenter.default.publisher(for: .paymentResult)) { notification in
-                if let success = notification.object as? Bool, success {
-                    Task { await authState.refreshUser(); dismiss() }
-                }
+            .task {
+                if store.products.isEmpty { await store.loadProducts() }
             }
         }
     }
 
-    private func planRow(_ plan: SubscriptionPlan) -> some View {
-        VStack(alignment: .leading, spacing: 12) {
+    private var orderedProducts: [Product] {
+        let order = StoreManager.productIDs
+        return store.products.sorted {
+            (order.firstIndex(of: $0.id) ?? 99) < (order.firstIndex(of: $1.id) ?? 99)
+        }
+    }
+
+    private func planRow(_ product: Product) -> some View {
+        let m = meta[product.id]
+        return VStack(alignment: .leading, spacing: 12) {
             HStack(alignment: .top) {
                 VStack(alignment: .leading, spacing: 4) {
                     HStack(spacing: 6) {
-                        Text(plan.name).font(.headline)
-                        if plan.highlighted {
+                        Text(m?.title ?? product.displayName).font(.headline)
+                        if m?.highlighted == true {
                             Text("Popüler")
                                 .font(.caption2.bold()).foregroundStyle(.white)
                                 .padding(.horizontal, 7).padding(.vertical, 3)
@@ -86,15 +127,19 @@ struct SubscriptionView: View {
                         }
                     }
                     HStack(alignment: .firstTextBaseline, spacing: 2) {
-                        Text(plan.price).font(.title2.bold()).foregroundStyle(Theme.accent)
-                        Text(plan.period).font(.caption).foregroundStyle(.secondary)
+                        Text(product.displayPrice).font(.title2.bold()).foregroundStyle(Theme.accent)
+                        if let period = periodText(product) {
+                            Text(period).font(.caption).foregroundStyle(.secondary)
+                        }
                     }
                 }
                 Spacer()
                 Button {
-                    Task { await purchase(plan: plan.id) }
+                    Task {
+                        if await store.purchase(product) { await syncAndMaybeDismiss() }
+                    }
                 } label: {
-                    if isLoading {
+                    if store.purchasing == product.id {
                         ProgressView().frame(width: 76, height: 36)
                     } else {
                         Text("Satın Al")
@@ -104,35 +149,52 @@ struct SubscriptionView: View {
                 }
                 .buttonStyle(.borderedProminent)
                 .tint(Theme.accent)
-                .disabled(isLoading)
+                .disabled(store.purchasing != nil)
             }
 
-            VStack(alignment: .leading, spacing: 6) {
-                ForEach(plan.features, id: \.self) { feature in
-                    Label(feature, systemImage: "checkmark.circle.fill")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+            if let features = m?.features {
+                VStack(alignment: .leading, spacing: 6) {
+                    ForEach(features, id: \.self) { feature in
+                        Label(feature, systemImage: "checkmark.circle.fill")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
                 }
             }
         }
         .padding(.vertical, 4)
     }
 
-    private func purchase(plan: String) async {
-        isLoading = true
-        errorMessage = nil
-        do {
-            let urlString = try await APIService.shared.getCheckoutURL(plan: plan)
-            if let url = URL(string: urlString) { safariURL = url; showSafari = true }
-        } catch {
-            errorMessage = error.localizedDescription
+    private func periodText(_ product: Product) -> String? {
+        guard let period = product.subscription?.subscriptionPeriod else { return nil }
+        switch period.unit {
+        case .day:   return period.value == 7 ? "/ hafta" : "/ \(period.value) gün"
+        case .week:  return "/ hafta"
+        case .month: return period.value == 1 ? "/ ay" : "/ \(period.value) ay"
+        case .year:  return "/ yıl"
+        @unknown default: return nil
         }
-        isLoading = false
     }
-}
 
-struct SafariView: UIViewControllerRepresentable {
-    let url: URL
-    func makeUIViewController(context: Context) -> SFSafariViewController { SFSafariViewController(url: url) }
-    func updateUIViewController(_ uiViewController: SFSafariViewController, context: Context) {}
+    // Required auto-renewable subscription disclosure + functional links.
+    private var disclosure: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Abonelikler, mevcut dönem bitmeden en az 24 saat önce iptal edilmezse otomatik yenilenir. Ödeme, satın alma onayında Apple Kimliğinize yansıtılır. Aboneliği App Store hesap ayarlarından yönetebilir veya iptal edebilirsiniz.")
+                .font(.caption2)
+                .foregroundStyle(.secondary)
+            HStack(spacing: 16) {
+                Link("Kullanım Koşulları", destination: termsURL)
+                Link("Gizlilik Politikası", destination: privacyURL)
+            }
+            .font(.caption2.bold())
+        }
+        .padding(.vertical, 4)
+    }
+
+    private func syncAndMaybeDismiss() async {
+        await authState.refreshUser()
+        if authState.tier == .full || store.entitledTier != .free {
+            dismiss()
+        }
+    }
 }

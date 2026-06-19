@@ -4,17 +4,23 @@ import SwiftUI
 struct DownifyApp: App {
     @StateObject private var authState = AuthState()
     @StateObject private var fontManager = FontManager()
+    @StateObject private var store = StoreManager()
 
     var body: some Scene {
         WindowGroup {
             ContentView()
                 .environmentObject(authState)
                 .environmentObject(fontManager)
+                .environmentObject(store)
                 .tint(Theme.accent)
                 .fontDesign(fontManager.design)
                 .onOpenURL { url in
                     handleDeepLink(url)
                 }
+                .onChange(of: store.entitledTier) { _, newTier in
+                    authState.storeTier = newTier
+                }
+                .task { authState.storeTier = store.entitledTier }
         }
     }
 

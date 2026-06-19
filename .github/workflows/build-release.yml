@@ -79,16 +79,7 @@ jobs:
           - device: "iPhone SE (3rd generation)"
             xcode: "16.3"
             xcode_path: "/Applications/Xcode_16.3.app"
-          # ── iPad — Xcode 26
-          - device: "iPad Pro 13-inch (M4)"
-            xcode: "26.3"
-            xcode_path: "/Applications/Xcode_26.3.app"
-          - device: "iPad Air 13-inch (M2)"
-            xcode: "26.3"
-            xcode_path: "/Applications/Xcode_26.3.app"
-          - device: "iPad mini (A17 Pro)"
-            xcode: "26.3"
-            xcode_path: "/Applications/Xcode_26.3.app"
+          # iPad YOK — uygulama iPhone-only (TARGETED_DEVICE_FAMILY=1).
 
     steps:
       - name: Checkout

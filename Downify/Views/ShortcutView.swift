@@ -6,7 +6,7 @@ struct ShortcutView: View {
     @State private var showShareSetup = false
     @State private var showSiriSetup = false
 
-    var isFullTier: Bool { authState.user?.tier == .full }
+    var isFullTier: Bool { authState.tier == .full }
 
     var body: some View {
         NavigationStack {
