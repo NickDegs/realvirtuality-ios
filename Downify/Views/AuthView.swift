@@ -37,6 +37,8 @@ struct AuthView: View {
                     .padding(.horizontal)
 
                 toggleSection
+
+                guestSection
             }
             .padding(.bottom, 40)
         }
@@ -154,6 +156,40 @@ struct AuthView: View {
             .font(.subheadline)
             .foregroundStyle(.secondary)
         }
+    }
+
+    // MARK: - Guest Section
+
+    private var guestSection: some View {
+        VStack(spacing: 10) {
+            HStack(spacing: 12) {
+                Rectangle().fill(.separator).frame(height: 0.5)
+                Text("veya").font(.caption).foregroundStyle(.secondary)
+                Rectangle().fill(.separator).frame(height: 0.5)
+            }
+            .padding(.horizontal)
+
+            Button {
+                Task { await authState.loginAsGuest() }
+            } label: {
+                HStack(spacing: 8) {
+                    Image(systemName: "person.crop.circle.dashed")
+                    Text("Hesap olmadan devam et").fontWeight(.medium)
+                }
+                .frame(maxWidth: .infinity)
+            }
+            .buttonStyle(.bordered)
+            .controlSize(.large)
+            .tint(Theme.accent)
+            .padding(.horizontal)
+            .disabled(authState.isLoading)
+
+            Text("Herkese açık içeriği hesap açmadan indirebilirsin.")
+                .font(.caption2)
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+        }
+        .padding(.top, 8)
     }
 
     // MARK: - Apple Sign In

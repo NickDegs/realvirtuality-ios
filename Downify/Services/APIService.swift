@@ -66,6 +66,10 @@ final class APIService {
         return try await request("/auth/register", method: "POST", body: Body(email: email, username: username, password: password))
     }
 
+    func guestLogin() async throws -> AuthResponse {
+        return try await request("/auth/guest", method: "POST")
+    }
+
     func getMe() async throws -> User {
         return try await request("/auth/me")
     }
