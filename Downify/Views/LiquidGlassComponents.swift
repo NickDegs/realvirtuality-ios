@@ -7,26 +7,45 @@ extension Color {
     static let brand = Theme.accent
 }
 
-// MARK: - iOS 26 Native Liquid Glass Helpers
-// Uses the system `glassEffect` so the real refraction + lens edge highlight
-// is rendered natively (not a faux blur). `.interactive()` adds the fluid
-// touch response; `GlassEffectContainer` lets nearby glass shapes merge.
+// MARK: - Frosted surfaces (stable, iOS 16+)
+// Uses `.ultraThinMaterial` for a translucent editorial look. Avoids the
+// iOS-26-only Liquid Glass APIs (glassEffect / glassProminent /
+// GlassEffectContainer) that forced an iOS-26-only deployment target and
+// were the most likely startup-crash surface.
 
 extension View {
-    /// A static glass surface (cards, sheets). Native lens edge + refraction.
+    /// Frosted surface for any shape (replaces `.glassEffect(in:)`).
+    func frosted<S: Shape>(in shape: S, tinted: Bool = false) -> some View {
+        background(
+            tinted ? AnyShapeStyle(Theme.accent) : AnyShapeStyle(.ultraThinMaterial),
+            in: shape
+        )
+    }
+
+    /// A static frosted surface (cards, sheets) with a hairline edge.
     func glassCard(radius: CGFloat = 18) -> some View {
-        glassEffect(.regular, in: RoundedRectangle(cornerRadius: radius))
+        background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: radius))
+            .overlay(
+                RoundedRectangle(cornerRadius: radius)
+                    .strokeBorder(Color.primary.opacity(0.06), lineWidth: 0.5)
+            )
     }
 
-    /// Interactive glass for inputs — native refraction + lens edge.
+    /// Frosted surface for inputs.
     func glassInput(radius: CGFloat = 13) -> some View {
-        glassEffect(.regular.interactive(), in: RoundedRectangle(cornerRadius: radius))
+        background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: radius))
+            .overlay(
+                RoundedRectangle(cornerRadius: radius)
+                    .strokeBorder(Color.primary.opacity(0.08), lineWidth: 0.5)
+            )
     }
 
-    /// Interactive glass for tappable controls (fluid lens edge on press).
+    /// Frosted surface for tappable controls; tinted when active.
     func liquidGlass(tinted: Bool = false, radius: CGFloat = 18) -> some View {
-        glassEffect(.regular.tint(tinted ? Theme.accent : nil).interactive(),
-                    in: RoundedRectangle(cornerRadius: radius))
+        background(
+            tinted ? AnyShapeStyle(Theme.accent.opacity(0.18)) : AnyShapeStyle(.ultraThinMaterial),
+            in: RoundedRectangle(cornerRadius: radius)
+        )
     }
 }
 
@@ -60,11 +79,13 @@ struct GlassPill: View {
 struct PillStyle: ViewModifier {
     let isSelected: Bool
     func body(content: Content) -> some View {
-        // Native iOS 26 Liquid Glass: interactive capsule with the system
-        // refraction + lens edge. Tinted when selected.
-        content.glassEffect(
-            .regular.tint(isSelected ? Theme.accent : nil).interactive(),
+        // Frosted capsule; tinted accent when selected.
+        content.background(
+            isSelected ? AnyShapeStyle(Theme.accent) : AnyShapeStyle(.ultraThinMaterial),
             in: .capsule
+        )
+        .overlay(
+            Capsule().strokeBorder(Color.primary.opacity(isSelected ? 0 : 0.08), lineWidth: 0.5)
         )
     }
 }
@@ -109,7 +130,7 @@ struct EmptyStateView: View {
             }
             if let action {
                 Button(actionLabel, action: action)
-                    .buttonStyle(.glassProminent)
+                    .buttonStyle(.borderedProminent)
                     .tint(Theme.accent)
             }
         }

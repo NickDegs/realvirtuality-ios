@@ -116,7 +116,7 @@ struct KeyMomentsView: View {
                 } label: {
                     Image(systemName: "arrow.uturn.backward").font(.body.bold()).padding(14)
                 }
-                .glassEffect(in: RoundedRectangle(cornerRadius: 12))
+                .frosted(in: RoundedRectangle(cornerRadius: 12))
 
                 Button {
                     Task { await downloadChapters() }

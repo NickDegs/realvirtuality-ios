@@ -21,7 +21,7 @@ struct CloudSaveButton: View {
             .frame(maxWidth: .infinity)
         }
         .disabled(isDownloading)
-        .glassEffect(in: RoundedRectangle(cornerRadius: 14))
+        .frosted(in: RoundedRectangle(cornerRadius: 14))
         .fileExporter(
             isPresented: $showPicker,
             document: localURL.map { VideoFile(url: $0) },

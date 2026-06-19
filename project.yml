@@ -2,7 +2,7 @@ name: Downify
 options:
   bundleIdPrefix: app
   deploymentTarget:
-    iOS: "26.0"
+    iOS: "17.0"
   xcodeVersion: "16.2"
   createIntermediateGroups: true
   developmentLanguage: tr
@@ -11,7 +11,7 @@ settings:
   base:
     SWIFT_VERSION: "5.9"
     TARGETED_DEVICE_FAMILY: "1"
-    IPHONEOS_DEPLOYMENT_TARGET: "26.0"
+    IPHONEOS_DEPLOYMENT_TARGET: "17.0"
     MARKETING_VERSION: "1.0"
     CURRENT_PROJECT_VERSION: "10"
 
@@ -20,7 +20,7 @@ targets:
     type: application
     platform: iOS
     bundleId: app.downify
-    deploymentTarget: "26.0"
+    deploymentTarget: "17.0"
     sources:
       - path: Downify
         excludes:
@@ -61,7 +61,7 @@ targets:
     type: app-extension
     platform: iOS
     bundleId: app.downify.share
-    deploymentTarget: "26.0"
+    deploymentTarget: "17.0"
     sources:
       - path: ShareExtension
     info:

@@ -172,7 +172,7 @@ struct DownloadTab: View {
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 4)
             }
-            .buttonStyle(.glassProminent)
+            .buttonStyle(.borderedProminent)
             .controlSize(.large)
             .tint(Theme.accent)
             .disabled(urlText.isEmpty || isDownloading)
@@ -211,18 +211,16 @@ struct DownloadTab: View {
 
     private var optionsRow: some View {
         ScrollView(.horizontal, showsIndicators: false) {
-            GlassEffectContainer(spacing: 8) {
-                HStack(spacing: 8) {
-                    GlassPill("Watermark'sız",
-                              icon: removeWatermark ? "checkmark.seal.fill" : "seal",
-                              isSelected: removeWatermark) { removeWatermark.toggle() }
+            HStack(spacing: 8) {
+                GlassPill("Watermark'sız",
+                          icon: removeWatermark ? "checkmark.seal.fill" : "seal",
+                          isSelected: removeWatermark) { removeWatermark.toggle() }
 
-                    GlassPill(audioOnly ? "MP3" : "Video",
-                              icon: audioOnly ? "music.note" : "video",
-                              isSelected: audioOnly) { audioOnly.toggle() }
+                GlassPill(audioOnly ? "MP3" : "Video",
+                          icon: audioOnly ? "music.note" : "video",
+                          isSelected: audioOnly) { audioOnly.toggle() }
 
-                    qualityMenu
-                }
+                qualityMenu
             }
             .padding(.vertical, 2)
         }
@@ -241,20 +239,18 @@ struct DownloadTab: View {
             .font(.caption.bold())
             .padding(.horizontal, 14).padding(.vertical, 8)
         }
-        .glassEffect(in: .capsule)
+        .frosted(in: .capsule)
     }
 
     // MARK: - Mode Selector
 
     private var modeSelector: some View {
         ScrollView(.horizontal, showsIndicators: false) {
-            GlassEffectContainer(spacing: 8) {
-                HStack(spacing: 8) {
-                    ForEach(DownloadMode.allCases) { mode in
-                        GlassPill(mode.rawValue, icon: mode.icon, isSelected: downloadMode == mode) {
-                            withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
-                                downloadMode = mode
-                            }
+            HStack(spacing: 8) {
+                ForEach(DownloadMode.allCases) { mode in
+                    GlassPill(mode.rawValue, icon: mode.icon, isSelected: downloadMode == mode) {
+                        withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                            downloadMode = mode
                         }
                     }
                 }
@@ -294,12 +290,12 @@ struct DownloadTab: View {
                             Text(p.name).font(.caption.bold())
                         }
                         .padding(.horizontal, 12).padding(.vertical, 7)
-                        .glassEffect(in: .capsule)
+                        .frosted(in: .capsule)
                     }
                     Text("1000+ platform")
                         .font(.caption.bold()).foregroundStyle(Theme.accent)
                         .padding(.horizontal, 12).padding(.vertical, 7)
-                        .glassEffect(in: .capsule)
+                        .frosted(in: .capsule)
                 }
             }
         }
