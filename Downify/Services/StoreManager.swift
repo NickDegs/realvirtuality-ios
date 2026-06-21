@@ -14,10 +14,9 @@ final class StoreManager: ObservableObject {
 
     /// Product IDs — must be created identically in App Store Connect.
     static let productIDs: [String] = [
-        "app.downify.pro",            // Non-Consumable  (Pro, reklamsız)
+        "app.downify.pro",            // Non-Consumable  (Pro)
         "app.downify.full.monthly",   // Auto-Renewable  (Full aylık)
         "app.downify.full.yearly",    // Auto-Renewable  (Full yıllık)
-        "app.downify.full.lifetime",  // Non-Consumable  (Full ömür boyu)
     ]
 
     static func tier(for productID: String) -> SubscriptionTier {

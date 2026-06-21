@@ -21,10 +21,6 @@ struct SubscriptionView: View {
             title: "Full — Yıllık",
             features: ["Tüm özellikler", "Yıllık avantaj", "Kestirme & Siri desteği"],
             highlighted: false),
-        "app.downify.full.lifetime": Meta(
-            title: "Ömür Boyu",
-            features: ["Tüm özellikler", "Tek seferlik ödeme", "Kalıcı lisans"],
-            highlighted: false),
     ]
 
     private let termsURL = URL(string: "https://realvirtuality.app/terms.html")!
