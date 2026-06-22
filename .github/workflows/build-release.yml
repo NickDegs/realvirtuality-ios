@@ -277,6 +277,46 @@ jobs:
             -authenticationKeyIssuerID "$ASC_ISSUER_ID"
           echo "✅ TestFlight'a yüklendi (App Store Connect işleme alacak, birkaç dk sonra TestFlight'ta görünür)"
 
+      # Build işlendikten sonra export compliance'ı otomatik cevapla + internal
+      # test grubuna ekle → yeni build testçilerde KENDİLİĞİNDEN görünür.
+      - name: Auto export-compliance + internal test group
+        if: github.event_name == 'push' || startsWith(github.ref, 'refs/tags/')
+        continue-on-error: true
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+        run: |
+          pip3 install --quiet pyjwt requests cryptography 2>/dev/null || pip3 install --quiet --break-system-packages pyjwt requests cryptography
+          python3 - <<'PYEOF'
+          import os, time, jwt, requests
+          KEY_ID=os.environ["ASC_KEY_ID"]; ISS=os.environ["ASC_ISSUER_ID"]
+          KEY=open(os.path.expanduser(f"~/.appstoreconnect/private_keys/AuthKey_{KEY_ID}.p8")).read()
+          def tok():
+              now=int(time.time())
+              return jwt.encode({"iss":ISS,"iat":now,"exp":now+1100,"aud":"appstoreconnect-v1"},
+                                KEY, algorithm="ES256", headers={"kid":KEY_ID})
+          B="https://api.appstoreconnect.apple.com"
+          def api(m,p,**kw):
+              return requests.request(m, B+p, headers={"Authorization":f"Bearer {tok()}","Content-Type":"application/json"}, **kw)
+          app=api("GET","/v1/apps?filter[bundleId]=app.downify").json()["data"][0]["id"]
+          grp=[g["id"] for g in api("GET",f"/v1/apps/{app}/betaGroups?limit=20").json()["data"]
+               if g["attributes"]["isInternalGroup"]]
+          gid=grp[0] if grp else None
+          bid=None
+          for _ in range(48):  # ~12 dk
+              b=api("GET",f"/v1/builds?filter[app]={app}&sort=-uploadedDate&limit=1&fields[builds]=processingState").json()["data"]
+              if b and b[0]["attributes"]["processingState"]=="VALID":
+                  bid=b[0]["id"]; break
+              time.sleep(15)
+          if not bid:
+              print("build hâlâ işleniyor; ASC sonra otomatik tamamlar"); raise SystemExit
+          import json as J
+          api("PATCH",f"/v1/builds/{bid}",data=J.dumps({"data":{"type":"builds","id":bid,"attributes":{"usesNonExemptEncryption":False}}}))
+          if gid:
+              api("POST",f"/v1/betaGroups/{gid}/relationships/builds",data=J.dumps({"data":[{"type":"builds","id":bid}]}))
+          print("✅ export compliance + internal grup ayarlandı, build TestFlight'ta görünür")
+          PYEOF
+
       - name: Create GitHub Release
         if: startsWith(github.ref, 'refs/tags/')
         continue-on-error: true
