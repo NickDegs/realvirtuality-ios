@@ -8,6 +8,10 @@ final class KeychainService {
 
     private init() {}
 
+    // `kSecAttrSynchronizable = true` → the token syncs through the user's
+    // iCloud Keychain, so signing in once (via SMS) carries the session to
+    // their other Apple devices automatically (iCloud auto-sync).
+
     func saveToken(_ token: String) {
         let data = token.data(using: .utf8)!
         let query: [CFString: Any] = [
@@ -15,7 +19,8 @@ final class KeychainService {
             kSecAttrService: service,
             kSecAttrAccount: tokenKey,
             kSecValueData: data,
-            kSecAttrAccessible: kSecAttrAccessibleAfterFirstUnlock
+            kSecAttrAccessible: kSecAttrAccessibleAfterFirstUnlock,
+            kSecAttrSynchronizable: kCFBooleanTrue!
         ]
         SecItemDelete(query as CFDictionary)
         SecItemAdd(query as CFDictionary, nil)
@@ -27,7 +32,8 @@ final class KeychainService {
             kSecAttrService: service,
             kSecAttrAccount: tokenKey,
             kSecReturnData: true,
-            kSecMatchLimit: kSecMatchLimitOne
+            kSecMatchLimit: kSecMatchLimitOne,
+            kSecAttrSynchronizable: kSecAttrSynchronizableAny
         ]
         var result: AnyObject?
         let status = SecItemCopyMatching(query as CFDictionary, &result)
@@ -39,7 +45,8 @@ final class KeychainService {
         let query: [CFString: Any] = [
             kSecClass: kSecClassGenericPassword,
             kSecAttrService: service,
-            kSecAttrAccount: tokenKey
+            kSecAttrAccount: tokenKey,
+            kSecAttrSynchronizable: kSecAttrSynchronizableAny
         ]
         SecItemDelete(query as CFDictionary)
     }

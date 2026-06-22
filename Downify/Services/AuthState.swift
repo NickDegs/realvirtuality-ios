@@ -33,37 +33,25 @@ final class AuthState: ObservableObject {
         isLoading = false
     }
 
-    func login(email: String, password: String) async {
+    /// Sends an SMS code. Returns true if sent so the UI can show the code field.
+    func sendSMSCode(phone: String) async -> Bool {
         isLoading = true
         error = nil
+        defer { isLoading = false }
         do {
-            let response = try await APIService.shared.login(email: email, password: password)
-            KeychainService.shared.saveToken(response.accessToken)
-            user = response.user
+            try await APIService.shared.sendSMSCode(phone: phone)
+            return true
         } catch {
             self.error = error.localizedDescription
+            return false
         }
-        isLoading = false
     }
 
-    func register(email: String, username: String, password: String) async {
+    func verifySMSCode(phone: String, code: String) async {
         isLoading = true
         error = nil
         do {
-            let response = try await APIService.shared.register(email: email, username: username, password: password)
-            KeychainService.shared.saveToken(response.accessToken)
-            user = response.user
-        } catch {
-            self.error = error.localizedDescription
-        }
-        isLoading = false
-    }
-
-    func loginWithApple(identityToken: String, fullName: String?) async {
-        isLoading = true
-        error = nil
-        do {
-            let response = try await APIService.shared.loginWithApple(identityToken: identityToken, fullName: fullName)
+            let response = try await APIService.shared.verifySMSCode(phone: phone, code: code)
             KeychainService.shared.saveToken(response.accessToken)
             user = response.user
         } catch {

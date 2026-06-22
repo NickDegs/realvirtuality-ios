@@ -49,21 +49,19 @@ final class APIService {
         return result
     }
 
-    // MARK: - Auth
+    // MARK: - Auth (SMS / Twilio Verify)
 
-    func loginWithApple(identityToken: String, fullName: String?) async throws -> AuthResponse {
-        struct Body: Encodable { let identityToken: String; let fullName: String? }
-        return try await request("/auth/apple", method: "POST", body: Body(identityToken: identityToken, fullName: fullName))
+    /// Sends a one-time SMS code to the phone number (E.164, e.g. +905551234567).
+    func sendSMSCode(phone: String) async throws {
+        struct Body: Encodable { let phone: String }
+        struct Resp: Decodable { let success: Bool }
+        let _: Resp = try await request("/auth/sms/send", method: "POST", body: Body(phone: phone))
     }
 
-    func login(email: String, password: String) async throws -> AuthResponse {
-        struct Body: Encodable { let email, password: String }
-        return try await request("/auth/login", method: "POST", body: Body(email: email, password: password))
-    }
-
-    func register(email: String, username: String, password: String) async throws -> AuthResponse {
-        struct Body: Encodable { let email, username, password: String }
-        return try await request("/auth/register", method: "POST", body: Body(email: email, username: username, password: password))
+    /// Verifies the SMS code; creates/returns the phone account.
+    func verifySMSCode(phone: String, code: String) async throws -> AuthResponse {
+        struct Body: Encodable { let phone: String; let code: String }
+        return try await request("/auth/sms/verify", method: "POST", body: Body(phone: phone, code: code))
     }
 
     func guestLogin() async throws -> AuthResponse {
