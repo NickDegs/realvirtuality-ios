@@ -280,7 +280,7 @@ jobs:
       # Build işlendikten sonra export compliance'ı otomatik cevapla + internal
       # test grubuna ekle → yeni build testçilerde KENDİLİĞİNDEN görünür.
       - name: Auto export-compliance + internal test group
-        if: github.event_name == 'push' || startsWith(github.ref, 'refs/tags/')
+        if: github.event_name == 'push' || inputs.upload_to_testflight
         continue-on-error: true
         env:
           ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
