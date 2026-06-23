@@ -194,23 +194,6 @@ final class APIService {
         let _: Empty = try await request("/download/scheduled/\(id)", method: "DELETE")
     }
 
-    // MARK: - Instagram / Private Sessions
-
-    func saveInstagramSession(cookies: String) async throws {
-        struct Body: Encodable { let cookies: String }
-        struct Response: Decodable { let success: Bool }
-        let _: Response = try await request("/instagram/session", method: "POST", body: Body(cookies: cookies))
-    }
-
-    func getPrivateSessions() async throws -> [PlatformSession] {
-        return try await request("/sessions/list")
-    }
-
-    func deletePrivateSession(platform: String) async throws {
-        struct Empty: Decodable {}
-        let _: Empty = try await request("/sessions/\(platform.lowercased())", method: "DELETE")
-    }
-
     // MARK: - User
 
     func refreshUser() async throws -> User {

@@ -17,7 +17,7 @@
 "download" = "Download";
 "downloading" = "Downloading...";
 "media_url" = "Media URL";
-"url_placeholder" = "Instagram, TikTok, YouTube...";
+"url_placeholder" = "Instagram, TikTok, X…";
 "supported_platforms" = "Supported Platforms";
 "preparing" = "Preparing...";
 "download_complete" = "Download complete!";
@@ -38,12 +38,9 @@
 "quality" = "Quality";
 "best" = "Best";
 "audio_only" = "Audio Only (MP3)";
-"instagram_session" = "Private Account Login";
 "manage_plan" = "Manage Plan";
 "version" = "Version";
 "privacy_policy" = "Privacy Policy";
 "support" = "Support";
 "terms" = "Terms of Use";
-"instagram_login" = "Instagram Login";
-"instagram_saved" = "Instagram session saved. You can now download private content.";
 "saving" = "Saving...";

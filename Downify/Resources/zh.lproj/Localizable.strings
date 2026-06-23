@@ -17,7 +17,7 @@
 "download" = "下载";
 "downloading" = "下载中...";
 "media_url" = "媒体链接";
-"url_placeholder" = "Instagram、TikTok、YouTube...";
+"url_placeholder" = "Instagram、TikTok、X…";
 "supported_platforms" = "支持的平台";
 "preparing" = "准备中...";
 "download_complete" = "下载完成！";
@@ -38,12 +38,9 @@
 "quality" = "画质";
 "best" = "最佳";
 "audio_only" = "仅音频 (MP3)";
-"instagram_session" = "私人账号登录";
 "manage_plan" = "管理方案";
 "version" = "版本";
 "privacy_policy" = "隐私政策";
 "support" = "支持";
 "terms" = "使用条款";
-"instagram_login" = "Instagram 登录";
-"instagram_saved" = "Instagram 会话已保存，您现在可以下载私人内容。";
 "saving" = "保存中...";

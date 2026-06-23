@@ -130,7 +130,7 @@ struct AddScheduledSheet: View {
             Form {
                 Section("Video URL'si") {
                     HStack {
-                        TextField("Instagram, TikTok, YouTube...", text: $urlText)
+                        TextField("Instagram, TikTok, X…", text: $urlText)
                             .keyboardType(.URL).autocorrectionDisabled()
                             .textInputAutocapitalization(.never)
                         Button {

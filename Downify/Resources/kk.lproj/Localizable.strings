@@ -17,7 +17,7 @@
 "download" = "Жүктеу";
 "downloading" = "Жүктелуде...";
 "media_url" = "Медиа URL";
-"url_placeholder" = "Instagram, TikTok, YouTube...";
+"url_placeholder" = "Instagram, TikTok, X…";
 "supported_platforms" = "Қолдау көрсетілетін платформалар";
 "preparing" = "Дайындалуда...";
 "download_complete" = "Жүктеу аяқталды!";
@@ -38,12 +38,9 @@
 "quality" = "Сапа";
 "best" = "Ең жақсы";
 "audio_only" = "Тек аудио (MP3)";
-"instagram_session" = "Жеке тіркелгіге кіру";
 "manage_plan" = "Жоспарды басқару";
 "version" = "Нұсқа";
 "privacy_policy" = "Құпиялылық саясаты";
 "support" = "Қолдау";
 "terms" = "Пайдалану шарттары";
-"instagram_login" = "Instagram кірісі";
-"instagram_saved" = "Instagram сессиясы сақталды. Енді жеке мазмұнды жүктей аласыз.";
 "saving" = "Сақталуда...";

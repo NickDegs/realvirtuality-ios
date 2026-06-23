@@ -149,7 +149,7 @@ struct ShareExtensionSetupView: View {
 
                 Section("Adımlar") {
                     setupStep(num: 1, title: "Herhangi bir uygulamayı aç",
-                              detail: "Safari, Instagram, Twitter veya YouTube")
+                              detail: "Safari, Instagram veya Twitter")
                     setupStep(num: 2, title: "Paylaş butonuna bas",
                               detail: "Kare içinde ok işareti olan ikon")
                     setupStep(num: 3, title: "Diğer'e git",

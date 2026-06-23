@@ -69,7 +69,7 @@ struct ClipView: View {
 
     private var urlSection: some View {
         HStack(spacing: 10) {
-            TextField("Instagram, TikTok, YouTube...", text: $urlText)
+            TextField("Instagram, TikTok, X…", text: $urlText)
                 .keyboardType(.URL)
                 .autocorrectionDisabled()
                 .textInputAutocapitalization(.never)

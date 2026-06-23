@@ -143,7 +143,7 @@ struct AddAutoSubscriptionSheet: View {
             Form {
                 Section("Hesap / Sayfa URL'si") {
                     HStack {
-                        TextField("instagram.com/hesap veya youtube.com/kanal", text: $urlText)
+                        TextField("instagram.com/hesap veya tiktok.com/@kullanici", text: $urlText)
                             .keyboardType(.URL)
                             .autocorrectionDisabled()
                             .textInputAutocapitalization(.never)

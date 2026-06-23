@@ -54,6 +54,8 @@
 	<true/>
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>Videolar ve görseller fotoğraf kütüphanenize kaydedilecek.</string>
+	<key>NSUserTrackingUsageDescription</key>
+	<string>İzniniz, size daha alakalı reklamlar göstermek için kullanılır. İzin vermeseniz de uygulamayı tam olarak kullanabilirsiniz.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

@@ -17,7 +17,7 @@
 "download" = "Yüklə";
 "downloading" = "Yüklənir...";
 "media_url" = "Media URL";
-"url_placeholder" = "Instagram, TikTok, YouTube...";
+"url_placeholder" = "Instagram, TikTok, X…";
 "supported_platforms" = "Dəstəklənən platformlar";
 "preparing" = "Hazırlanır...";
 "download_complete" = "Yükləmə tamamlandı!";
@@ -38,12 +38,9 @@
 "quality" = "Keyfiyyət";
 "best" = "Ən yaxşı";
 "audio_only" = "Yalnız səs (MP3)";
-"instagram_session" = "Şəxsi hesab girişi";
 "manage_plan" = "Planı idarə et";
 "version" = "Versiya";
 "privacy_policy" = "Gizlilik siyasəti";
 "support" = "Dəstək";
 "terms" = "İstifadə şərtləri";
-"instagram_login" = "Instagram girişi";
-"instagram_saved" = "Instagram sessiyası saxlanıldı. İndi şəxsi məzmunu yükləyə bilərsiniz.";
 "saving" = "Saxlanılır...";
