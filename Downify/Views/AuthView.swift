@@ -5,12 +5,13 @@ struct AuthView: View {
 
     private enum Phase { case phone, code }
     @State private var phase: Phase = .phone
-    @State private var dialCode = "+90"
+    @State private var country: Country = Countries.deviceDefault
+    @State private var showCountryPicker = false
     @State private var localNumber = ""
     @State private var code = ""
 
     private var fullPhone: String {
-        dialCode + localNumber.filter(\.isNumber)
+        country.dialCode + localNumber.filter(\.isNumber)
     }
 
     var body: some View {
@@ -38,6 +39,9 @@ struct AuthView: View {
             .padding(.bottom, 40)
             .animation(.spring(response: 0.35, dampingFraction: 0.85), value: phase)
         }
+        .sheet(isPresented: $showCountryPicker) {
+            CountryPickerView(selected: $country)
+        }
     }
 
     // MARK: - Header
@@ -62,12 +66,21 @@ struct AuthView: View {
     private var phoneSection: some View {
         VStack(spacing: 16) {
             HStack(spacing: 8) {
-                TextField("+90", text: $dialCode)
-                    .frame(width: 64)
-                    .multilineTextAlignment(.center)
-                    .keyboardType(.phonePad)
+                Button {
+                    showCountryPicker = true
+                } label: {
+                    HStack(spacing: 6) {
+                        Text(country.flag).font(.title3)
+                        Text(country.dialCode)
+                            .font(.body.weight(.medium))
+                            .foregroundStyle(.primary)
+                        Image(systemName: "chevron.down")
+                            .font(.caption2.weight(.bold))
+                            .foregroundStyle(.secondary)
+                    }
                     .padding(14)
                     .glassInput()
+                }
 
                 HStack(spacing: 10) {
                     Image(systemName: "phone").foregroundStyle(Theme.accent).frame(width: 18)
@@ -180,5 +193,56 @@ struct AuthView: View {
                 .multilineTextAlignment(.center)
         }
         .padding(.top, 8)
+    }
+}
+
+// MARK: - Country Picker
+
+struct CountryPickerView: View {
+    @Binding var selected: Country
+    @Environment(\.dismiss) private var dismiss
+    @State private var search = ""
+
+    private var filtered: [Country] {
+        let q = search.trimmingCharacters(in: .whitespaces).lowercased()
+        guard !q.isEmpty else { return Countries.all }
+        return Countries.all.filter {
+            $0.name.lowercased().contains(q)
+                || $0.dialCode.contains(q)
+                || $0.iso.lowercased().contains(q)
+        }
+    }
+
+    var body: some View {
+        NavigationStack {
+            List(filtered) { c in
+                Button {
+                    selected = c
+                    dismiss()
+                } label: {
+                    HStack(spacing: 12) {
+                        Text(c.flag).font(.title2)
+                        Text(c.name)
+                            .foregroundStyle(.primary)
+                        Spacer()
+                        Text(c.dialCode)
+                            .foregroundStyle(.secondary)
+                        if c.id == selected.id {
+                            Image(systemName: "checkmark")
+                                .foregroundStyle(Theme.accent)
+                        }
+                    }
+                }
+            }
+            .listStyle(.plain)
+            .searchable(text: $search, prompt: "Ülke veya kod ara")
+            .navigationTitle("Ülke kodu")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Kapat") { dismiss() }
+                }
+            }
+        }
     }
 }
