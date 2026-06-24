@@ -345,8 +345,7 @@ struct DownloadTab: View {
                 url: urlText,
                 quality: defaultQuality == "best" ? nil : defaultQuality,
                 audioOnly: audioOnly,
-                noWatermark: removeWatermark,
-                usePrivateSession: false
+                noWatermark: removeWatermark
             )
         } catch APIError.unauthorized {
             authState.logout()

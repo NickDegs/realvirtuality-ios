@@ -104,10 +104,10 @@ final class APIService {
         return response.checkoutUrl
     }
 
-    func startDownload(url: String, quality: String? = nil, audioOnly: Bool = false, noWatermark: Bool = false, usePrivateSession: Bool = false) async throws -> DownloadResponse {
-        struct Body: Encodable { let url: String; let quality: String?; let audioOnly: Bool?; let noWatermark: Bool?; let usePrivateSession: Bool? }
+    func startDownload(url: String, quality: String? = nil, audioOnly: Bool = false, noWatermark: Bool = false) async throws -> DownloadResponse {
+        struct Body: Encodable { let url: String; let quality: String?; let audioOnly: Bool?; let noWatermark: Bool? }
         return try await request("/download/start", method: "POST",
-            body: Body(url: url, quality: quality, audioOnly: audioOnly, noWatermark: noWatermark, usePrivateSession: usePrivateSession ? true : nil))
+            body: Body(url: url, quality: quality, audioOnly: audioOnly, noWatermark: noWatermark))
     }
 
     // MARK: - Bulk Download
