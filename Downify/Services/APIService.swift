@@ -48,9 +48,35 @@ final class APIService {
 
         let decoder = JSONDecoder()
         decoder.keyDecodingStrategy = .convertFromSnakeCase
-        decoder.dateDecodingStrategy = .iso8601
+        // Backend dates come from Python isoformat() — often WITHOUT timezone and WITH
+        // microseconds (e.g. "2026-06-24T21:00:03.286552"), which strict .iso8601 rejects.
+        // Parse leniently and never let a date break the whole response.
+        decoder.dateDecodingStrategy = .custom { dec in
+            let raw = try dec.singleValueContainer().decode(String.self)
+            return APIService.parseBackendDate(raw) ?? Date()
+        }
         guard let result = try? decoder.decode(T.self, from: data) else { throw APIError.decodingError }
         return result
+    }
+
+    /// Tolerant parser for the various date shapes the API may return.
+    static func parseBackendDate(_ s: String) -> Date? {
+        let iso = ISO8601DateFormatter()
+        iso.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        if let d = iso.date(from: s) { return d }
+        iso.formatOptions = [.withInternetDateTime]
+        if let d = iso.date(from: s) { return d }
+        let df = DateFormatter()
+        df.locale = Locale(identifier: "en_US_POSIX")
+        df.timeZone = TimeZone(identifier: "UTC")
+        for fmt in ["yyyy-MM-dd'T'HH:mm:ss.SSSSSS",
+                    "yyyy-MM-dd'T'HH:mm:ss.SSS",
+                    "yyyy-MM-dd'T'HH:mm:ss",
+                    "yyyy-MM-dd HH:mm:ss"] {
+            df.dateFormat = fmt
+            if let d = df.date(from: s) { return d }
+        }
+        return nil
     }
 
     // MARK: - Auth (SMS / Twilio Verify)
