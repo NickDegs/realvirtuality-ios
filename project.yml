@@ -32,6 +32,8 @@ targets:
     info:
       path: Downify/Info.plist
       properties:
+        UIDeviceFamily:
+          - 1
         UISupportedInterfaceOrientations:
           - UIInterfaceOrientationPortrait
           - UIInterfaceOrientationPortraitUpsideDown
@@ -43,6 +45,7 @@ targets:
       base:
         PRODUCT_NAME: Downify
         PRODUCT_BUNDLE_IDENTIFIER: app.downify
+        TARGETED_DEVICE_FAMILY: "1"
         CODE_SIGN_STYLE: Automatic
         DEVELOPMENT_TEAM: SZF4T3P583
         INFOPLIST_FILE: Downify/Info.plist
@@ -80,6 +83,7 @@ targets:
       base:
         PRODUCT_NAME: DownifyShareExtension
         PRODUCT_BUNDLE_IDENTIFIER: app.downify.share
+        TARGETED_DEVICE_FAMILY: "1"
         CODE_SIGN_STYLE: Automatic
         DEVELOPMENT_TEAM: SZF4T3P583
         INFOPLIST_FILE: ShareExtension/Info.plist
