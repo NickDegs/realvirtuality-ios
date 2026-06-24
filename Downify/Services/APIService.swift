@@ -31,7 +31,11 @@ final class APIService {
         req.httpMethod = method
         req.setValue("application/json", forHTTPHeaderField: "Content-Type")
         if let token { req.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization") }
-        if let body { req.httpBody = try JSONEncoder().encode(body) }
+        if let body {
+            let encoder = JSONEncoder()
+            encoder.keyEncodingStrategy = .convertToSnakeCase
+            req.httpBody = try encoder.encode(body)
+        }
 
         let (data, response) = try await session.data(for: req)
         guard let http = response as? HTTPURLResponse else { throw APIError.serverError("Bağlantı hatası") }
