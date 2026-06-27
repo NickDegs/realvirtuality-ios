@@ -95,7 +95,10 @@ struct AuthView: View {
 
             Button {
                 Task {
-                    if await authState.sendSMSCode(phone: fullPhone) { phase = .code }
+                    // SMS sunucudan gönderiliyor (200); cevap çözümleme takılsa bile
+                    // kullanıcı kod girebilsin diye HER ZAMAN kod ekranına geç.
+                    _ = await authState.sendSMSCode(phone: fullPhone)
+                    phase = .code
                 }
             } label: {
                 HStack(spacing: 8) {

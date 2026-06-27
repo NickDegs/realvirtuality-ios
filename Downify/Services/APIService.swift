@@ -84,8 +84,8 @@ final class APIService {
     /// Sends a one-time SMS code to the phone number (E.164, e.g. +905551234567).
     func sendSMSCode(phone: String) async throws {
         struct Body: Encodable { let phone: String }
-        struct Resp: Decodable { let success: Bool }
-        let _: Resp = try await request("/auth/sms/send", method: "POST", body: Body(phone: phone))
+        struct Empty: Decodable {}   // gövdeyi yok say: {"success":true} hiç patlamasın
+        let _: Empty = try await request("/auth/sms/send", method: "POST", body: Body(phone: phone))
     }
 
     /// Verifies the SMS code; creates/returns the phone account.
