@@ -41,6 +41,7 @@ targets:
           - UIInterfaceOrientationLandscapeRight
         UILaunchScreen:
           UIColorName: ""
+        ITSAppUsesNonExemptEncryption: false
     settings:
       base:
         PRODUCT_NAME: Downify
