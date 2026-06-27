@@ -127,7 +127,7 @@ struct DownloadTab: View {
                 platformIcon
                     .frame(width: 28)
 
-                TextField("Instagram, TikTok, X…", text: $urlText)
+                TextField("TikTok, YouTube, X…", text: $urlText)
                     .keyboardType(.URL)
                     .autocorrectionDisabled()
                     .textInputAutocapitalization(.never)
@@ -306,7 +306,6 @@ struct DownloadTab: View {
     private struct PlatformInfo { let name: String; let icon: String; let color: Color }
 
     private let supportedPlatforms: [PlatformInfo] = [
-        .init(name: "Instagram",  icon: "camera.fill",         color: .pink),
         .init(name: "TikTok",     icon: "music.note",          color: .primary),
         .init(name: "Twitter/X",  icon: "bird.fill",           color: .blue),
         .init(name: "Facebook",   icon: "f.circle.fill",       color: Color(red: 0.2, green: 0.4, blue: 0.8)),
@@ -324,8 +323,7 @@ struct DownloadTab: View {
     private func detectPlatform(_ url: String) {
         let lower = url.lowercased()
         let detected: String?
-        if lower.contains("instagram.com")                             { detected = "Instagram" }
-        else if lower.contains("tiktok.com")                           { detected = "TikTok" }
+        if lower.contains("tiktok.com")                                { detected = "TikTok" }
         else if lower.contains("twitter.com") || lower.contains("x.com") { detected = "Twitter/X" }
         else if lower.contains("facebook.com")                         { detected = "Facebook" }
         else if lower.contains("reddit.com")                           { detected = "Reddit" }

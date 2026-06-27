@@ -54,7 +54,7 @@ struct BulkDownloadView: View {
 
             Section("URL") {
                 HStack {
-                    TextField("instagram.com/kullanici ya da tiktok.com/@kullanici",
+                    TextField("tiktok.com/@kullanici ya da youtube.com/@kanal",
                               text: $urlText, axis: .vertical)
                         .keyboardType(.URL)
                         .autocorrectionDisabled()
@@ -82,8 +82,6 @@ struct BulkDownloadView: View {
             }
 
             Section("Desteklenen Kaynaklar") {
-                Label("Instagram — Profil gönderileri", systemImage: "camera.fill")
-                    .foregroundStyle(.pink)
                 Label("TikTok — Kullanıcı videoları", systemImage: "music.note")
                     .foregroundStyle(.primary)
                 Label("Twitter / X — Kullanıcı medyaları", systemImage: "bird.fill")

@@ -39,7 +39,7 @@ struct KeyMomentsView: View {
                 .padding(.top, 8)
 
                 HStack(spacing: 10) {
-                    TextField("TikTok, Instagram, X…", text: $urlText)
+                    TextField("TikTok, YouTube, X…", text: $urlText)
                         .keyboardType(.URL).autocorrectionDisabled()
                         .textInputAutocapitalization(.never)
                     Button {

@@ -37,18 +37,6 @@ struct AccountView: View {
                         }
                     }
 
-                    NavigationLink(destination: AutoDownloadView()) {
-                        Label {
-                            VStack(alignment: .leading, spacing: 2) {
-                                Text("Otomatik İndirme")
-                                Text("Profil takibi & zamanlama")
-                                    .font(.caption).foregroundStyle(.secondary)
-                            }
-                        } icon: {
-                            Image(systemName: "clock.arrow.2.circlepath")
-                                .foregroundStyle(.green)
-                        }
-                    }
                 }
 
                 Section {

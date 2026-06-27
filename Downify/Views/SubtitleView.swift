@@ -60,7 +60,7 @@ struct SubtitleView: View {
     private var urlSection: some View {
         VStack(spacing: 10) {
             HStack(spacing: 10) {
-                TextField("TikTok, Instagram, X…", text: $urlText)
+                TextField("TikTok, YouTube, X…", text: $urlText)
                     .keyboardType(.URL).autocorrectionDisabled()
                     .textInputAutocapitalization(.never)
                     .onChange(of: urlText) { _ in tracks = [] }
