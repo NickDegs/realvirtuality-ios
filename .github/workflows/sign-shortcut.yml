@@ -1,0 +1,26 @@
+name: Sign Shortcuts
+on:
+  workflow_dispatch:
+  push:
+    paths: ['shortcuts/**']
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+jobs:
+  sign:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Sign shortcuts
+        run: |
+          mkdir -p signed
+          for f in shortcuts/*.shortcut; do
+            name=$(basename "$f")
+            echo "Signing $name ..."
+            shortcuts sign --mode anyone --input "$f" --output "signed/$name" && echo "OK $name" || echo "FAIL $name"
+          done
+          echo "=== signed dir ==="; ls -la signed || true
+      - uses: actions/upload-artifact@v4
+        with:
+          name: signed-shortcuts
+          path: signed/*.shortcut
+          if-no-files-found: warn
