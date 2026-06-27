@@ -12,6 +12,19 @@ struct AccountView: View {
                     profileRow
                 }
 
+                if authState.user?.email.hasSuffix("@guest.downify.app") == true {
+                    Section {
+                        Button {
+                            authState.logout()
+                        } label: {
+                            Label("SMS ile Giriş Yap", systemImage: "iphone")
+                                .foregroundStyle(Theme.accent)
+                        }
+                    } footer: {
+                        Text("Misafir olarak kullanıyorsun. Telefonunla giriş yap — premium ve geçmişin iCloud üzerinden tüm Apple cihazlarına otomatik senkronlanır.")
+                    }
+                }
+
                 Section("Abonelik") {
                     subscriptionRow
                 }
