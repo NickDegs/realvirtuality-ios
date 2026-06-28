@@ -20,10 +20,9 @@ struct AuthView: View {
                 header
                     .padding(.top, 60)
 
-                switch phase {
-                case .phone: phoneSection
-                case .code:  codeSection
-                }
+                // Telefon + kod alanı HER İKİSİ DE her zaman görünür (kod alanı "açılmıyor" sorunu biter).
+                phoneSection
+                codeSection
 
                 if let error = authState.error {
                     HStack(spacing: 6) {
@@ -53,8 +52,7 @@ struct AuthView: View {
                 .foregroundStyle(Theme.accent)
             Text("Downify")
                 .font(.system(size: 34, weight: .bold, design: .rounded))
-            Text(phase == .phone ? "Telefon numaranızla giriş yapın"
-                                 : "Telefona gelen kodu girin")
+            Text("Telefonunla giriş yap: numara → Kod Gönder → gelen kodu gir → Doğrula")
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
