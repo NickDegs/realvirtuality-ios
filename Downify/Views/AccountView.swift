@@ -30,6 +30,19 @@ struct AccountView: View {
                 }
 
                 Section("Özellikler") {
+                    if authState.tier == .full {
+                        NavigationLink(destination: BurnerLoginView()) {
+                            Label {
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text("Burner Giriş & Çerez")
+                                    Text("Private indirme için yedek hesap bağla")
+                                        .font(.caption).foregroundStyle(.secondary)
+                                }
+                            } icon: {
+                                Image(systemName: "key.horizontal.fill").foregroundStyle(.orange)
+                            }
+                        }
+                    }
                     NavigationLink(destination: ShortcutView()) {
                         Label {
                             VStack(alignment: .leading, spacing: 2) {
