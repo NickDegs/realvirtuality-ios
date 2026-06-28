@@ -58,18 +58,20 @@ struct DownloadVideoIntent: AppIntent {
         let taskId = start.taskId
 
         // 2) Tamamlanana kadar bekle (~120sn)
+        // AppIntent süre limiti var → en fazla ~30sn bekle (kısa video/IG biter); uzunsa çökmeden çık.
         var fileURLString: String?
         var filename = ""
-        for _ in 0..<40 {
-            try await Task.sleep(nanoseconds: 3_000_000_000)
-            let st = try await APIService.shared.getDownloadStatus(taskId: taskId)
+        for _ in 0..<12 {
+            try await Task.sleep(nanoseconds: 2_500_000_000)
+            let st = try? await APIService.shared.getDownloadStatus(taskId: taskId)
+            guard let st else { continue }
             if st.status == "completed", let dl = st.downloadUrl, !dl.isEmpty {
                 fileURLString = dl; filename = st.filename ?? ""; break
             }
-            if st.status == "failed" { throw IntentError.failed(st.error ?? "İndirme başarısız") }
+            if st.status == "failed" { return .result(value: "İndirme başarısız: \(st.error ?? "")") }
         }
         guard let fileURLString, let fileURL = URL(string: fileURLString) else {
-            return .result(value: "İndirme uzun sürdü — Downify uygulamasından kontrol et.")
+            return .result(value: "İndirme sürüyor — birazdan galeride/Downify'da olur. Uzun videoda Paylaş→Downify kullan.")
         }
 
         // 3) Dosyayı indir (auth gerekmez — UUID tahmin edilemez)
